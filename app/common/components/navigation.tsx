@@ -27,6 +27,11 @@ const menus = [
         to: "/products/stocks-keeping",
       },
       {
+        name: "Category",
+        description: "See the top categories in your community",
+        to: "/products/category",
+      },
+      {
         name: "Submit Products",
         description: "Promote a product to our community",
         to: "/products/submit",
@@ -46,6 +51,22 @@ const menus = [
         name: "Returns",
         description: "See the top categories in your community",
         to: "/orders/returns",
+      },
+    ],
+  },
+  {
+    name: "System",
+    to: "systems",
+    items: [
+      {
+        name: "Services",
+        description: "See the top categories in your community",
+        to: "/system/services",
+      },
+      {
+        name: "Options",
+        description: "See the top categories in your community",
+        to: "/system/options",
       },
     ],
   },

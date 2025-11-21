@@ -1,25 +1,55 @@
 import { Form } from "react-router";
-import { Input } from "~/common/components/ui/input";
-import { Label } from "~/common/components/ui/label";
+import RadioGroup from "~/common/components/radio-group";
+import Select from "~/common/components/select";
+import TextField from "~/common/components/text-field";
+import Title from "~/common/components/title";
+import { products_main_category } from "~/seeds";
 
 export default function SubmitProductPage() {
   return (
     <div>
-      <div className="pb-4">
-        <h1 className="text-3xl font-bold">상품 등록</h1>
-      </div>
+      <Title title="상품 등록" />
 
       {/* <Form className="grid grid-cols-2 gap-10 mx-auto"> */}
-      <Form>
-        <div className="flex flex-col space-y-2">
-          <Label htmlFor="name">상품명</Label>
-          <Input id="name" />
+      <Form className="space-y-5">
+        <div className="grid grid-cols-2 gap-10 mx-auto">
+          <div className="space-y-5">
+            <TextField id="name" name="name" label="상품명" />
+            <RadioGroup
+              label="성별"
+              options={[
+                { label: "남성", value: "male" },
+                { label: "여성", value: "female" },
+                { label: "남녀공용", value: "unisex" },
+              ]}
+            />
+          </div>
+          <div className="space-y-5">
+            <TextField
+              id="classification_code"
+              name="classification_code"
+              label="상품분류"
+              value="패션"
+              disabled
+            />
+          </div>
         </div>
-
-        <div className="flex flex-col space-y-2">
-          <Label htmlFor="name">상품명</Label>
-          <Input id="name" />
+        <div className="grid grid-cols-2 gap-10 mx-auto">
+          <div className="space-y-5">
+            <Select
+              label="카테고리"
+              options={products_main_category.map((item) => {
+                return { label: item.group_name, value: item.group_code };
+              })}
+            />
+          </div>
+          <div className="space-y-5">
+            <Select label="상세 카테고리" options={[]} />
+          </div>
         </div>
+        {/* <div className="space-y-5">
+          <Editor />
+        </div> */}
       </Form>
     </div>
   );

@@ -2,6 +2,7 @@
 
 - 분류코드(code) pk
 - 분류명(name)
+- 사용유무(use_yn)
 
 # product_main_category(상품 메인카테고리)
 
@@ -10,7 +11,7 @@
 - 카테고리코드(group_code)
 - 카테고리명(group_name)
 - 사용유무(use_yn)
-- 정렬순서(sort_number)
+- 정렬순서(sort_order)
 - 판매자번호(vendor_id) -> vendors(판매자).id
 
 # product_sub_cetegory(상품 서브카테고리)
