@@ -15,16 +15,21 @@ interface SelectOptionProps {
   value: string;
 }
 
-interface SelectProps extends InputHTMLAttributes<HTMLSelectElement> {
+interface SelectProps {
   label?: string;
   options: SelectOptionProps[];
+  onChange?: (value: string) => void;
 }
 
-export default function Select({ label, options, ...rest }: SelectProps) {
+export default function Select({
+  label,
+  options,
+  ...rest
+}: SelectProps & Omit<InputHTMLAttributes<HTMLSelectElement>, "onChange">) {
   return (
-    <div className="flex flex-col space-y-3">
+    <div className="flex flex-col w-full space-y-3">
       {label && <Label htmlFor={rest.id}>{label}</Label>}
-      <SelectWrap>
+      <SelectWrap onValueChange={rest?.onChange}>
         <SelectTrigger className="w-full" disabled={options.length === 0}>
           <SelectValue placeholder={rest.placeholder} />
         </SelectTrigger>

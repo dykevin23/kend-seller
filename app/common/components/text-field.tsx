@@ -9,7 +9,7 @@ interface TextFieldProps
 
 export default function TextField({ label, ...rest }: TextFieldProps) {
   return (
-    <div className="flex flex-col space-y-3">
+    <div className="flex flex-col w-full space-y-3">
       {label && <Label htmlFor={rest.id}>{label}</Label>}
       <Input {...rest} />
     </div>

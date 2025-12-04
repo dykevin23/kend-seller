@@ -49,7 +49,7 @@ export default function App() {
       className={cn({
         // "py-28 px-5 md:px-20": !pathname.includes("/auth/"),
         // "transition-opacity animate-pulse": isLoading,
-        "py-28 px-5 md:px-20": true,
+        "pt-20": true,
       })}
     >
       <Navigation />
