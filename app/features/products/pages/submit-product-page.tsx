@@ -13,11 +13,27 @@ import { useState } from "react";
 import ProductImageCard from "../components/product-image-card";
 import type { Route } from "./+types/submit-product-page";
 import ProductDeliveryCard from "../components/product-delivery-card";
+import { Button } from "~/common/components/ui/button";
+import { z } from "zod";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const addressList = [];
 
   return { addressList };
+};
+
+const formSchema = z.object({
+  productName: z.string().min(1),
+  sex: z.string(),
+});
+
+export const action = async ({ request }: Route.ActionArgs) => {
+  const formData = await request.formData();
+  const { success, data, error } = formSchema.safeParse(
+    Object.fromEntries(formData)
+  );
+
+  console.log("### success / data / error => ", success, data, error);
 };
 
 export default function SubmitProductPage({
@@ -32,14 +48,15 @@ export default function SubmitProductPage({
       <Title title="상품 등록" />
 
       {/* <Form className="grid grid-cols-2 gap-10 mx-auto"> */}
-      <Form className="space-y-5">
+      <Form className="space-y-5" method="post">
         <Card>
           <h2 className="text-xl font-bold">상품 기본정보</h2>
           <div className="grid grid-cols-2 gap-10 mx-auto">
             <div className="space-y-5">
-              <TextField id="name" name="name" label="상품명" />
+              <TextField id="productName" name="productName" label="상품명" />
               <RadioGroup
                 label="성별"
+                name="sex"
                 options={[
                   { label: "남성", value: "male" },
                   { label: "여성", value: "female" },
@@ -81,6 +98,10 @@ export default function SubmitProductPage({
 
         {/* 배송지 */}
         <ProductDeliveryCard />
+
+        <div className="flex justify-end">
+          <Button type="submit">등록</Button>
+        </div>
       </Form>
     </Content>
   );

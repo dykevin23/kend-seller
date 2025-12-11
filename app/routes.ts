@@ -18,6 +18,11 @@ export default [
     ]),
   ]),
 
+  /* 판매자정보 */
+  ...prefix("seller", [
+    route("/address", "features/seller/pages/address-list-page.tsx"),
+  ]),
+
   /* 시스템관리 */
   ...prefix("system", [
     // 서비스 관리

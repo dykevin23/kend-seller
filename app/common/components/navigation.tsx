@@ -55,6 +55,17 @@ const menus = [
     ],
   },
   {
+    name: "Seller Information",
+    to: "/seller",
+    items: [
+      {
+        name: "Delivery Address",
+        description: "See the top categories in your community",
+        to: "/seller/address",
+      },
+    ],
+  },
+  {
     name: "System",
     to: "systems",
     items: [

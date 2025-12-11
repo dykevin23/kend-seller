@@ -1,6 +1,7 @@
 import { cn } from "~/lib/utils";
 import { Label } from "./ui/label";
 import { RadioGroup as RadioGroupWrap, RadioGroupItem } from "./ui/radio-group";
+import type { InputHTMLAttributes } from "react";
 
 interface OptionProps {
   // key: string;
@@ -8,7 +9,7 @@ interface OptionProps {
   value: string;
 }
 
-interface RadioGroupProps {
+interface RadioGroupProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   options: OptionProps[];
   vertical?: boolean;
@@ -18,6 +19,8 @@ export default function RadioGroup({
   label,
   options,
   vertical = false,
+  name,
+  ...rest
 }: RadioGroupProps) {
   return (
     <div className="flex flex-col space-y-3">
@@ -28,6 +31,7 @@ export default function RadioGroup({
           "flex flex-row": !vertical,
         })}
         defaultValue={options[0].value}
+        name={name}
       >
         {options.map((option) => (
           <div className="flex items-center gap-3" key={option.value}>
