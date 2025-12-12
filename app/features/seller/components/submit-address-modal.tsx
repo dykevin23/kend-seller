@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Form, useFetcher } from "react-router";
+import { useFetcher } from "react-router";
 import DaumPostCodeModal, {
   type IAddressType,
 } from "~/common/components/daum-post-code-modal";
@@ -38,10 +38,25 @@ export default function SubmitAddressModal({
     if (!open) setAddress({ zoneCode: "", address: "", addressType: "" });
   }, [open]);
 
+  useEffect(() => {
+    if (fetcher) {
+      const { state, data } = fetcher;
+      if (state !== "loading") {
+        if (data?.ok) {
+          onClose();
+        }
+      }
+    }
+  }, [fetcher]);
+
   return (
     open && (
       <Modal open={open} title="새 주소지 등록" onClose={onClose}>
-        <fetcher.Form className="space-y-2" method="post">
+        <fetcher.Form
+          className="space-y-2"
+          method="post"
+          action="/seller/address/post"
+        >
           {!addressType && (
             <div className="flex px-4">
               <Label htmlFor="addressType" className="w-1/4">
@@ -70,7 +85,7 @@ export default function SubmitAddressModal({
               <TextField
                 id="zoneCode"
                 name="zoneCode"
-                className="w-40"
+                className="w-40 bg-gray-200"
                 readOnly
                 value={address?.zoneCode}
               />

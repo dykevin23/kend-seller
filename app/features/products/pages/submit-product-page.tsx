@@ -1,11 +1,6 @@
 import { Form } from "react-router";
-import Card from "~/common/components/card";
 import Content from "~/common/components/content";
-import RadioGroup from "~/common/components/radio-group";
-import Select from "~/common/components/select";
-import TextField from "~/common/components/text-field";
 import Title from "~/common/components/title";
-import { products_main_category } from "~/seeds";
 import ProductOptionCard, {
   type ProductOptionArrayProps,
 } from "../components/product-option-card";
@@ -15,6 +10,9 @@ import type { Route } from "./+types/submit-product-page";
 import ProductDeliveryCard from "../components/product-delivery-card";
 import { Button } from "~/common/components/ui/button";
 import { z } from "zod";
+import ProductReturnCard from "../components/product-return-card";
+import ProductDetailCard from "../components/product-detail-card";
+import ProductBasicCard from "../components/product-basic-card";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const addressList = [];
@@ -49,46 +47,10 @@ export default function SubmitProductPage({
 
       {/* <Form className="grid grid-cols-2 gap-10 mx-auto"> */}
       <Form className="space-y-5" method="post">
-        <Card>
-          <h2 className="text-xl font-bold">상품 기본정보</h2>
-          <div className="grid grid-cols-2 gap-10 mx-auto">
-            <div className="space-y-5">
-              <TextField id="productName" name="productName" label="상품명" />
-              <RadioGroup
-                label="성별"
-                name="sex"
-                options={[
-                  { label: "남성", value: "male" },
-                  { label: "여성", value: "female" },
-                  { label: "남녀공용", value: "unisex" },
-                ]}
-              />
-            </div>
-            <div className="space-y-5">
-              <TextField
-                id="classification_code"
-                name="classification_code"
-                label="상품분류"
-                value="패션"
-                disabled
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-10 mx-auto">
-            <div className="space-y-5">
-              <Select
-                label="카테고리"
-                options={products_main_category.map((item) => {
-                  return { label: item.group_name, value: item.group_code };
-                })}
-              />
-            </div>
-            <div className="space-y-5">
-              <Select label="상세 카테고리" options={[]} />
-            </div>
-          </div>
-        </Card>
+        {/* 상품 기본정보 */}
+        <ProductBasicCard />
 
+        {/* 상품 옵션 */}
         <ProductOptionCard data={productOptions} setData={setProductOptions} />
 
         <ProductImageCard />
@@ -96,8 +58,14 @@ export default function SubmitProductPage({
           <Editor />
         </div> */}
 
+        {/* 상품 상세정보 */}
+        <ProductDetailCard />
+
         {/* 배송지 */}
         <ProductDeliveryCard />
+
+        {/* 반품/교환 */}
+        <ProductReturnCard />
 
         <div className="flex justify-end">
           <Button type="submit">등록</Button>

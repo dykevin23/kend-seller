@@ -17,21 +17,6 @@ interface AddressProps {
   addressDetail: string;
 }
 
-const formSchema = z.object({
-  addressName: z.string().min(1),
-  zoneCode: z.string().max(6),
-  address: z.string(),
-  addressDetail: z.string(),
-});
-
-export const action = async ({ request }: Route.ActionArgs) => {
-  const formData = await request.formData();
-  const { success, data, error } = formSchema.safeParse(
-    Object.fromEntries(formData)
-  );
-  console.log("### success, data => ", success, data, error);
-};
-
 export const loader = async ({}: Route.LoaderArgs) => {
   const addressList: AddressProps[] = [
     {

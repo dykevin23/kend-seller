@@ -11,7 +11,7 @@ export default function TextField({ label, ...rest }: TextFieldProps) {
   return (
     <div className="flex flex-col w-full space-y-3">
       {label && <Label htmlFor={rest.id}>{label}</Label>}
-      <Input {...rest} />
+      <Input className="text-sm" {...rest} />
     </div>
   );
 }
