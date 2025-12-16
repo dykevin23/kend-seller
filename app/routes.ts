@@ -40,4 +40,10 @@ export default [
       route("/submit", "features/system/pages/submit-option-page.tsx"),
     ]),
   ]),
+
+  // Auth
+  ...prefix("auth", [
+    route("/login", "features/auth/pages/login-page.tsx"),
+    route("/join", "features/auth/pages/join-page.tsx"),
+  ]),
 ] satisfies RouteConfig;

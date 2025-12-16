@@ -3,8 +3,10 @@ import {
   Links,
   Meta,
   Outlet,
+  redirect,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -43,16 +45,27 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const url = new URL(request.url);
+  const pathname = url.pathname;
+  if (!pathname.startsWith("/auth")) {
+    return redirect("/auth/login");
+  }
+};
+
 export default function App() {
+  const { pathname } = useLocation();
+  const isAuth = !pathname.includes("/auth/");
+
   return (
     <div
       className={cn({
         // "py-28 px-5 md:px-20": !pathname.includes("/auth/"),
         // "transition-opacity animate-pulse": isLoading,
-        "pt-20": true,
+        "pt-20": isAuth,
       })}
     >
-      <Navigation />
+      {isAuth && <Navigation />}
       <Outlet />
     </div>
   );
