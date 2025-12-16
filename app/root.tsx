@@ -13,6 +13,8 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import Navigation from "./common/components/navigation";
 import { cn } from "./lib/utils";
+import { makeSSRClient } from "./supa-client";
+import { getUserById } from "./features/users/queries";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -46,11 +48,27 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const url = new URL(request.url);
-  const pathname = url.pathname;
-  if (!pathname.startsWith("/auth")) {
-    return redirect("/auth/login");
+  const { client, headers } = makeSSRClient(request);
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+
+  if (user) {
+    const profile = await getUserById(client, { id: user.id });
+    if (profile) {
+      return { user, profile };
+    } else {
+      await client.auth.signOut({ scope: "global" });
+      return redirect("/auth/login", { headers });
+    }
+  } else {
+    const url = new URL(request.url);
+    const pathname = url.pathname;
+    if (!pathname.startsWith("/auth")) {
+      return redirect("/auth/login", { headers });
+    }
   }
+  return { user: null, profile: null };
 };
 
 export default function App() {
