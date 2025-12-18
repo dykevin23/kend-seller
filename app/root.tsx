@@ -7,6 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLocation,
+  useNavigate,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -15,6 +16,8 @@ import Navigation from "./common/components/navigation";
 import { cn } from "./lib/utils";
 import { makeSSRClient } from "./supa-client";
 import { getUserById } from "./features/users/queries";
+import { useEffect } from "react";
+import { AlertProvider, useAlert } from "./hooks/useAlert";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -39,7 +42,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <main>{children}</main>
+        <main>
+          <AlertProvider>{children}</AlertProvider>
+        </main>
+
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -56,7 +62,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   if (user) {
     const profile = await getUserById(client, { id: user.id });
     if (profile) {
-      return { user, profile };
+      const isEnrollSeller = false;
+      return { user, profile, isEnrollSeller };
     } else {
       await client.auth.signOut({ scope: "global" });
       return redirect("/auth/login", { headers });
@@ -71,9 +78,28 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   return { user: null, profile: null };
 };
 
-export default function App() {
+export default function App({ loaderData }: Route.ComponentProps) {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  const { alert } = useAlert();
   const isAuth = !pathname.includes("/auth/");
+
+  useEffect(() => {
+    if (!loaderData.isEnrollSeller) {
+      console.log("### here");
+      alert({
+        title: "알림",
+        message: "판매자 정보를 입력해야합니다.",
+        primaryButton: {
+          label: "등록하러가기",
+          onClick: () => {
+            navigate("/seller/information/submit");
+          },
+        },
+      });
+    }
+  }, [loaderData.isEnrollSeller]);
 
   return (
     <div

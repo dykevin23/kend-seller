@@ -20,6 +20,12 @@ export default [
 
   /* 판매자정보 */
   ...prefix("seller", [
+    ...prefix("information", [
+      route(
+        "/submit",
+        "features/seller/pages/submit-seller-information-page.tsx"
+      ),
+    ]),
     ...prefix("address", [
       index("features/seller/pages/address-list-page.tsx"),
       route("/post", "features/seller/pages/post-address-page.tsx"),
