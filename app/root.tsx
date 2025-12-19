@@ -86,8 +86,11 @@ export default function App({ loaderData }: Route.ComponentProps) {
   const isAuth = !pathname.includes("/auth/");
 
   useEffect(() => {
-    if (!loaderData.isEnrollSeller) {
-      console.log("### here");
+    if (
+      !loaderData.isEnrollSeller &&
+      isAuth &&
+      pathname !== "/seller/information/submit"
+    ) {
       alert({
         title: "알림",
         message: "판매자 정보를 입력해야합니다.",
