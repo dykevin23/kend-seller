@@ -85,24 +85,24 @@ export default function App({ loaderData }: Route.ComponentProps) {
   const { alert } = useAlert();
   const isAuth = !pathname.includes("/auth/");
 
-  useEffect(() => {
-    if (
-      !loaderData.isEnrollSeller &&
-      isAuth &&
-      pathname !== "/seller/information/submit"
-    ) {
-      alert({
-        title: "알림",
-        message: "판매자 정보를 입력해야합니다.",
-        primaryButton: {
-          label: "등록하러가기",
-          onClick: () => {
-            navigate("/seller/information/submit");
-          },
-        },
-      });
-    }
-  }, [loaderData.isEnrollSeller]);
+  // useEffect(() => {
+  //   if (
+  //     !loaderData.isEnrollSeller &&
+  //     isAuth &&
+  //     pathname !== "/seller/information/submit"
+  //   ) {
+  //     alert({
+  //       title: "알림",
+  //       message: "판매자 정보를 입력해야합니다.",
+  //       primaryButton: {
+  //         label: "등록하러가기",
+  //         onClick: () => {
+  //           navigate("/seller/information/submit");
+  //         },
+  //       },
+  //     });
+  //   }
+  // }, [loaderData.isEnrollSeller]);
 
   return (
     <div

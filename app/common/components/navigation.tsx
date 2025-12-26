@@ -70,9 +70,9 @@ const menus = [
     to: "systems",
     items: [
       {
-        name: "Services",
+        name: "Domains",
         description: "See the top categories in your community",
-        to: "/system/services",
+        to: "/system/domains",
       },
       {
         name: "Options",

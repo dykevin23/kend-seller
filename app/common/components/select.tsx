@@ -47,11 +47,12 @@ export default function Select({
 const SelectComponent = ({
   options,
   className,
+  name,
   ...rest
 }: Omit<SelectProps, "label" | "direction"> &
   Omit<InputHTMLAttributes<HTMLSelectElement>, "onChange">) => {
   return (
-    <SelectWrap onValueChange={rest?.onChange}>
+    <SelectWrap onValueChange={rest?.onChange} name={name}>
       <SelectTrigger
         className={cn("w-full", className)}
         disabled={options.length === 0}

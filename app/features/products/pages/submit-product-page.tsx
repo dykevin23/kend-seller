@@ -14,11 +14,16 @@ import ProductReturnCard from "../components/product-return-card";
 import ProductDetailCard from "../components/product-detail-card";
 import ProductBasicCard from "../components/product-basic-card";
 import ProductDescriptionCard from "../components/product-description-card";
+import { makeSSRClient } from "~/supa-client";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
+  const { client, headers } = makeSSRClient(request);
+
+  // 기본정보
+
   const addressList = [];
 
-  return { addressList };
+  return { domains, addressList };
 };
 
 const formSchema = z.object({

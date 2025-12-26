@@ -34,10 +34,10 @@ export default [
 
   /* 시스템관리 */
   ...prefix("system", [
-    // 서비스 관리
-    ...prefix("services", [
-      index("features/system/pages/services-page.tsx"),
-      route("/submit", "features/system/pages/submit-service-page.tsx"),
+    // 도메인 관리
+    ...prefix("domains", [
+      index("features/system/pages/domains-page.tsx"),
+      route("/submit", "features/system/pages/submit-domain-page.tsx"),
     ]),
     // 옵션 관리
     ...prefix("options", [
