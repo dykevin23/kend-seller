@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import Content from "~/common/components/content";
 import Title from "~/common/components/title";
 import { Button } from "~/common/components/ui/button";
 import {
@@ -13,7 +14,7 @@ import { classifications } from "~/seeds";
 
 export default function ServicesPage() {
   return (
-    <div>
+    <Content>
       <Title title="서비스 관리" />
 
       <Table>
@@ -42,6 +43,6 @@ export default function ServicesPage() {
           <Link to="./submit">등록</Link>
         </Button>
       </div>
-    </div>
+    </Content>
   );
 }

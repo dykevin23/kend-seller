@@ -3,6 +3,7 @@ import RadioGroup from "~/common/components/radio-group";
 import Select from "~/common/components/select";
 import TextField from "~/common/components/text-field";
 import { products_main_category } from "~/seeds";
+import { GENDER_TYPES } from "../constrants";
 
 export default function ProductBasicCard() {
   return (
@@ -13,18 +14,18 @@ export default function ProductBasicCard() {
           <TextField id="productName" name="productName" label="상품명" />
           <RadioGroup
             label="성별"
-            name="sex"
-            options={[
-              { label: "남성", value: "male" },
-              { label: "여성", value: "female" },
-              { label: "남녀공용", value: "unisex" },
-            ]}
+            id="gender"
+            name="gender"
+            options={GENDER_TYPES.map((type) => ({
+              label: type.label,
+              value: type.value,
+            }))}
           />
         </div>
         <div className="space-y-5">
           <TextField
-            id="classification_code"
-            name="classification_code"
+            id="domain_id"
+            name="domain_id"
             label="상품분류"
             value="패션"
             disabled
@@ -35,13 +36,20 @@ export default function ProductBasicCard() {
         <div className="space-y-5">
           <Select
             label="카테고리"
+            id="main_category"
+            name="main_category"
             options={products_main_category.map((item) => {
               return { label: item.group_name, value: item.group_code };
             })}
           />
         </div>
         <div className="space-y-5">
-          <Select label="상세 카테고리" options={[]} />
+          <Select
+            label="상세 카테고리"
+            id="sub_category"
+            name="sub_category"
+            options={[]}
+          />
         </div>
       </div>
     </Card>

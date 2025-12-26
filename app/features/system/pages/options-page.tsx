@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import Content from "~/common/components/content";
 import Title from "~/common/components/title";
 import { Button } from "~/common/components/ui/button";
 import {
@@ -13,7 +14,7 @@ import { option_groups } from "~/seeds";
 
 export default function OptionsPage() {
   return (
-    <div>
+    <Content>
       <Title title="옵션 관리" />
 
       <Table>
@@ -42,6 +43,6 @@ export default function OptionsPage() {
           <Link to="./submit">등록</Link>
         </Button>
       </div>
-    </div>
+    </Content>
   );
 }

@@ -1,9 +1,3 @@
-## product_classification(상품분류)
-
-- 분류코드(code) pk
-- 분류명(name)
-- 사용유무(use_yn)
-
 # product_main_category(상품 메인카테고리)
 
 - 상품분류(classification) -> product_classification(상품분류).code
@@ -45,7 +39,7 @@
 - 가격(price) optional
 - 판매상태(status) => 준비중/판매중/품절/판매중지/판매완료 => 공통코드
 
-# vendors(판매자)
+# seller(판매자)
 
 - 판매자번호(id) pk
 - 판매자명(name)
@@ -111,14 +105,3 @@
 - 리뷰번호(id) pk
 - 상품번호(product_id) -> products(상품).id
 - 재고번호(sku_id) -> stock_keeping(sku).id
-
-# admin_address(주소지)
-
-- 주소지번호(id) pk
-- 판매자번호(vendor_id) -> vendors(판매자).id
-- 주소지명(address_name)
-- 우편번호
-- 기본주소
-- 상세주소
-- 전화번호
-- 주소지구분

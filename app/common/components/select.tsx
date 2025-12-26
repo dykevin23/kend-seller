@@ -9,6 +9,7 @@ import {
   SelectLabel,
   SelectItem,
 } from "./ui/select";
+import { cn } from "~/lib/utils";
 
 interface SelectOptionProps {
   label: string;
@@ -45,12 +46,16 @@ export default function Select({
 
 const SelectComponent = ({
   options,
+  className,
   ...rest
 }: Omit<SelectProps, "label" | "direction"> &
   Omit<InputHTMLAttributes<HTMLSelectElement>, "onChange">) => {
   return (
     <SelectWrap onValueChange={rest?.onChange}>
-      <SelectTrigger className="w-1/2" disabled={options.length === 0}>
+      <SelectTrigger
+        className={cn("w-full", className)}
+        disabled={options.length === 0}
+      >
         <SelectValue placeholder={rest.placeholder} />
       </SelectTrigger>
       <SelectContent>

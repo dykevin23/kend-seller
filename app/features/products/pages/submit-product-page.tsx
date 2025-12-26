@@ -13,6 +13,7 @@ import { z } from "zod";
 import ProductReturnCard from "../components/product-return-card";
 import ProductDetailCard from "../components/product-detail-card";
 import ProductBasicCard from "../components/product-basic-card";
+import ProductDescriptionCard from "../components/product-description-card";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const addressList = [];
@@ -53,10 +54,9 @@ export default function SubmitProductPage({
         {/* 상품 옵션 */}
         <ProductOptionCard data={productOptions} setData={setProductOptions} />
 
-        <ProductImageCard />
-        {/* <div className="space-y-5">
-          <Editor />
-        </div> */}
+        <ProductImageCard options={productOptions} />
+
+        <ProductDescriptionCard />
 
         {/* 상품 상세정보 */}
         <ProductDetailCard />

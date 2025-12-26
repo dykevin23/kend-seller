@@ -26,7 +26,7 @@ export default function DataGrid<T>({ data, columns }: DataGridProps<T>) {
   });
 
   return (
-    <div className="overflow-hidden rounded-md border flex py-4">
+    <div className="overflow-hidden rounded-md border flex">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
