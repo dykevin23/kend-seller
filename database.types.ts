@@ -58,6 +58,45 @@ export type Database = {
           },
         ]
       }
+      admin_seller_members: {
+        Row: {
+          created_at: string
+          id: number
+          seller_id: number | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          seller_id?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          seller_id?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_seller_members_seller_id_admin_sellers_id_fk"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "admin_sellers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_seller_members_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
       admin_sellers: {
         Row: {
           address: string

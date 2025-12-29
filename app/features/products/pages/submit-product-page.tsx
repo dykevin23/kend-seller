@@ -23,7 +23,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   const addressList = [];
 
-  return { domains, addressList };
+  return { addressList };
 };
 
 const formSchema = z.object({

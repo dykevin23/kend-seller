@@ -1,5 +1,5 @@
 {
-  "id": "ec41f845-528c-4b6d-a43b-0b322c030570",
+  "id": "0e66c6c8-6d27-4f1d-b3f1-766247edcb70",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -541,6 +541,89 @@
           ],
           "columnsTo": [
             "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.admin_seller_members": {
+      "name": "admin_seller_members",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "admin_seller_members_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "seller_id": {
+          "name": "seller_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "admin_seller_members_seller_id_admin_sellers_id_fk": {
+          "name": "admin_seller_members_seller_id_admin_sellers_id_fk",
+          "tableFrom": "admin_seller_members",
+          "tableTo": "admin_sellers",
+          "columnsFrom": [
+            "seller_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "admin_seller_members_user_id_profiles_profile_id_fk": {
+          "name": "admin_seller_members_user_id_profiles_profile_id_fk",
+          "tableFrom": "admin_seller_members",
+          "tableTo": "profiles",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "profile_id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"

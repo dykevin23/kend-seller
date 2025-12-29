@@ -1,6 +1,14 @@
-import { bigint, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  bigint,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { domains } from "../system/schema";
 import { ADDRESS_TYPES } from "./constrants";
+import { profiles } from "../users/external/profiles";
 
 /**
  * 판매자 테이블(sellers)
@@ -24,6 +32,18 @@ export const sellers = pgTable("admin_sellers", {
   address_detail: text().notNull(),
   business: text().notNull(),
   domain_id: bigint({ mode: "number" }).references(() => domains.id),
+  created_at: timestamp().notNull().defaultNow(),
+  updated_at: timestamp().notNull().defaultNow(),
+});
+
+export const seller_members = pgTable("admin_seller_members", {
+  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+  seller_id: bigint({ mode: "number" }).references(() => sellers.id, {
+    onDelete: "cascade",
+  }),
+  user_id: uuid().references(() => profiles.profile_id, {
+    onDelete: "cascade",
+  }),
   created_at: timestamp().notNull().defaultNow(),
   updated_at: timestamp().notNull().defaultNow(),
 });

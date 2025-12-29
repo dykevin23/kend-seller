@@ -1,8 +1,8 @@
--- CREATE TYPE "public"."description_type" AS ENUM('IMAGE', 'HTML');--> statement-breakpoint
--- CREATE TYPE "public"."gender_type" AS ENUM('MALE', 'FEMALE', 'UNISEX');--> statement-breakpoint
--- CREATE TYPE "public"."image_type" AS ENUM('MAIN', 'ADDITIONAL');--> statement-breakpoint
--- CREATE TYPE "public"."sales_status" AS ENUM('PREPARE', 'SALE', 'SOLD_OUT', 'STOP', 'COMPLETE');--> statement-breakpoint
--- CREATE TYPE "public"."admin_address_type" AS ENUM('SHIPPING', 'RETURN');--> statement-breakpoint
+CREATE TYPE "public"."description_type" AS ENUM('IMAGE', 'HTML');--> statement-breakpoint
+CREATE TYPE "public"."gender_type" AS ENUM('MALE', 'FEMALE', 'UNISEX');--> statement-breakpoint
+CREATE TYPE "public"."image_type" AS ENUM('MAIN', 'ADDITIONAL');--> statement-breakpoint
+CREATE TYPE "public"."sales_status" AS ENUM('PREPARE', 'SALE', 'SOLD_OUT', 'STOP', 'COMPLETE');--> statement-breakpoint
+CREATE TYPE "public"."admin_address_type" AS ENUM('SHIPPING', 'RETURN');--> statement-breakpoint
 CREATE TABLE "product_descriptions" (
 	"id" bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "product_descriptions_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 1 CACHE 1),
 	"product_id" bigint,
@@ -60,6 +60,14 @@ CREATE TABLE "product_stock_keepings" (
 	"regular_price" integer DEFAULT 0,
 	"sale_price" integer DEFAULT 0,
 	"status" "sales_status" DEFAULT 'PREPARE' NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "admin_seller_members" (
+	"id" bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "admin_seller_members_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 9223372036854775807 START WITH 1 CACHE 1),
+	"seller_id" bigint,
+	"user_id" uuid,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -139,6 +147,8 @@ ALTER TABLE "product_options" ADD CONSTRAINT "product_options_system_option_id_s
 ALTER TABLE "products" ADD CONSTRAINT "products_domain_id_domains_id_fk" FOREIGN KEY ("domain_id") REFERENCES "public"."domains"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "products" ADD CONSTRAINT "products_seller_id_admin_sellers_id_fk" FOREIGN KEY ("seller_id") REFERENCES "public"."admin_sellers"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_stock_keepings" ADD CONSTRAINT "product_stock_keepings_product_id_products_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "admin_seller_members" ADD CONSTRAINT "admin_seller_members_seller_id_admin_sellers_id_fk" FOREIGN KEY ("seller_id") REFERENCES "public"."admin_sellers"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "admin_seller_members" ADD CONSTRAINT "admin_seller_members_user_id_profiles_profile_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("profile_id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "admin_sellers" ADD CONSTRAINT "admin_sellers_domain_id_domains_id_fk" FOREIGN KEY ("domain_id") REFERENCES "public"."domains"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "admin_seller_address" ADD CONSTRAINT "admin_seller_address_seller_id_admin_sellers_id_fk" FOREIGN KEY ("seller_id") REFERENCES "public"."admin_sellers"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "main_categories" ADD CONSTRAINT "main_categories_domain_id_domains_id_fk" FOREIGN KEY ("domain_id") REFERENCES "public"."domains"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
