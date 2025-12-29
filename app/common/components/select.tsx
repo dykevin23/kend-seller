@@ -36,7 +36,7 @@ export default function Select({
     </div>
   ) : (
     <div className="flex px-4">
-      <Label htmlFor={rest.id} className="w-1/4">
+      <Label htmlFor={rest.id} className="w-48 shrink-0 text-sm">
         {label}
       </Label>
       <SelectComponent options={options} {...rest} />
@@ -61,7 +61,7 @@ const SelectComponent = ({
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectLabel>Fruits</SelectLabel>
+          {/* <SelectLabel>Fruits</SelectLabel> */}
           {options.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}

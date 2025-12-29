@@ -6,11 +6,13 @@ interface TextFieldProps
   extends InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
   label?: string;
   direction?: "col" | "row";
+  outsideAdornment?: React.ReactNode;
 }
 
 export default function TextField({
   label,
   direction = "col",
+  outsideAdornment,
   ...rest
 }: TextFieldProps) {
   return direction === "col" ? (
@@ -20,10 +22,14 @@ export default function TextField({
     </div>
   ) : (
     <div className="flex px-4">
-      <Label htmlFor={rest.id} className="w-1/4">
+      <Label htmlFor={rest.id} className="w-48 shrink-0 text-sm">
         {label}
       </Label>
-      <TextField className="text-sm" {...rest} />
+
+      <div className="flex flex-1 items-center gap-2">
+        <Input className="flex-1" {...rest} />
+        {outsideAdornment}
+      </div>
     </div>
   );
 }
