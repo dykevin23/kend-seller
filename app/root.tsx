@@ -18,6 +18,7 @@ import { makeSSRClient } from "./supa-client";
 import { getUserById } from "./features/users/queries";
 import { useEffect } from "react";
 import { AlertProvider, useAlert } from "./hooks/useAlert";
+import { getAllCommonCodes } from "./features/system/queries";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -58,12 +59,13 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const {
     data: { user },
   } = await client.auth.getUser();
+  const commonCodes = await getAllCommonCodes(client);
 
   if (user) {
     const profile = await getUserById(client, { id: user.id });
     if (profile) {
       const isEnrollSeller = false;
-      return { user, profile, isEnrollSeller };
+      return { user, profile, isEnrollSeller, commonCodes };
     } else {
       await client.auth.signOut({ scope: "global" });
       return redirect("/auth/login", { headers });
@@ -75,7 +77,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       return redirect("/auth/login", { headers });
     }
   }
-  return { user: null, profile: null };
+  return { user: null, profile: null, commonCodes };
 };
 
 export default function App({ loaderData }: Route.ComponentProps) {
@@ -85,24 +87,24 @@ export default function App({ loaderData }: Route.ComponentProps) {
   const { alert } = useAlert();
   const isAuth = !pathname.includes("/auth/");
 
-  useEffect(() => {
-    if (
-      !loaderData.isEnrollSeller &&
-      isAuth &&
-      pathname !== "/seller/information/submit"
-    ) {
-      alert({
-        title: "알림",
-        message: "판매자 정보를 입력해야합니다.",
-        primaryButton: {
-          label: "등록하러가기",
-          onClick: () => {
-            navigate("/seller/information/submit");
-          },
-        },
-      });
-    }
-  }, [loaderData.isEnrollSeller]);
+  // useEffect(() => {
+  //   if (
+  //     !loaderData.isEnrollSeller &&
+  //     isAuth &&
+  //     pathname !== "/seller/information/submit"
+  //   ) {
+  //     alert({
+  //       title: "알림",
+  //       message: "판매자 정보를 입력해야합니다.",
+  //       primaryButton: {
+  //         label: "등록하러가기",
+  //         onClick: () => {
+  //           navigate("/seller/information/submit");
+  //         },
+  //       },
+  //     });
+  //   }
+  // }, [loaderData.isEnrollSeller]);
 
   return (
     <div

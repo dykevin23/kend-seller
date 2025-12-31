@@ -79,6 +79,11 @@ const menus = [
         description: "See the top categories in your community",
         to: "/system/options",
       },
+      {
+        name: "Common Codes",
+        description: "See the top categories in your community",
+        to: "/system/commonCodes",
+      },
     ],
   },
 ];

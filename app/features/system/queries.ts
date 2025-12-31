@@ -7,3 +7,27 @@ export const getDomains = async (client: SupabaseClient<Database>) => {
   if (error) throw error;
   return data;
 };
+
+export const getAllCommonCodes = async (client: SupabaseClient<Database>) => {
+  const { data: groupData, error: groupError } = await client
+    .from("common_code_group")
+    .select(`id, code, name`);
+
+  if (groupError) throw groupError;
+
+  const { data: codeData, error: codesError } = await client
+    .from("common_codes")
+    .select(`id, group_code, code, name, use_yn`);
+  if (codesError) throw codesError;
+
+  const commonCodegroup = groupData.map((group) => {
+    return {
+      ...group,
+      children: codeData.filter(
+        (commonCode) => commonCode.group_code === group.id
+      ),
+    };
+  });
+
+  return commonCodegroup;
+};

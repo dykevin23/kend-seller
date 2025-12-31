@@ -22,10 +22,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     Object.fromEntries(formData)
   );
 
-  console.log("### result => ", success, data, error);
-
   if (!success) {
-    console.log("### error => ", error);
     return { formErrors: error.flatten().fieldErrors };
   }
 

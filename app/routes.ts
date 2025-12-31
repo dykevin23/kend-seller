@@ -45,6 +45,21 @@ export default [
       route("/:optionId", "features/system/pages/option-page.tsx"),
       route("/submit", "features/system/pages/submit-option-page.tsx"),
     ]),
+    // 공통코드 관리
+    ...prefix("commonCodes", [
+      index("features/system/pages/common-code-groups-page.tsx"),
+      ...prefix("/group", [
+        ...prefix("/:groupId", [
+          index("features/system/pages/common-code-group-page.tsx"),
+          route("/submit", "features/system/pages/submit-common-code-page.tsx"),
+          route("/code/:codeId", "features/system/pages/common-code-page.tsx"),
+        ]),
+        route(
+          "/submit",
+          "features/system/pages/submit-common-code-group-page.tsx"
+        ),
+      ]),
+    ]),
   ]),
 
   // Auth

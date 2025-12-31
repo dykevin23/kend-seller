@@ -46,3 +46,24 @@ export const system_options = pgTable("system_options", {
   created_at: timestamp().notNull().defaultNow(),
   updated_at: timestamp().notNull().defaultNow(),
 });
+
+export const common_code_group = pgTable("common_code_group", {
+  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+  code: text().notNull().unique(),
+  name: text().notNull(),
+  created_at: timestamp().notNull().defaultNow(),
+  updated_at: timestamp().notNull().defaultNow(),
+});
+
+export const common_codes = pgTable("common_codes", {
+  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+  group_code: bigint({ mode: "number" }).references(
+    () => common_code_group.id,
+    { onDelete: "cascade" }
+  ),
+  code: text().notNull().unique(),
+  name: text().notNull(),
+  use_yn: text().notNull().default("Y"),
+  created_at: timestamp().notNull().defaultNow(),
+  updated_at: timestamp().notNull().defaultNow(),
+});

@@ -1,0 +1,1 @@
+ALTER TABLE "common_codes" ADD COLUMN "use_yn" text DEFAULT 'Y' NOT NULL;

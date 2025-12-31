@@ -147,6 +147,68 @@ export type Database = {
           },
         ]
       }
+      common_code_group: {
+        Row: {
+          code: string
+          created_at: string
+          id: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: never
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: never
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      common_codes: {
+        Row: {
+          code: string
+          created_at: string
+          group_code: number | null
+          id: number
+          name: string
+          updated_at: string
+          use_yn: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          group_code?: number | null
+          id?: never
+          name: string
+          updated_at?: string
+          use_yn?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          group_code?: number | null
+          id?: never
+          name?: string
+          updated_at?: string
+          use_yn?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "common_codes_group_code_common_code_group_id_fk"
+            columns: ["group_code"]
+            isOneToOne: false
+            referencedRelation: "common_code_group"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       domains: {
         Row: {
           code: string
