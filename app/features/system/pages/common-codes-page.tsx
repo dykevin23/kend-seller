@@ -12,10 +12,7 @@ import {
   TableRow,
 } from "~/common/components/ui/table";
 import type { loader as rootLoader } from "~/root";
-import type { Route } from "./+types/common-codes-page";
 import { useState } from "react";
-
-export const loader = async ({ request }: Route.LoaderArgs) => {};
 
 export default function CommonCodesPages() {
   const { commonCodes } = useRouteLoaderData<typeof rootLoader>("root");

@@ -19,6 +19,7 @@ import { getUserById } from "./features/users/queries";
 import { useEffect } from "react";
 import { AlertProvider, useAlert } from "./hooks/useAlert";
 import { getAllCommonCodes } from "./features/system/queries";
+import { getIsEnrollSeller } from "./features/seller/queries";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -64,7 +65,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   if (user) {
     const profile = await getUserById(client, { id: user.id });
     if (profile) {
-      const isEnrollSeller = false;
+      const isEnrollSeller = await getIsEnrollSeller(client, user.id);
       return { user, profile, isEnrollSeller, commonCodes };
     } else {
       await client.auth.signOut({ scope: "global" });
@@ -87,24 +88,24 @@ export default function App({ loaderData }: Route.ComponentProps) {
   const { alert } = useAlert();
   const isAuth = !pathname.includes("/auth/");
 
-  // useEffect(() => {
-  //   if (
-  //     !loaderData.isEnrollSeller &&
-  //     isAuth &&
-  //     pathname !== "/seller/information/submit"
-  //   ) {
-  //     alert({
-  //       title: "알림",
-  //       message: "판매자 정보를 입력해야합니다.",
-  //       primaryButton: {
-  //         label: "등록하러가기",
-  //         onClick: () => {
-  //           navigate("/seller/information/submit");
-  //         },
-  //       },
-  //     });
-  //   }
-  // }, [loaderData.isEnrollSeller]);
+  useEffect(() => {
+    if (
+      !loaderData.isEnrollSeller &&
+      isAuth &&
+      pathname !== "/seller/information/submit"
+    ) {
+      alert({
+        title: "알림",
+        message: "판매자 정보를 입력해야합니다.",
+        primaryButton: {
+          label: "등록하러가기",
+          onClick: () => {
+            navigate("/seller/information/submit");
+          },
+        },
+      });
+    }
+  }, [loaderData.isEnrollSeller]);
 
   return (
     <div

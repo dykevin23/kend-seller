@@ -10,18 +10,23 @@ import { Separator } from "~/common/components/ui/separator";
 import type { Route } from "./+types/submit-seller-information-page";
 import { makeSSRClient } from "~/supa-client";
 import { getDomains } from "~/features/system/queries";
-import { Form } from "react-router";
+import { Form, useNavigate, useRouteLoaderData } from "react-router";
 import { Button } from "~/common/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
+import type { loader as rootLoader } from "~/root";
+import { useCommonCodes } from "~/hooks/useCommonCodes";
+import { getLoggedInUserId } from "~/features/users/queries";
+import { createSellerInformation } from "../mutations";
 
 const formSchema = z.object({
-  bizrNo: z.string().length(10),
+  bizrNo: z.string().length(10).nonempty(),
   representativeName: z.string().min(2),
   companyName: z.string().min(1),
   zoneCode: z.string().max(6),
   address: z.string(),
   addressDetail: z.string(),
+  business: z.string(),
   domain: z.string(),
 });
 export const action = async ({ request }: Route.ActionArgs) => {
@@ -30,11 +35,19 @@ export const action = async ({ request }: Route.ActionArgs) => {
     Object.fromEntries(formData)
   );
 
-  console.log("### result => ", success, data, error);
+  if (!success) {
+    return { formErrors: error.flatten().fieldErrors };
+  }
+
+  const { client } = makeSSRClient(request);
+  const userId = await getLoggedInUserId(client);
+  await createSellerInformation(client, { ...data, userId: userId });
+
+  return { ok: true };
 };
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
-  const { client, headers } = makeSSRClient(request);
+  const { client } = makeSSRClient(request);
   const domains = await getDomains(client);
 
   return { domains };
@@ -42,11 +55,21 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
 export default function SubmitSellerInformationPage({
   loaderData,
+  actionData,
 }: Route.ComponentProps) {
+  const navigate = useNavigate();
+  const { commonCodes } = useRouteLoaderData<typeof rootLoader>("root");
+  const business = useCommonCodes("BUSINESS_TYPE", commonCodes);
+
   const [address, setAddress] = useState<IAddressType>();
   const handleZoneCode = (data: IAddressType) => {
     setAddress(data);
   };
+
+  useEffect(() => {
+    if (actionData?.ok) navigate(-1);
+  }, [actionData]);
+
   return (
     <Content>
       <Title title="판매자 정보 입력" />
@@ -111,8 +134,13 @@ export default function SubmitSellerInformationPage({
             />
           </div>
           <Select
+            id="business"
+            name="business"
             label="비즈니스 형태"
-            options={[]}
+            options={business.map((code) => ({
+              label: code.name,
+              value: code.id + "",
+            }))}
             direction="row"
             className="w-1/4"
           />
