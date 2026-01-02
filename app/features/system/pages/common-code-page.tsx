@@ -1,18 +1,20 @@
-import { Form, useNavigate, useRouteLoaderData } from "react-router";
+import { Form, useNavigate } from "react-router";
 import Card from "~/common/components/card";
 import Content from "~/common/components/content";
 import TextField from "~/common/components/text-field";
 import Title from "~/common/components/title";
 import { Button } from "~/common/components/ui/button";
 import type { Route } from "./+types/common-code-page";
-import type { loader } from "~/root";
+import { useRootData } from "~/hooks/useRootData";
 
 export default function CommonCodePage({ params }: Route.ComponentProps) {
   const navigate = useNavigate();
-  const { commonCodes } = useRouteLoaderData<typeof loader>("root");
+  const { commonCodes } = useRootData();
 
   const group = commonCodes?.find((item) => item.id + "" === params.groupId);
-  const commonCode = group.children.find((item) => (item.id = params.codeId));
+  const commonCode = group?.children.find(
+    (item) => (item.id = Number(params.codeId))
+  );
 
   return (
     <Content>

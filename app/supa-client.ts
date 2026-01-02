@@ -12,7 +12,13 @@ export type Database = MergeDeep<
   SupabaseDatabase,
   {
     public: {
-      Views: {};
+      Views: {
+        seller_information_view: {
+          Row: SetNonNullable<
+            SupabaseDatabase["public"]["Views"]["seller_information_view"]["Row"]
+          >;
+        };
+      };
     };
   }
 >;

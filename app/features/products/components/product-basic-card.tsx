@@ -4,8 +4,11 @@ import Select from "~/common/components/select";
 import TextField from "~/common/components/text-field";
 import { products_main_category } from "~/seeds";
 import { GENDER_TYPES } from "../constrants";
+import { useRootData } from "~/hooks/useRootData";
 
 export default function ProductBasicCard() {
+  const { seller } = useRootData();
+
   return (
     <Card>
       <h2 className="text-xl font-bold">상품 기본정보</h2>
@@ -24,11 +27,17 @@ export default function ProductBasicCard() {
         </div>
         <div className="space-y-5">
           <TextField
+            id="domain_name"
+            name="domain_name"
+            label="상품분류"
+            value={seller?.domain_name}
+            disabled
+          />
+          <input
+            className="hidden"
             id="domain_id"
             name="domain_id"
-            label="상품분류"
-            value="패션"
-            disabled
+            value={seller?.domain_id}
           />
         </div>
       </div>

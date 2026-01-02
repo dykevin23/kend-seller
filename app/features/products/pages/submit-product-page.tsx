@@ -19,6 +19,8 @@ import { makeSSRClient } from "~/supa-client";
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client, headers } = makeSSRClient(request);
 
+  // 판매자 정보
+
   // 기본정보
 
   const addressList = [];

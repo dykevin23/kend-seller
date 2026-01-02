@@ -1,4 +1,4 @@
-import { Link, useNavigate, useRouteLoaderData } from "react-router";
+import { Link, useNavigate } from "react-router";
 import Card from "~/common/components/card";
 import Content from "~/common/components/content";
 import Title from "~/common/components/title";
@@ -11,13 +11,13 @@ import {
   TableHeader,
   TableRow,
 } from "~/common/components/ui/table";
-import type { loader } from "~/root";
+import { useRootData } from "~/hooks/useRootData";
 
 export default function CommonCodeGroupPage() {
   const navigate = useNavigate();
-  const { commonCodes } = useRouteLoaderData<typeof loader>("root");
+  const { commonCodes } = useRootData();
 
-  const handleRowClick = (id: string) => {
+  const handleRowClick = (id: number) => {
     navigate(`./group/${id}`);
   };
 

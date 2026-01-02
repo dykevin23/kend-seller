@@ -19,7 +19,8 @@ import { getUserById } from "./features/users/queries";
 import { useEffect } from "react";
 import { AlertProvider, useAlert } from "./hooks/useAlert";
 import { getAllCommonCodes } from "./features/system/queries";
-import { getIsEnrollSeller } from "./features/seller/queries";
+import { getSellerInfo } from "./features/seller/queries";
+import type { RootLoaderData } from "./hooks/useRootData";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -55,7 +56,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
+export const loader = async ({
+  request,
+}: Route.LoaderArgs): Promise<RootLoaderData | Response> => {
   const { client, headers } = makeSSRClient(request);
   const {
     data: { user },
@@ -65,8 +68,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   if (user) {
     const profile = await getUserById(client, { id: user.id });
     if (profile) {
-      const isEnrollSeller = await getIsEnrollSeller(client, user.id);
-      return { user, profile, isEnrollSeller, commonCodes };
+      const seller = await getSellerInfo(client);
+      return { user, profile, seller, commonCodes };
     } else {
       await client.auth.signOut({ scope: "global" });
       return redirect("/auth/login", { headers });
@@ -78,7 +81,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       return redirect("/auth/login", { headers });
     }
   }
-  return { user: null, profile: null, commonCodes };
+  return { user: null, profile: null, commonCodes, seller: null };
 };
 
 export default function App({ loaderData }: Route.ComponentProps) {
@@ -90,7 +93,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
 
   useEffect(() => {
     if (
-      !loaderData.isEnrollSeller &&
+      !loaderData.seller &&
       isAuth &&
       pathname !== "/seller/information/submit"
     ) {
@@ -105,7 +108,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
         },
       });
     }
-  }, [loaderData.isEnrollSeller]);
+  }, [loaderData.seller]);
 
   return (
     <div

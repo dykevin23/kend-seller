@@ -3,8 +3,7 @@ import Content from "~/common/components/content";
 import TextField from "~/common/components/text-field";
 import Title from "~/common/components/title";
 import type { Route } from "./+types/common-code-group-page";
-import { Link, useNavigate, useRouteLoaderData } from "react-router";
-import type { loader } from "~/root";
+import { Link, useNavigate } from "react-router";
 import {
   Table,
   TableBody,
@@ -14,10 +13,11 @@ import {
   TableRow,
 } from "~/common/components/ui/table";
 import { Button } from "~/common/components/ui/button";
+import { useRootData } from "~/hooks/useRootData";
 
 export default function CommonCodeGroupPage({ params }: Route.ComponentProps) {
   const navigate = useNavigate();
-  const { commonCodes } = useRouteLoaderData<typeof loader>("root");
+  const { commonCodes } = useRootData();
 
   const group = commonCodes?.find((item) => item.id + "" === params.groupId);
 
@@ -49,7 +49,7 @@ export default function CommonCodeGroupPage({ params }: Route.ComponentProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {group.children.map((code, index) => (
+            {group?.children.map((code, index) => (
               <TableRow key={code.id} onClick={() => handleRowClick(code.id)}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{code.code}</TableCell>

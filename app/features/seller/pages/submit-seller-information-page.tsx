@@ -10,14 +10,14 @@ import { Separator } from "~/common/components/ui/separator";
 import type { Route } from "./+types/submit-seller-information-page";
 import { makeSSRClient } from "~/supa-client";
 import { getDomains } from "~/features/system/queries";
-import { Form, useNavigate, useRouteLoaderData } from "react-router";
+import { Form, useNavigate } from "react-router";
 import { Button } from "~/common/components/ui/button";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import type { loader as rootLoader } from "~/root";
 import { useCommonCodes } from "~/hooks/useCommonCodes";
 import { getLoggedInUserId } from "~/features/users/queries";
 import { createSellerInformation } from "../mutations";
+import { useRootData } from "~/hooks/useRootData";
 
 const formSchema = z.object({
   bizrNo: z.string().length(10).nonempty(),
@@ -58,7 +58,7 @@ export default function SubmitSellerInformationPage({
   actionData,
 }: Route.ComponentProps) {
   const navigate = useNavigate();
-  const { commonCodes } = useRouteLoaderData<typeof rootLoader>("root");
+  const { commonCodes } = useRootData();
   const business = useCommonCodes("BUSINESS_TYPE", commonCodes);
 
   const [address, setAddress] = useState<IAddressType>();

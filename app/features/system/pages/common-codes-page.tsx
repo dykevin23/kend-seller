@@ -1,4 +1,4 @@
-import { Link, useRouteLoaderData } from "react-router";
+import { Link } from "react-router";
 import Card from "~/common/components/card";
 import Content from "~/common/components/content";
 import Title from "~/common/components/title";
@@ -11,21 +11,22 @@ import {
   TableHeader,
   TableRow,
 } from "~/common/components/ui/table";
-import type { loader as rootLoader } from "~/root";
 import { useState } from "react";
+import { useRootData } from "~/hooks/useRootData";
+import type { CommonCode } from "~/types/root";
 
 export default function CommonCodesPages() {
-  const { commonCodes } = useRouteLoaderData<typeof rootLoader>("root");
-  const [codes, setCodes] = useState([]);
+  const { commonCodes } = useRootData();
+  const [codes, setCodes] = useState<CommonCode[]>([]);
   const [rowSelectionGroupId, setRowSelectionGroupId] = useState<string>("");
 
-  const handleRowSelection = (id: string) => {
+  const handleRowSelection = (id: number) => {
     const [group] = commonCodes.filter((groups) => groups.id === id);
     if (group) {
-      setRowSelectionGroupId(id);
+      setRowSelectionGroupId(id.toString());
       setCodes(
-        group.children.map((item) => {
-          return { ...item, group_code: group.code };
+        group.children.map((item: CommonCode) => {
+          return { ...item, group_code: Number(group.code) };
         })
       );
     }

@@ -1,14 +1,14 @@
-import { Form, redirect, useNavigate, useRouteLoaderData } from "react-router";
+import { Form, redirect, useNavigate } from "react-router";
 import Card from "~/common/components/card";
 import Content from "~/common/components/content";
 import TextField from "~/common/components/text-field";
 import Title from "~/common/components/title";
 import { Button } from "~/common/components/ui/button";
 import type { Route } from "./+types/submit-common-code-page";
-import type { loader } from "~/root";
 import { z } from "zod";
 import { makeSSRClient } from "~/supa-client";
 import { createCommonCode } from "../mutations";
+import { useRootData } from "~/hooks/useRootData";
 
 export const formSchema = z.object({
   group_id: z.string(),
@@ -34,7 +34,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
 export default function SubmitCommonCodePage({ params }: Route.ComponentProps) {
   const navigate = useNavigate();
-  const { commonCodes } = useRouteLoaderData<typeof loader>("root");
+  const { commonCodes } = useRootData();
 
   const group = commonCodes?.find((item) => item.id + "" === params.groupId);
 
