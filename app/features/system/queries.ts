@@ -31,3 +31,26 @@ export const getAllCommonCodes = async (client: SupabaseClient<Database>) => {
 
   return commonCodegroup;
 };
+
+export const getCategories = async (client: SupabaseClient<Database>) => {
+  const { data: mainCategories, error: mainError } = await client
+    .from("main_categories")
+    .select("*");
+  if (mainError) throw mainError;
+
+  const { data: subCategories, error: subError } = await client
+    .from("sub_categories")
+    .select("*");
+  if (subError) throw subError;
+
+  const result = mainCategories.map((main) => {
+    return {
+      ...main,
+      children: subCategories.filter(
+        (sub) => sub.main_category_code === main.id
+      ),
+    };
+  });
+
+  return result;
+};

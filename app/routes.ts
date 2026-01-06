@@ -1,6 +1,7 @@
 import {
   type RouteConfig,
   index,
+  layout,
   prefix,
   route,
 } from "@react-router/dev/routes";
@@ -12,10 +13,6 @@ export default [
   ...prefix("products", [
     // 상품등록 화면
     route("/submit", "features/products/pages/submit-product-page.tsx"),
-    // 카테고리
-    ...prefix("category", [
-      index("features/products/pages/categories-page.tsx"),
-    ]),
   ]),
 
   /* 판매자정보 */
@@ -39,11 +36,23 @@ export default [
       index("features/system/pages/domains-page.tsx"),
       route("/submit", "features/system/pages/submit-domain-page.tsx"),
     ]),
-    // 옵션 관리
-    ...prefix("options", [
-      index("features/system/pages/options-page.tsx"),
-      route("/:optionId", "features/system/pages/option-page.tsx"),
-      route("/submit", "features/system/pages/submit-option-page.tsx"),
+    // 카테고리 관리
+    ...prefix("categories", [
+      layout("features/system/layouts/category-layout.tsx", [
+        index("features/system/pages/main-categories-page.tsx"),
+        route("/submit", "features/system/pages/submit-main-category-page.tsx"),
+        ...prefix("/:categoryId", [
+          index("features/system/pages/main-category-page.tsx"),
+          route(
+            "/submit",
+            "features/system/pages/submit-sub-categories-page.tsx"
+          ),
+          route(
+            "/sub/:subCategoryId",
+            "features/system/pages/sub-category-page.tsx"
+          ),
+        ]),
+      ]),
     ]),
     // 공통코드 관리
     ...prefix("commonCodes", [

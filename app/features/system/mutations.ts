@@ -51,14 +51,43 @@ export const createCommonCode = async (
     name: string;
   }
 ) => {
+  const { data, error } = await client.from("common_codes").insert({
+    code: code,
+    name: name,
+    group_code: Number(group_id),
+    use_yn: "Y",
+  });
+
+  if (error) throw error;
+};
+
+export const createMainCategory = async (
+  client: SupabaseClient<Database>,
+  { domainId, code, name }: { domainId: string; code: string; name: string }
+) => {
   const { data, error } = await client
-    .from("common_codes")
+    .from("main_categories")
     .insert({
+      domain_id: Number(domainId),
       code: code,
       name: name,
-      group_code: Number(group_id),
-      use_yn: "Y",
-    });
+    })
+    .select("id")
+    .single();
+
+  if (error) throw error;
+  return data.id;
+};
+
+export const createSubCategory = async (
+  client: SupabaseClient<Database>,
+  { categoryId, code, name }: { categoryId: string; code: string; name: string }
+) => {
+  const { error } = await client.from("sub_categories").insert({
+    main_category_code: Number(categoryId),
+    code: code,
+    name: name,
+  });
 
   if (error) throw error;
 };

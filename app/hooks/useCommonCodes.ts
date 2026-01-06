@@ -1,3 +1,5 @@
-export function useCommonCodes(key: string, codes: any) {
-  return codes.find((code) => code.code === key).children;
+import type { CommonCodeGroup } from "~/types/root";
+
+export function useCommonCodes(key: string, codeGroup: CommonCodeGroup[]) {
+  return codeGroup.find((group) => group.code === key)?.children || [];
 }
