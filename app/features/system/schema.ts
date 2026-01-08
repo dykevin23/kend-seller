@@ -18,7 +18,9 @@ export const domains = pgTable("domains", {
 
 export const main_categories = pgTable("main_categories", {
   id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  domain_id: bigint({ mode: "number" }).references(() => domains.id),
+  domain_id: bigint({ mode: "number" })
+    .references(() => domains.id)
+    .notNull(),
   code: text().notNull().unique(),
   name: text().notNull(),
   created_at: timestamp().notNull().defaultNow(),
@@ -27,10 +29,9 @@ export const main_categories = pgTable("main_categories", {
 
 export const sub_categories = pgTable("sub_categories", {
   id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  main_category_code: bigint({ mode: "number" }).references(
-    () => main_categories.id,
-    { onDelete: "cascade" }
-  ),
+  main_category_code: bigint({ mode: "number" })
+    .references(() => main_categories.id, { onDelete: "cascade" })
+    .notNull(),
   code: text().notNull(),
   name: text().notNull(),
   created_at: timestamp().notNull().defaultNow(),

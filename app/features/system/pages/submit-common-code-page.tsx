@@ -11,12 +11,11 @@ import { createCommonCode } from "../mutations";
 import { useRootData } from "~/hooks/useRootData";
 
 export const formSchema = z.object({
-  group_id: z.string(),
   code: z.string().min(3),
   name: z.string().min(1),
 });
 
-export const action = async ({ request }: Route.ActionArgs) => {
+export const action = async ({ request, params }: Route.ActionArgs) => {
   const formData = await request.formData();
   const { success, data, error } = formSchema.safeParse(
     Object.fromEntries(formData)
@@ -26,10 +25,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
     return { formErrors: error.flatten().fieldErrors };
   }
 
-  const { group_id, code, name } = data;
+  const { code, name } = data;
   const { client, headers } = makeSSRClient(request);
-  await createCommonCode(client, { group_id, code, name });
-  return redirect(`/system/commonCodes/group/${group_id}`);
+  await createCommonCode(client, { group_id: params.groupId, code, name });
+  return redirect(`/system/commonCodes/group/${params.groupId}`);
 };
 
 export default function SubmitCommonCodePage({ params }: Route.ComponentProps) {
@@ -49,12 +48,6 @@ export default function SubmitCommonCodePage({ params }: Route.ComponentProps) {
             readOnly
             direction="row"
             className="w-1/2 bg-gray-300"
-          />
-          <input
-            className="hidden"
-            id="group_id"
-            name="group_id"
-            value={params.groupId}
           />
           <TextField
             id="code"

@@ -22,6 +22,13 @@
       "when": 1767059344622,
       "tag": "0002_curly_alex_power",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1767837949405,
+      "tag": "0003_sturdy_robin_chapel",
+      "breakpoints": true
     }
   ]
 }

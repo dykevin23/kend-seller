@@ -2,12 +2,31 @@ import Card from "~/common/components/card";
 import RadioGroup from "~/common/components/radio-group";
 import Select from "~/common/components/select";
 import TextField from "~/common/components/text-field";
-import { products_main_category } from "~/seeds";
 import { GENDER_TYPES } from "../constrants";
 import { useRootData } from "~/hooks/useRootData";
+import { useState } from "react";
+import type { Category } from "~/types/system";
 
-export default function ProductBasicCard() {
+interface BasicCardProps {
+  categories: Category[];
+}
+
+export default function ProductBasicCard({ categories }: BasicCardProps) {
   const { seller } = useRootData();
+  const [selectedCategory, setSelectedCategory] = useState<{
+    main: string;
+    sub: string;
+  }>({ main: "", sub: "" });
+
+  const mainCategories = categories.filter(
+    (item) => item.domainId === seller?.domain_id
+  );
+
+  const handleMainCategory = (value: string) => {
+    setSelectedCategory((prev) => {
+      return { main: value, sub: "" };
+    });
+  };
 
   return (
     <Card>
@@ -27,16 +46,16 @@ export default function ProductBasicCard() {
         </div>
         <div className="space-y-5">
           <TextField
-            id="domain_name"
-            name="domain_name"
+            id="domain"
+            name="domain"
             label="상품분류"
             value={seller?.domain_name}
             disabled
           />
           <input
             className="hidden"
-            id="domain_id"
-            name="domain_id"
+            id="domainId"
+            name="domainId"
             value={seller?.domain_id}
           />
         </div>
@@ -45,19 +64,32 @@ export default function ProductBasicCard() {
         <div className="space-y-5">
           <Select
             label="카테고리"
-            id="main_category"
-            name="main_category"
-            options={products_main_category.map((item) => {
-              return { label: item.group_name, value: item.group_code };
-            })}
+            id="mainCategory"
+            name="mainCategory"
+            options={mainCategories.map((category) => ({
+              label: category.name,
+              value: category.id.toString(),
+            }))}
+            value={selectedCategory.main}
+            onChange={handleMainCategory}
           />
         </div>
         <div className="space-y-5">
           <Select
             label="상세 카테고리"
-            id="sub_category"
-            name="sub_category"
-            options={[]}
+            id="subCategory"
+            name="subCategory"
+            options={
+              selectedCategory.main
+                ? mainCategories
+                    .find((item) => item.id === Number(selectedCategory.main))
+                    ?.children.map((item) => ({
+                      label: item.name,
+                      value: item.id.toString(),
+                    })) || []
+                : []
+            }
+            value={selectedCategory.sub}
           />
         </div>
       </div>

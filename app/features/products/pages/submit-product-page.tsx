@@ -15,6 +15,8 @@ import ProductDetailCard from "../components/product-detail-card";
 import ProductBasicCard from "../components/product-basic-card";
 import ProductDescriptionCard from "../components/product-description-card";
 import { makeSSRClient } from "~/supa-client";
+import { getCategories } from "~/features/system/queries";
+import { useRootData } from "~/hooks/useRootData";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client, headers } = makeSSRClient(request);
@@ -22,10 +24,11 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   // 판매자 정보
 
   // 기본정보
+  const categories = await getCategories(client);
 
   const addressList = [];
 
-  return { addressList };
+  return { addressList, categories };
 };
 
 const formSchema = z.object({
@@ -45,6 +48,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 export default function SubmitProductPage({
   loaderData,
 }: Route.ComponentProps) {
+  const { seller } = useRootData();
   const [productOptions, setProductOptions] = useState<
     ProductOptionArrayProps[]
   >([]);
@@ -56,7 +60,7 @@ export default function SubmitProductPage({
       {/* <Form className="grid grid-cols-2 gap-10 mx-auto"> */}
       <Form className="space-y-5" method="post">
         {/* 상품 기본정보 */}
-        <ProductBasicCard />
+        <ProductBasicCard categories={loaderData.categories} />
 
         {/* 상품 옵션 */}
         <ProductOptionCard data={productOptions} setData={setProductOptions} />
