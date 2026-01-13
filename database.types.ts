@@ -657,7 +657,6 @@ export type Database = {
           created_at: string
           domain_id: number | null
           id: number
-          key: string
           name: string
           updated_at: string
         }
@@ -666,7 +665,6 @@ export type Database = {
           created_at?: string
           domain_id?: number | null
           id?: never
-          key: string
           name: string
           updated_at?: string
         }
@@ -675,7 +673,6 @@ export type Database = {
           created_at?: string
           domain_id?: number | null
           id?: never
-          key?: string
           name?: string
           updated_at?: string
         }

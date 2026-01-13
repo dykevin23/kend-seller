@@ -91,3 +91,50 @@ export const createSubCategory = async (
 
   if (error) throw error;
 };
+
+export const createSystemOption = async (
+  client: SupabaseClient<Database>,
+  {
+    domainId,
+    code,
+    name,
+  }: {
+    domainId?: string;
+    code: string;
+    name: string;
+  }
+) => {
+  const { error } = await client.from("system_options").insert({
+    domain_id: domainId ? Number(domainId) : null,
+    code: code,
+    name: name,
+  });
+
+  if (error) throw error;
+};
+
+export const updateSystemOption = async (
+  client: SupabaseClient<Database>,
+  {
+    id,
+    domainId,
+    code,
+    name,
+  }: {
+    id: number;
+    domainId?: string;
+    code: string;
+    name: string;
+  }
+) => {
+  const { error } = await client
+    .from("system_options")
+    .update({
+      domain_id: domainId ? Number(domainId) : null,
+      code: code,
+      name: name,
+    })
+    .eq("id", id);
+
+  if (error) throw error;
+};

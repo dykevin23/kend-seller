@@ -69,6 +69,12 @@ export default [
         ),
       ]),
     ]),
+    // 시스템 옵션 관리
+    ...prefix("systemOptions", [
+      index("features/system/pages/system-options-page.tsx"),
+      route("/submit", "features/system/pages/submit-system-option-page.tsx"),
+      route("/:id", "features/system/pages/system-option-page.tsx"),
+    ]),
   ]),
 
   // Auth

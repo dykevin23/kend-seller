@@ -66,18 +66,23 @@ const menus = [
     items: [
       {
         name: "Domains",
-        description: "See the top categories in your community",
+        description: "도메인 관리",
         to: "/system/domains",
       },
       {
         name: "Categories",
-        description: "See the top categories in your community",
+        description: "카테고리 관리",
         to: "/system/categories",
       },
       {
         name: "Common Codes",
-        description: "See the top categories in your community",
+        description: "공통코드 관리",
         to: "/system/commonCodes",
+      },
+      {
+        name: "System Options",
+        description: "시스템 옵션 관리",
+        to: "/system/systemOptions",
       },
     ],
   },

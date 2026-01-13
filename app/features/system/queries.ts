@@ -72,3 +72,27 @@ export const getCategories = async (
 
   return result;
 };
+
+export const getSystemOptions = async (client: SupabaseClient<Database>) => {
+  const { data, error } = await client
+    .from("system_options")
+    .select("*")
+    .order("id", { ascending: true });
+
+  if (error) throw error;
+  return data;
+};
+
+export const getSystemOptionById = async (
+  client: SupabaseClient<Database>,
+  id: number
+) => {
+  const { data, error } = await client
+    .from("system_options")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) throw error;
+  return data;
+};
