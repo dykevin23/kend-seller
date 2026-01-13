@@ -15,20 +15,27 @@ import ProductDetailCard from "../components/product-detail-card";
 import ProductBasicCard from "../components/product-basic-card";
 import ProductDescriptionCard from "../components/product-description-card";
 import { makeSSRClient } from "~/supa-client";
-import { getCategories } from "~/features/system/queries";
+import { getCategories, getSystemOptionsByDomain } from "~/features/system/queries";
 import { useRootData } from "~/hooks/useRootData";
+import { getSellerInfo } from "~/features/seller/queries";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client, headers } = makeSSRClient(request);
 
   // 판매자 정보
+  const seller = await getSellerInfo(client);
 
   // 기본정보
   const categories = await getCategories(client);
 
+  // 시스템 옵션 (판매자 domain에 맞는 옵션)
+  const systemOptions = seller?.domain_id
+    ? await getSystemOptionsByDomain(client, seller.domain_id)
+    : [];
+
   const addressList = [];
 
-  return { addressList, categories };
+  return { addressList, categories, systemOptions };
 };
 
 const formSchema = z.object({
@@ -70,7 +77,11 @@ export default function SubmitProductPage({
         <ProductBasicCard categories={loaderData.categories} />
 
         {/* 상품 옵션 */}
-        <ProductOptionCard data={productOptions} setData={setProductOptions} />
+        <ProductOptionCard
+          data={productOptions}
+          setData={setProductOptions}
+          systemOptions={loaderData.systemOptions}
+        />
 
         <ProductImageCard options={productOptions} />
 

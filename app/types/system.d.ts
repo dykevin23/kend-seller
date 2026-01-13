@@ -12,3 +12,10 @@ export type Category = {
   domainId: number;
   children: SubCategory[];
 };
+
+export type SystemOption = {
+  id: number;
+  code: string;
+  name: string;
+  domainId: number;
+};

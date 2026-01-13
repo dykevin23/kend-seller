@@ -1,0 +1,1 @@
+ALTER TABLE "system_options" ALTER COLUMN "domain_id" SET NOT NULL;

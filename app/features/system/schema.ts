@@ -40,7 +40,9 @@ export const sub_categories = pgTable("sub_categories", {
 
 export const system_options = pgTable("system_options", {
   id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  domain_id: bigint({ mode: "number" }).references(() => domains.id),
+  domain_id: bigint({ mode: "number" })
+    .references(() => domains.id)
+    .notNull(),
   code: text().notNull().unique(),
   name: text().notNull(),
   created_at: timestamp().notNull().defaultNow(),

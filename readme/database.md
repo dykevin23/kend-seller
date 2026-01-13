@@ -148,6 +148,12 @@ Rules:
 - Migration이 적용된 이후 typegen을 갱신한다.
 - Application 코드는 항상 최신 typegen 결과를 기준으로 한다.
 
+**IMPORTANT: Database 변경 작업 순서**
+1. `/app/features/**/schema.ts` 파일 수정
+2. `npm run db:generate` - migration 파일 생성
+3. `npm run db:migrate` - migration 실행
+4. `npm run db:typegen` - TypeScript 타입 생성 (반드시 실행할 것!)
+
 ## 8. Notes for AI Assistants
 
 - 실제 컬럼 정의는 항상 `/app/features/**/schema.ts` 를 우선 참고한다.

@@ -5,9 +5,9 @@ import Select from "~/common/components/select";
 import TextField from "~/common/components/text-field";
 import { Button } from "~/common/components/ui/button";
 import { Label } from "~/common/components/ui/label";
-import { option_groups } from "~/seeds";
 import { type ColumnDef } from "@tanstack/react-table";
 import DataGrid from "~/common/components/data-grid";
+import type { SystemOption } from "~/types/system";
 
 interface ProductOptionProps {
   optionKey: string;
@@ -26,27 +26,24 @@ export interface ProductOptionArrayProps {
 interface ProductOptionCardProps {
   data: ProductOptionArrayProps[];
   setData: Dispatch<SetStateAction<ProductOptionArrayProps[]>>;
+  systemOptions: SystemOption[];
 }
 
 export default function ProductOptionCard({
   data,
   setData,
+  systemOptions,
 }: ProductOptionCardProps) {
   const [productOptions, setProductOptions] = useState<ProductOptionProps[]>([
-    { optionKey: "COLOR", optionName: "색상", values: ["white", "black"] },
-    {
-      optionKey: "SIZE",
-      optionName: "사이즈",
-      values: ["Large", "Medium", "Small"],
-    },
+    { optionKey: "", optionName: "", values: [] },
   ]);
 
   const handleChangeOptionKey = (i: number) => (v: string) => {
     setProductOptions((prev) => {
       return prev.map((item, index) => {
-        const option = option_groups.find((option) => option.group_key === v);
+        const option = systemOptions.find((option) => option.code === v);
         return index === i
-          ? { optionKey: v, optionName: option?.group_name || "", values: [""] }
+          ? { optionKey: v, optionName: option?.name || "", values: [""] }
           : item;
       });
     });
@@ -161,9 +158,9 @@ export default function ProductOptionCard({
           <div className="flex" key={index}>
             <div className="flex w-3/4 gap-4 pr-2">
               <Select
-                options={option_groups.map((option) => ({
-                  label: option.group_name,
-                  value: option.group_key,
+                options={systemOptions.map((option) => ({
+                  label: option.name,
+                  value: option.code,
                 }))}
                 value={option.optionKey}
                 onChange={handleChangeOptionKey(index)}

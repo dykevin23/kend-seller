@@ -96,3 +96,17 @@ export const getSystemOptionById = async (
   if (error) throw error;
   return data;
 };
+
+export const getSystemOptionsByDomain = async (
+  client: SupabaseClient<Database>,
+  domainId: number
+) => {
+  const { data, error } = await client
+    .from("system_options")
+    .select("id, code, name, domain_id")
+    .eq("domain_id", domainId)
+    .order("id", { ascending: true });
+
+  if (error) throw error;
+  return data;
+};
