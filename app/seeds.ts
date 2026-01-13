@@ -52,33 +52,3 @@ export const option_values = [
     name: "YELLOW",
   },
 ];
-
-export const products_main_category = [
-  {
-    group_id: "mc-1",
-    classification_code: "FASHION",
-    group_code: "TOP",
-    group_name: "상의",
-    use_yn: "Y",
-    sort_order: 1,
-    vendor_id: "vender-1",
-  },
-  {
-    group_id: "mc-2",
-    classification_code: "FASHION",
-    group_code: "BOTTOMS",
-    group_name: "하의",
-    use_yn: "Y",
-    sort_order: 2,
-    vendor_id: "vender-1",
-  },
-  {
-    group_id: "mc-3",
-    classification_code: "FASHION",
-    group_code: "SHOES",
-    group_name: "신발",
-    use_yn: "Y",
-    sort_order: 3,
-    vendor_id: "vender-1",
-  },
-];

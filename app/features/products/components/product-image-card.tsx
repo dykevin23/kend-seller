@@ -55,7 +55,7 @@ export default function ProductImageCard({ options }: ProductImageCardProps) {
     setAdditionalImages((prev) => [...prev, ...newImages]);
   };
 
-  console.log("### options => ", options);
+  // console.log("### options => ", options);
 
   return (
     <Card>

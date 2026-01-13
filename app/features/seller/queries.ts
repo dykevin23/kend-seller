@@ -5,7 +5,7 @@ export const getSellerInfo = async (client: SupabaseClient<Database>) => {
   const { data, error } = await client
     .from("seller_information_view")
     .select("*")
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data;
 };

@@ -1,30 +1,13 @@
 import { Plus } from "lucide-react";
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import Card from "~/common/components/card";
 import Select from "~/common/components/select";
 import TextField from "~/common/components/text-field";
 import { Button } from "~/common/components/ui/button";
 import { Label } from "~/common/components/ui/label";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/common/components/ui/table";
 import { option_groups } from "~/seeds";
-
-import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type ColumnDef,
-  type VisibilityState,
-} from "@tanstack/react-table";
+import { type ColumnDef } from "@tanstack/react-table";
+import DataGrid from "~/common/components/data-grid";
 
 interface ProductOptionProps {
   optionKey: string;
@@ -49,22 +32,6 @@ export default function ProductOptionCard({
   data,
   setData,
 }: ProductOptionCardProps) {
-  //   const useSkipper = () => {
-  //     const shouldSkipRef = useRef(true);
-  //     const shouldSkip = shouldSkipRef.current;
-
-  //     // Wrap a function with this to skip a pagination reset temporarily
-  //     const skip = useCallback(() => {
-  //       shouldSkipRef.current = false;
-  //     }, []);
-
-  //     useEffect(() => {
-  //       shouldSkipRef.current = true;
-  //     });
-
-  //     return [shouldSkip, skip] as const;
-  //   };
-
   const [productOptions, setProductOptions] = useState<ProductOptionProps[]>([
     { optionKey: "COLOR", optionName: "색상", values: ["white", "black"] },
     {
@@ -73,9 +40,6 @@ export default function ProductOptionCard({
       values: ["Large", "Medium", "Small"],
     },
   ]);
-  const [rowSelection, setRowSelection] = useState({});
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  //   const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
 
   const handleChangeOptionKey = (i: number) => (v: string) => {
     setProductOptions((prev) => {
@@ -97,7 +61,7 @@ export default function ProductOptionCard({
 
       setProductOptions((prev) => {
         return prev.map((item, index) => {
-          return index === i ? { ...prev, values: value.split(",") } : item;
+          return index === i ? { ...item, values: value.split(",") } : item;
         });
       });
     };
@@ -148,35 +112,6 @@ export default function ProductOptionCard({
     setData(list);
   };
 
-  const defaultColumn: Partial<ColumnDef<ProductOptionArrayProps>> = {
-    cell: ({ getValue, row: { index }, column: { id }, table }) => {
-      const initialValue = getValue() as number;
-      // We need to keep and update the state of the cell normally
-      const [value, setValue] = useState<string>("");
-
-      // When the input is blurred, we'll call our table meta's updateData function
-      const onBlur = () => {
-        table.options.meta?.updateData(index, id, value);
-      };
-
-      // If the initialValue is changed external, sync it up with our state
-      useEffect(() => {
-        if (initialValue !== 0) {
-          setValue(String(initialValue));
-        }
-      }, [initialValue]);
-
-      return (
-        <TextField
-          value={value}
-          placeholder="0"
-          onBlur={onBlur}
-          onChange={(e) => setValue(e.target.value)}
-        />
-      );
-    },
-  };
-
   const columns: ColumnDef<ProductOptionArrayProps>[] = [
     {
       accessorKey: "options",
@@ -192,53 +127,27 @@ export default function ProductOptionCard({
         };
       }),
     },
-    { accessorKey: "regularPrice", header: () => <span>정상가</span> },
-    { accessorKey: "salePrice", header: () => <span>판매가</span> },
-    { accessorKey: "stocks", header: () => <span>재고</span> },
+    {
+      accessorKey: "regularPrice",
+      header: () => <span>정상가</span>,
+      meta: { editable: true },
+    },
+    {
+      accessorKey: "salePrice",
+      header: () => <span>판매가</span>,
+      meta: { editable: true },
+    },
+    {
+      accessorKey: "stocks",
+      header: () => <span>재고</span>,
+      meta: { editable: true },
+    },
     {
       accessorKey: "delete",
       header: () => <span>삭제</span>,
       cell: () => <Button>삭제</Button>,
     },
   ];
-
-  const table = useReactTable({
-    data,
-    columns,
-    defaultColumn,
-    // onSortingChange: setSorting,
-    // onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      // sorting,
-      // columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
-    meta: {
-      updateData: (rowIndex: number, columnId: string, value: unknown) => {
-        // Skip page index reset until after next rerender
-        // skipAutoResetPageIndex();
-        setData((old) =>
-          old.map((row, index) => {
-            if (index === rowIndex) {
-              return {
-                ...old[rowIndex]!,
-                [columnId]: value,
-              };
-            }
-            return row;
-          })
-        );
-      },
-    },
-    debugTable: true,
-  });
 
   return (
     <Card>
@@ -276,54 +185,7 @@ export default function ProductOptionCard({
         </div>
       </div>
 
-      {/* 옵션 데이터 테이블 start */}
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup: any) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header: any) => {
-                  const rowSpan =
-                    header.depth === 1 && header.subHeaders.length === 1
-                      ? 2
-                      : 1;
-
-                  return header.depth === 1 || header.column.parent ? (
-                    <TableHead
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      rowSpan={rowSpan}
-                      className="text-center"
-                    >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                    </TableHead>
-                  ) : (
-                    <></>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.map((row: any) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell: any) => (
-                  <TableCell key={cell.id} className="text-center">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-      {/* 옵션 데이터 테이블 end */}
+      <DataGrid columns={columns} data={data} onChange={(v) => setData(v)} />
     </Card>
   );
 }

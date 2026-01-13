@@ -4,7 +4,7 @@ import Title from "~/common/components/title";
 import ProductOptionCard, {
   type ProductOptionArrayProps,
 } from "../components/product-option-card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProductImageCard from "../components/product-image-card";
 import type { Route } from "./+types/submit-product-page";
 import ProductDeliveryCard from "../components/product-delivery-card";
@@ -33,7 +33,10 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
 const formSchema = z.object({
   productName: z.string().min(1),
-  sex: z.string(),
+  gender: z.string(),
+  domainId: z.string(),
+  mainCategory: z.string(),
+  subCategory: z.string(),
 });
 
 export const action = async ({ request }: Route.ActionArgs) => {
@@ -52,6 +55,10 @@ export default function SubmitProductPage({
   const [productOptions, setProductOptions] = useState<
     ProductOptionArrayProps[]
   >([]);
+
+  useEffect(() => {
+    console.log("### productOption useEffect => ", productOptions);
+  }, [productOptions]);
 
   return (
     <Content className="">
