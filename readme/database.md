@@ -154,6 +154,70 @@ Rules:
 3. `npm run db:migrate` - migration 실행
 4. `npm run db:typegen` - TypeScript 타입 생성 (반드시 실행할 것!)
 
+### Naming Convention for Application Layer Types
+
+**규칙: DB 컬럼명(snake_case) vs Application 타입(camelCase)**
+
+- Database 스키마는 PostgreSQL 컨벤션에 따라 `snake_case`를 사용한다.
+- Application 레이어의 타입 정의는 JavaScript/TypeScript 컨벤션에 따라 `camelCase`를 사용한다.
+
+**언제 매핑이 필요한가?**
+
+✅ **매핑 필요 (Query에서 snake_case → camelCase 변환)**
+- Array 데이터를 컴포넌트 props로 전달하는 경우
+- 타입 추론이 안 되어 `/app/types/*.d.ts`에 별도 타입을 정의하는 경우
+- 여러 컴포넌트에서 props drilling으로 전달되는 경우
+
+❌ **매핑 불필요**
+- loader/action에서 데이터를 가져와 바로 화면에 렌더링하는 경우
+- Object 데이터를 개별 props로 분해하여 전달하는 경우 (컴포넌트 props 타입만 camelCase로 선언)
+
+**예시:**
+
+```typescript
+// Case 1: Array를 props로 전달 → Query에서 매핑 필요
+export const getSystemOptionsByDomain = async (client, domainId) => {
+  const { data } = await client.from("system_options").select("*");
+
+  // ✅ Array는 Query에서 매핑
+  return data.map(item => ({
+    id: item.id,
+    domainId: item.domain_id,  // snake_case → camelCase
+    code: item.code,
+  }));
+};
+
+// 타입 정의 (camelCase)
+export type SystemOption = {
+  id: number;
+  domainId: number;
+  code: string;
+};
+
+// 컴포넌트에서 사용
+<ProductCard systemOptions={systemOptions} />
+
+// Case 2: Object를 개별 props로 전달 → 컴포넌트 타입만 camelCase
+// Query는 그대로
+export const getSeller = async (client) => {
+  const { data } = await client.from("sellers").select("*").single();
+  return data; // domain_id 그대로 반환
+};
+
+// 컴포넌트 props는 camelCase
+interface SellerCardProps {
+  domainId: number;  // camelCase
+}
+
+// 사용 시 직접 연결
+<SellerCard domainId={seller.domain_id} />
+```
+
+**적용 원칙:**
+- 화면 레벨(컴포넌트)에서 매핑 작업을 하지 않는다.
+- 매핑이 필요하면 Query 함수에서 수행한다.
+- `/app/types/*.d.ts`의 모든 타입은 camelCase로 작성한다.
+
 ## 8. Notes for AI Assistants
 
 - 실제 컬럼 정의는 항상 `/app/features/**/schema.ts` 를 우선 참고한다.

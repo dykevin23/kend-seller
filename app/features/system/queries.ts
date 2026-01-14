@@ -108,5 +108,11 @@ export const getSystemOptionsByDomain = async (
     .order("id", { ascending: true });
 
   if (error) throw error;
-  return data;
+
+  return data.map((item) => ({
+    id: item.id,
+    code: item.code,
+    name: item.name,
+    domainId: item.domain_id,
+  }));
 };

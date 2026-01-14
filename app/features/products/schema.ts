@@ -22,6 +22,7 @@ export const GenderType = pgEnum(
 
 export const products = pgTable("products", {
   id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+  storage_folder: text().notNull(),
   name: text().notNull(),
   gender: GenderType().default("MALE").notNull(),
   domain_id: bigint({ mode: "number" }).references(() => domains.id),

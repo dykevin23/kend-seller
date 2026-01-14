@@ -4,7 +4,7 @@ import Title from "~/common/components/title";
 import ProductOptionCard, {
   type ProductOptionArrayProps,
 } from "../components/product-option-card";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import ProductImageCard from "../components/product-image-card";
 import type { Route } from "./+types/submit-product-page";
 import ProductDeliveryCard from "../components/product-delivery-card";
@@ -63,6 +63,9 @@ export default function SubmitProductPage({
     ProductOptionArrayProps[]
   >([]);
 
+  // UUID 생성 (상품 이미지 저장용 폴더명)
+  const storageFolder = useMemo(() => crypto.randomUUID(), []);
+
   useEffect(() => {
     console.log("### productOption useEffect => ", productOptions);
   }, [productOptions]);
@@ -83,9 +86,9 @@ export default function SubmitProductPage({
           systemOptions={loaderData.systemOptions}
         />
 
-        <ProductImageCard options={productOptions} />
+        <ProductImageCard options={productOptions} storageFolder={storageFolder} />
 
-        <ProductDescriptionCard />
+        <ProductDescriptionCard storageFolder={storageFolder} />
 
         {/* 상품 상세정보 */}
         <ProductDetailCard />

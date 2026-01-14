@@ -528,6 +528,7 @@ export type Database = {
           main_category: string
           name: string
           seller_id: number | null
+          storage_folder: string
           sub_category: string
           updated_at: string
         }
@@ -539,6 +540,7 @@ export type Database = {
           main_category: string
           name: string
           seller_id?: number | null
+          storage_folder: string
           sub_category: string
           updated_at?: string
         }
@@ -550,6 +552,7 @@ export type Database = {
           main_category?: string
           name?: string
           seller_id?: number | null
+          storage_folder?: string
           sub_category?: string
           updated_at?: string
         }

@@ -43,6 +43,13 @@
       "when": 1768289521124,
       "tag": "0005_naive_wong",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1768369118494,
+      "tag": "0006_brief_wolfsbane",
+      "breakpoints": true
     }
   ]
 }
