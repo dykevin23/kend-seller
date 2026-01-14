@@ -10,6 +10,7 @@ import { Button } from "~/common/components/ui/button";
 import { Label } from "~/common/components/ui/label";
 import { Separator } from "~/common/components/ui/separator";
 import type { AddressType } from "~/types/table";
+import { ADDRESS_TYPES } from "../constrants";
 
 interface SubmitAddressModalProps {
   open: boolean;
@@ -22,12 +23,6 @@ export default function SubmitAddressModal({
   onClose,
 }: SubmitAddressModalProps) {
   const [address, setAddress] = useState<IAddressType>();
-  const [addressTypeOptions] = useState<
-    { label: string; value: AddressType }[]
-  >([
-    { label: "출고지", value: "shipping" },
-    { label: "반품지", value: "return" },
-  ]);
   const handleZoneCode = (data: IAddressType) => {
     setAddress(data);
   };
@@ -57,7 +52,9 @@ export default function SubmitAddressModal({
           method="post"
           action="/seller/address/post"
         >
-          {!addressType && (
+          {addressType ? (
+            <input type="hidden" name="addressType" value={addressType} />
+          ) : (
             <div className="flex px-4">
               <Label htmlFor="addressType" className="w-1/4">
                 주소구분
@@ -65,7 +62,7 @@ export default function SubmitAddressModal({
               <RadioGroup
                 id="addressType"
                 name="addressType"
-                options={addressTypeOptions}
+                options={[...ADDRESS_TYPES]}
               />
             </div>
           )}

@@ -9,3 +9,15 @@ export const getSellerInfo = async (client: SupabaseClient<Database>) => {
   if (error) throw error;
   return data;
 };
+
+export const getSellerAddresses = async (
+  client: SupabaseClient<Database>,
+  sellerId: number
+) => {
+  const { data, error } = await client
+    .from("admin_seller_address")
+    .select("*")
+    .eq("seller_id", sellerId);
+  if (error) throw error;
+  return data || [];
+};

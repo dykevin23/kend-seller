@@ -5,29 +5,32 @@ import DataGrid from "~/common/components/data-grid";
 import { Button } from "~/common/components/ui/button";
 import SubmitAddressModal from "../components/submit-address-modal";
 import { useState } from "react";
-import { z } from "zod";
 import type { ColumnDef } from "@tanstack/react-table";
+import { makeSSRClient } from "~/supa-client";
+import { getSellerInfo, getSellerAddresses } from "../queries";
+import type { AddressType } from "~/types/table";
+import { useRevalidator } from "react-router";
 
 interface AddressProps {
-  id: string;
-  addressName: string;
-  addressType: string; // 주소 타입(도로명/지번)
-  zoneCode: string;
+  id: number;
+  address_name: string;
+  address_type: AddressType;
+  zone_code: string;
   address: string;
-  addressDetail: string;
+  address_detail: string;
 }
 
-export const loader = async ({}: Route.LoaderArgs) => {
-  const addressList: AddressProps[] = [
-    {
-      id: "address-1",
-      addressName: "주소1",
-      address: "외대역동로 63-27",
-      zoneCode: "11111",
-      addressDetail: "112동 1802호",
-      addressType: "1",
-    },
-  ];
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const { client } = makeSSRClient(request);
+
+  // 판매자 정보 가져오기
+  const seller = await getSellerInfo(client);
+  if (!seller) {
+    return { addressList: [] };
+  }
+
+  // 주소 목록 가져오기
+  const addressList = await getSellerAddresses(client, seller.id);
 
   return { addressList };
 };
@@ -35,27 +38,33 @@ export const loader = async ({}: Route.LoaderArgs) => {
 export default function AddressListPage({ loaderData }: Route.ComponentProps) {
   const [submitAddressModalOpen, setSubmitAddressModalOpen] =
     useState<boolean>(false);
+  const revalidator = useRevalidator();
+
+  const handleCloseModal = () => {
+    setSubmitAddressModalOpen(false);
+    // 모달 닫힐 때 페이지 데이터 새로고침
+    revalidator.revalidate();
+  };
 
   const columns: ColumnDef<AddressProps>[] = [
     {
-      accessorKey: "addressType",
+      accessorKey: "address_type",
       header: "구분",
       cell: ({ row }) => {
-        return row.getValue("addressType") === "1" ? "출고지" : "반품지";
+        return row.getValue("address_type") === "SHIPPING" ? "출고지" : "반품지";
       },
     },
-    { accessorKey: "addressName", header: "주소지명" },
+    { accessorKey: "address_name", header: "주소지명" },
     {
       accessorKey: "address",
       header: "주소",
-      cell: ({ row, ...rest }) => {
-        console.log("### row => ", row, rest);
+      cell: ({ row }) => {
         const original = row.original as AddressProps;
         return (
           <div className="flex flex-col">
-            <span>({original.zoneCode})</span>
+            <span>({original.zone_code})</span>
             <span>
-              {row.getValue("address") + " " + original.addressDetail}
+              {row.getValue("address") + " " + original.address_detail}
             </span>
           </div>
         );
@@ -82,7 +91,7 @@ export default function AddressListPage({ loaderData }: Route.ComponentProps) {
 
       <SubmitAddressModal
         open={submitAddressModalOpen}
-        onClose={() => setSubmitAddressModalOpen(false)}
+        onClose={handleCloseModal}
       />
     </>
   );

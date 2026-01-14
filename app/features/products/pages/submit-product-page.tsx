@@ -17,7 +17,7 @@ import ProductDescriptionCard from "../components/product-description-card";
 import { makeSSRClient } from "~/supa-client";
 import { getCategories, getSystemOptionsByDomain } from "~/features/system/queries";
 import { useRootData } from "~/hooks/useRootData";
-import { getSellerInfo } from "~/features/seller/queries";
+import { getSellerInfo, getSellerAddresses } from "~/features/seller/queries";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client, headers } = makeSSRClient(request);
@@ -33,7 +33,10 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     ? await getSystemOptionsByDomain(client, seller.domain_id)
     : [];
 
-  const addressList = [];
+  // 판매자 주소 목록
+  const addressList = seller?.id
+    ? await getSellerAddresses(client, seller.id)
+    : [];
 
   return { addressList, categories, systemOptions };
 };
@@ -94,10 +97,10 @@ export default function SubmitProductPage({
         <ProductDetailCard />
 
         {/* 배송지 */}
-        <ProductDeliveryCard />
+        <ProductDeliveryCard addressList={loaderData.addressList} />
 
         {/* 반품/교환 */}
-        <ProductReturnCard />
+        <ProductReturnCard addressList={loaderData.addressList} />
 
         <div className="flex justify-end">
           <Button type="submit">등록</Button>
