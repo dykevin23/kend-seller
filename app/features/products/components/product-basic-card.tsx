@@ -57,6 +57,7 @@ export default function ProductBasicCard({ categories }: BasicCardProps) {
             id="domainId"
             name="domainId"
             value={seller?.domain_id}
+            onChange={() => {}}
           />
         </div>
       </div>

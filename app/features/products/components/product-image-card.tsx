@@ -12,7 +12,7 @@ import { useRef, useState } from "react";
 import DataGrid from "~/common/components/data-grid";
 import { Button } from "~/common/components/ui/button";
 import { browserClient } from "~/supa-client";
-import { uploadProductImage, getFileExtension } from "../storage";
+import { uploadProductImage, getFileExtension, deleteProductImage } from "../storage";
 
 interface ProductImageCardProps {
   options: ProductOptionArrayProps[];
@@ -131,16 +131,41 @@ export default function ProductImageCard({
     }
   };
 
-  const handleRemoveMainImage = () => {
+  const handleRemoveMainImage = async () => {
     if (mainImage) {
-      setMainImage(undefined);
-      // TODO: Storage에서도 삭제할지 결정 (등록 완료 전이므로 보류)
+      try {
+        // Storage에서 삭제
+        await deleteProductImage(
+          browserClient,
+          storageFolder,
+          "images",
+          mainImage.fileName
+        );
+        setMainImage(undefined);
+      } catch (error) {
+        console.error("이미지 삭제 실패:", error);
+        alert("이미지 삭제에 실패했습니다.");
+      }
     }
   };
 
-  const handleRemoveAdditionalImage = (index: number) => {
-    setAdditionalImages(additionalImages.filter((_, i) => i !== index));
-    // TODO: Storage에서도 삭제할지 결정 (등록 완료 전이므로 보류)
+  const handleRemoveAdditionalImage = async (index: number) => {
+    const imageToRemove = additionalImages[index];
+    if (imageToRemove) {
+      try {
+        // Storage에서 삭제
+        await deleteProductImage(
+          browserClient,
+          storageFolder,
+          "images",
+          imageToRemove.fileName
+        );
+        setAdditionalImages(additionalImages.filter((_, i) => i !== index));
+      } catch (error) {
+        console.error("이미지 삭제 실패:", error);
+        alert("이미지 삭제에 실패했습니다.");
+      }
+    }
   };
 
   return (
@@ -178,11 +203,10 @@ export default function ProductImageCard({
                     <Button
                       type="button"
                       size="icon"
-                      variant="destructive"
-                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-white/90 hover:bg-white border border-gray-300 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                       onClick={handleRemoveMainImage}
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-4 h-4 text-black" />
                     </Button>
                   </div>
                 )}
@@ -226,11 +250,10 @@ export default function ProductImageCard({
                     <Button
                       type="button"
                       size="icon"
-                      variant="destructive"
-                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-white/90 hover:bg-white border border-gray-300 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                       onClick={() => handleRemoveAdditionalImage(index)}
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-4 h-4 text-black" />
                     </Button>
                   </div>
                 ))}

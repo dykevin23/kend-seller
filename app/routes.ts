@@ -11,6 +11,7 @@ export default [
 
   /* 상품 */
   ...prefix("products", [
+    index("features/products/pages/product-list-page.tsx"),
     // 상품등록 화면
     route("/submit", "features/products/pages/submit-product-page.tsx"),
   ]),

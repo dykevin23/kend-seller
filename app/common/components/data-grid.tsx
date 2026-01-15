@@ -15,6 +15,7 @@ import {
 } from "./ui/table";
 import { useEffect, useState } from "react";
 import TextField from "./text-field";
+import { formatNumber, parseNumber } from "~/common/utils/format";
 
 interface DataGridProps<T> {
   data: T[];
@@ -26,23 +27,40 @@ interface DataGridProps<T> {
 function EditableCell<T>({ getValue, row: { index }, column, table }: CellContext<T, unknown>) {
   const initialValue = getValue();
   const [value, setValue] = useState<string>("");
+  const isNumber = column.columnDef.meta?.isNumber || false;
 
   const onBlur = () => {
-    table.options.meta?.updateData(index, column.id, value);
+    // 숫자 필드는 콤마를 제거한 숫자 값으로 저장
+    const valueToSave = isNumber ? parseNumber(value) : value;
+    table.options.meta?.updateData(index, column.id, valueToSave);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+
+    if (isNumber) {
+      // 숫자만 허용
+      const cleaned = inputValue.replace(/[^\d]/g, "");
+      setValue(formatNumber(cleaned));
+    } else {
+      setValue(inputValue);
+    }
   };
 
   useEffect(() => {
     if (initialValue != null && initialValue !== "") {
-      setValue(String(initialValue));
+      const stringValue = String(initialValue);
+      setValue(isNumber ? formatNumber(stringValue) : stringValue);
     }
-  }, [initialValue]);
+  }, [initialValue, isNumber]);
 
   return (
     <TextField
       value={value}
       placeholder="0"
       onBlur={onBlur}
-      onChange={(e) => setValue(e.target.value)}
+      onChange={handleChange}
+      className={isNumber ? "text-right" : ""}
     />
   );
 }

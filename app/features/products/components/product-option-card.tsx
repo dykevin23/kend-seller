@@ -127,17 +127,17 @@ export default function ProductOptionCard({
     {
       accessorKey: "regularPrice",
       header: () => <span>정상가</span>,
-      meta: { editable: true },
+      meta: { editable: true, isNumber: true },
     },
     {
       accessorKey: "salePrice",
       header: () => <span>판매가</span>,
-      meta: { editable: true },
+      meta: { editable: true, isNumber: true },
     },
     {
       accessorKey: "stocks",
       header: () => <span>재고</span>,
-      meta: { editable: true },
+      meta: { editable: true, isNumber: true },
     },
     {
       accessorKey: "delete",

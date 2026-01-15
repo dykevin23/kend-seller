@@ -4,7 +4,7 @@ import { Plus, X, Loader } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button } from "~/common/components/ui/button";
 import { browserClient } from "~/supa-client";
-import { uploadProductImage, getFileExtension } from "../storage";
+import { uploadProductImage, getFileExtension, deleteProductImage } from "../storage";
 
 interface ProductDescriptionCardProps {
   storageFolder: string;
@@ -66,9 +66,23 @@ export default function ProductDescriptionCard({
     }
   };
 
-  const handleRemoveImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
-    // TODO: Storage에서도 삭제할지 결정 (등록 완료 전이므로 보류)
+  const handleRemoveImage = async (index: number) => {
+    const imageToRemove = images[index];
+    if (imageToRemove) {
+      try {
+        // Storage에서 삭제
+        await deleteProductImage(
+          browserClient,
+          storageFolder,
+          "descriptions",
+          imageToRemove.fileName
+        );
+        setImages(images.filter((_, i) => i !== index));
+      } catch (error) {
+        console.error("이미지 삭제 실패:", error);
+        alert("이미지 삭제에 실패했습니다.");
+      }
+    }
   };
 
   return (
@@ -118,11 +132,10 @@ export default function ProductDescriptionCard({
                 <Button
                   type="button"
                   size="icon"
-                  variant="destructive"
-                  className="absolute top-2 right-2 w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 hover:bg-white border border-gray-300 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                   onClick={() => handleRemoveImage(index)}
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-5 h-5 text-black" />
                 </Button>
                 <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
                   {index + 1}

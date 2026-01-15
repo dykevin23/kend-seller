@@ -9,6 +9,7 @@ declare module "@tanstack/react-table" {
     align?: "left" | "center" | "right";
     editable?: boolean;
     editType?: "input" | "select";
+    isNumber?: boolean;
   }
 }
 

@@ -19,7 +19,7 @@ const menus = [
       {
         name: "Products list",
         description: "See the top performers in your community",
-        to: "/products/list",
+        to: "/products",
       },
       {
         name: "Stocks Keeping",

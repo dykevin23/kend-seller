@@ -1,10 +1,10 @@
-import { Form } from "react-router";
+import { Form, useNavigate } from "react-router";
 import Content from "~/common/components/content";
 import Title from "~/common/components/title";
 import ProductOptionCard, {
   type ProductOptionArrayProps,
 } from "../components/product-option-card";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ProductImageCard from "../components/product-image-card";
 import type { Route } from "./+types/submit-product-page";
 import ProductDeliveryCard from "../components/product-delivery-card";
@@ -285,8 +285,10 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
 export default function SubmitProductPage({
   loaderData,
+  actionData,
 }: Route.ComponentProps) {
   const { seller } = useRootData();
+  const navigate = useNavigate();
   const [productOptions, setProductOptions] = useState<
     ProductOptionArrayProps[]
   >([]);
@@ -296,6 +298,16 @@ export default function SubmitProductPage({
 
   // UUID 생성 (상품 이미지 저장용 폴더명)
   const storageFolder = useMemo(() => crypto.randomUUID(), []);
+
+  // 등록 완료 시 처리
+  useEffect(() => {
+    if (actionData?.ok) {
+      alert("상품 등록이 완료되었습니다.");
+      navigate("/products");
+    } else if (actionData?.error) {
+      alert(actionData.error);
+    }
+  }, [actionData, navigate]);
 
   return (
     <Content className="">

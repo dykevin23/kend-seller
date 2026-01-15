@@ -8,6 +8,7 @@ import {
   ScrollRestoration,
   useLocation,
   useNavigate,
+  useNavigation,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -21,6 +22,7 @@ import { AlertProvider, useAlert } from "./hooks/useAlert";
 import { getAllCommonCodes } from "./features/system/queries";
 import { getSellerInfo } from "./features/seller/queries";
 import type { RootLoaderData } from "./hooks/useRootData";
+import { LoadingOverlay } from "./common/components/ui/spinner";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -87,9 +89,11 @@ export const loader = async ({
 export default function App({ loaderData }: Route.ComponentProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const navigation = useNavigation();
 
   const { alert } = useAlert();
   const isAuth = !pathname.includes("/auth/");
+  const isLoading = navigation.state === "loading" || navigation.state === "submitting";
 
   useEffect(() => {
     if (
@@ -111,16 +115,19 @@ export default function App({ loaderData }: Route.ComponentProps) {
   }, [loaderData.seller]);
 
   return (
-    <div
-      className={cn({
-        // "py-28 px-5 md:px-20": !pathname.includes("/auth/"),
-        // "transition-opacity animate-pulse": isLoading,
-        "pt-20": isAuth,
-      })}
-    >
-      {isAuth && <Navigation />}
-      <Outlet />
-    </div>
+    <>
+      <LoadingOverlay isLoading={isLoading} />
+      <div
+        className={cn({
+          // "py-28 px-5 md:px-20": !pathname.includes("/auth/"),
+          // "transition-opacity animate-pulse": isLoading,
+          "pt-20": isAuth,
+        })}
+      >
+        {isAuth && <Navigation />}
+        <Outlet />
+      </div>
+    </>
   );
 }
 
