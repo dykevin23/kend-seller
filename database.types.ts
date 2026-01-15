@@ -318,6 +318,69 @@ export type Database = {
           },
         ]
       }
+      product_deliveries: {
+        Row: {
+          address_id: number
+          bundle_delivery: Database["public"]["Enums"]["bundle_delivery_type"]
+          courier_company: Database["public"]["Enums"]["courier_company"]
+          created_at: string
+          delivery_method: Database["public"]["Enums"]["delivery_method_type"]
+          free_shipping_condition: number | null
+          id: number
+          island_delivery: Database["public"]["Enums"]["island_delivery_type"]
+          product_id: number
+          shipping_days: number
+          shipping_fee: number
+          shipping_fee_type: Database["public"]["Enums"]["shipping_fee_type"]
+          updated_at: string
+        }
+        Insert: {
+          address_id: number
+          bundle_delivery?: Database["public"]["Enums"]["bundle_delivery_type"]
+          courier_company?: Database["public"]["Enums"]["courier_company"]
+          created_at?: string
+          delivery_method?: Database["public"]["Enums"]["delivery_method_type"]
+          free_shipping_condition?: number | null
+          id?: never
+          island_delivery?: Database["public"]["Enums"]["island_delivery_type"]
+          product_id: number
+          shipping_days?: number
+          shipping_fee?: number
+          shipping_fee_type?: Database["public"]["Enums"]["shipping_fee_type"]
+          updated_at?: string
+        }
+        Update: {
+          address_id?: number
+          bundle_delivery?: Database["public"]["Enums"]["bundle_delivery_type"]
+          courier_company?: Database["public"]["Enums"]["courier_company"]
+          created_at?: string
+          delivery_method?: Database["public"]["Enums"]["delivery_method_type"]
+          free_shipping_condition?: number | null
+          id?: never
+          island_delivery?: Database["public"]["Enums"]["island_delivery_type"]
+          product_id?: number
+          shipping_days?: number
+          shipping_fee?: number
+          shipping_fee_type?: Database["public"]["Enums"]["shipping_fee_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_deliveries_address_id_admin_seller_address_id_fk"
+            columns: ["address_id"]
+            isOneToOne: false
+            referencedRelation: "admin_seller_address"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_deliveries_product_id_products_id_fk"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_descriptions: {
         Row: {
           content: string | null
@@ -471,6 +534,51 @@ export type Database = {
             columns: ["system_option_id"]
             isOneToOne: false
             referencedRelation: "system_options"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_returns: {
+        Row: {
+          address_id: number
+          created_at: string
+          id: number
+          initial_shipping_fee: number
+          product_id: number
+          return_shipping_fee: number
+          updated_at: string
+        }
+        Insert: {
+          address_id: number
+          created_at?: string
+          id?: never
+          initial_shipping_fee?: number
+          product_id: number
+          return_shipping_fee?: number
+          updated_at?: string
+        }
+        Update: {
+          address_id?: number
+          created_at?: string
+          id?: never
+          initial_shipping_fee?: number
+          product_id?: number
+          return_shipping_fee?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_returns_address_id_admin_seller_address_id_fk"
+            columns: ["address_id"]
+            isOneToOne: false
+            referencedRelation: "admin_seller_address"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_returns_product_id_products_id_fk"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -722,11 +830,31 @@ export type Database = {
     }
     Enums: {
       admin_address_type: "SHIPPING" | "RETURN"
+      bundle_delivery_type: "AVAILABLE" | "UNAVAILABLE"
+      courier_company:
+        | "CJ"
+        | "POST"
+        | "HANJIN"
+        | "LOGEN"
+        | "LOTTE"
+        | "KDEXP"
+        | "DAESIN"
+        | "GSM"
+        | "ILYANG"
+        | "HDEXP"
+      delivery_method_type:
+        | "STANDARD"
+        | "FRESH_FROZEN"
+        | "CUSTOM_ORDER"
+        | "PURCHASE_AGENCY"
+        | "INSTALLATION_DIRECT"
       description_type: "IMAGE" | "HTML"
       gender_type: "MALE" | "FEMALE" | "UNISEX"
       image_type: "MAIN" | "ADDITIONAL"
+      island_delivery_type: "AVAILABLE" | "UNAVAILABLE"
       role: "customer" | "seller" | "administrator"
       sales_status: "PREPARE" | "SALE" | "SOLD_OUT" | "STOP" | "COMPLETE"
+      shipping_fee_type: "FREE" | "PAID" | "COD" | "CONDITIONAL"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -855,11 +983,33 @@ export const Constants = {
   public: {
     Enums: {
       admin_address_type: ["SHIPPING", "RETURN"],
+      bundle_delivery_type: ["AVAILABLE", "UNAVAILABLE"],
+      courier_company: [
+        "CJ",
+        "POST",
+        "HANJIN",
+        "LOGEN",
+        "LOTTE",
+        "KDEXP",
+        "DAESIN",
+        "GSM",
+        "ILYANG",
+        "HDEXP",
+      ],
+      delivery_method_type: [
+        "STANDARD",
+        "FRESH_FROZEN",
+        "CUSTOM_ORDER",
+        "PURCHASE_AGENCY",
+        "INSTALLATION_DIRECT",
+      ],
       description_type: ["IMAGE", "HTML"],
       gender_type: ["MALE", "FEMALE", "UNISEX"],
       image_type: ["MAIN", "ADDITIONAL"],
+      island_delivery_type: ["AVAILABLE", "UNAVAILABLE"],
       role: ["customer", "seller", "administrator"],
       sales_status: ["PREPARE", "SALE", "SOLD_OUT", "STOP", "COMPLETE"],
+      shipping_fee_type: ["FREE", "PAID", "COD", "CONDITIONAL"],
     },
   },
 } as const

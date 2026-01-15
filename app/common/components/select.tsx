@@ -14,6 +14,7 @@ import { cn } from "~/lib/utils";
 interface SelectOptionProps {
   label: string;
   value: string;
+  disabled?: boolean;
 }
 
 interface SelectProps {
@@ -61,9 +62,12 @@ const SelectComponent = ({
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {/* <SelectLabel>Fruits</SelectLabel> */}
           {options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
+            <SelectItem
+              key={option.value}
+              value={option.value}
+              disabled={option.disabled}
+            >
               {option.label}
             </SelectItem>
           ))}

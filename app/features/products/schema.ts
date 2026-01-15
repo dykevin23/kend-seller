@@ -11,9 +11,14 @@ import {
   GENDER_TYPES,
   IMAGE_TYPES,
   SALES_STATUS,
+  ISLAND_DELIVERY_TYPES,
+  DELIVERY_METHOD_TYPES,
+  BUNDLE_DELIVERY_TYPES,
+  SHIPPING_FEE_TYPES,
+  COURIER_COMPANIES,
 } from "./constrants";
 import { domains, system_options } from "../system/schema";
-import { sellers } from "../seller/schema";
+import { sellers, sellers_address } from "../seller/schema";
 
 export const GenderType = pgEnum(
   "gender_type",
@@ -109,6 +114,76 @@ export const product_descriptions = pgTable("product_descriptions", {
   }),
   type: DescriptionType().notNull().default("IMAGE"),
   content: text(),
+  created_at: timestamp().notNull().defaultNow(),
+  updated_at: timestamp().notNull().defaultNow(),
+});
+
+// 제주/도서산간 배송여부
+export const IslandDeliveryType = pgEnum(
+  "island_delivery_type",
+  ISLAND_DELIVERY_TYPES.map((type) => type.value) as [string, ...string[]]
+);
+
+// 배송방법
+export const DeliveryMethodType = pgEnum(
+  "delivery_method_type",
+  DELIVERY_METHOD_TYPES.map((type) => type.value) as [string, ...string[]]
+);
+
+// 묶음배송
+export const BundleDeliveryType = pgEnum(
+  "bundle_delivery_type",
+  BUNDLE_DELIVERY_TYPES.map((type) => type.value) as [string, ...string[]]
+);
+
+// 배송비 종류
+export const ShippingFeeType = pgEnum(
+  "shipping_fee_type",
+  SHIPPING_FEE_TYPES.map((type) => type.value) as [string, ...string[]]
+);
+
+// 택배사
+export const CourierCompany = pgEnum(
+  "courier_company",
+  COURIER_COMPANIES.map((type) => type.value) as [string, ...string[]]
+);
+
+// 상품 배송정보
+export const product_deliveries = pgTable("product_deliveries", {
+  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+  product_id: bigint({ mode: "number" })
+    .references(() => products.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  address_id: bigint({ mode: "number" })
+    .references(() => sellers_address.id)
+    .notNull(),
+  island_delivery: IslandDeliveryType().notNull().default("AVAILABLE"),
+  delivery_method: DeliveryMethodType().notNull().default("STANDARD"),
+  bundle_delivery: BundleDeliveryType().notNull().default("AVAILABLE"),
+  shipping_fee_type: ShippingFeeType().notNull().default("FREE"),
+  shipping_fee: integer().notNull().default(0),
+  free_shipping_condition: integer().default(0),
+  shipping_days: integer().notNull().default(1),
+  courier_company: CourierCompany().notNull().default("CJ"),
+  created_at: timestamp().notNull().defaultNow(),
+  updated_at: timestamp().notNull().defaultNow(),
+});
+
+// 상품 반품/교환 정보
+export const product_returns = pgTable("product_returns", {
+  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+  product_id: bigint({ mode: "number" })
+    .references(() => products.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  address_id: bigint({ mode: "number" })
+    .references(() => sellers_address.id)
+    .notNull(),
+  initial_shipping_fee: integer().notNull().default(0),
+  return_shipping_fee: integer().notNull().default(0),
   created_at: timestamp().notNull().defaultNow(),
   updated_at: timestamp().notNull().defaultNow(),
 });

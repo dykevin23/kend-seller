@@ -218,7 +218,31 @@ interface SellerCardProps {
 - 매핑이 필요하면 Query 함수에서 수행한다.
 - `/app/types/*.d.ts`의 모든 타입은 camelCase로 작성한다.
 
-## 8. Notes for AI Assistants
+## 8. Query Code Convention
+
+각 feature 폴더에는 데이터베이스 쿼리를 담당하는 파일들을 다음과 같이 분리하여 작성한다.
+
+### queries.ts
+- **목적**: 조회(Read) 쿼리만 작성
+- **함수 네이밍**: `get` 접두어 사용
+- **예시**: `getProductById`, `getProductsByCategory`
+
+### mutations.ts
+- **목적**: 생성(Create), 수정(Update), 삭제(Delete) 쿼리 작성
+- **함수 네이밍**:
+  - 생성: `create` 접두어 (예: `createProduct`)
+  - 수정: `update` 접두어 (예: `updateProduct`)
+  - 삭제: `delete` 접두어 (예: `deleteProduct`)
+
+**파일 구조 예시:**
+```
+/app/features/products/
+  ├── schema.ts
+  ├── queries.ts      # getProducts, getProductById 등
+  ├── mutations.ts    # createProduct, updateProduct, deleteProduct 등
+```
+
+## 9. Notes for AI Assistants
 
 - 실제 컬럼 정의는 항상 `/app/features/**/schema.ts` 를 우선 참고한다.
 - 이 문서는 **의도(Intent)와 책임 경계(Boundary)** 를 설명하기 위한 것이다.

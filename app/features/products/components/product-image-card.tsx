@@ -17,9 +17,13 @@ import { uploadProductImage, getFileExtension } from "../storage";
 interface ProductImageCardProps {
   options: ProductOptionArrayProps[];
   storageFolder: string;
+  mainImage: ProductImage | undefined;
+  setMainImage: (image: ProductImage | undefined) => void;
+  additionalImages: ProductImage[];
+  setAdditionalImages: (images: ProductImage[]) => void;
 }
 
-interface Image {
+export interface ProductImage {
   url: string;
   fileName: string;
 }
@@ -29,11 +33,13 @@ const MAX_ADDITIONAL_IMAGES = 9;
 export default function ProductImageCard({
   options,
   storageFolder,
+  mainImage,
+  setMainImage,
+  additionalImages,
+  setAdditionalImages,
 }: ProductImageCardProps) {
   const mainFileInputRef = useRef<HTMLInputElement>(null);
   const additionalFileInputRef = useRef<HTMLInputElement>(null);
-  const [mainImage, setMainImage] = useState<Image>();
-  const [additionalImages, setAdditionalImages] = useState<Image[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleMainImg = () => {
@@ -91,7 +97,7 @@ export default function ProductImageCard({
     setIsUploading(true);
 
     try {
-      const uploadedImages: Image[] = [];
+      const uploadedImages: ProductImage[] = [];
 
       for (let i = 0; i < filesToAdd.length; i++) {
         const file = filesToAdd[i];
@@ -110,7 +116,7 @@ export default function ProductImageCard({
         uploadedImages.push({ url, fileName });
       }
 
-      setAdditionalImages((prev) => [...prev, ...uploadedImages]);
+      setAdditionalImages([...additionalImages, ...uploadedImages]);
 
       if (files.length > remainingSlots) {
         alert(
@@ -133,10 +139,8 @@ export default function ProductImageCard({
   };
 
   const handleRemoveAdditionalImage = (index: number) => {
-    setAdditionalImages((prev) => {
-      return prev.filter((_, i) => i !== index);
-      // TODO: Storage에서도 삭제할지 결정 (등록 완료 전이므로 보류)
-    });
+    setAdditionalImages(additionalImages.filter((_, i) => i !== index));
+    // TODO: Storage에서도 삭제할지 결정 (등록 완료 전이므로 보류)
   };
 
   return (

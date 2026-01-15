@@ -8,18 +8,21 @@ import { uploadProductImage, getFileExtension } from "../storage";
 
 interface ProductDescriptionCardProps {
   storageFolder: string;
+  images: DescriptionImage[];
+  setImages: (images: DescriptionImage[]) => void;
 }
 
-interface DescriptionImage {
+export interface DescriptionImage {
   url: string;
   fileName: string;
 }
 
 export default function ProductDescriptionCard({
   storageFolder,
+  images,
+  setImages,
 }: ProductDescriptionCardProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [images, setImages] = useState<DescriptionImage[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleAddImage = () => {
@@ -54,7 +57,7 @@ export default function ProductDescriptionCard({
         uploadedImages.push({ url, fileName });
       }
 
-      setImages((prev) => [...prev, ...uploadedImages]);
+      setImages([...images, ...uploadedImages]);
     } catch (error) {
       console.error("이미지 업로드 실패:", error);
       alert("이미지 업로드에 실패했습니다.");
@@ -64,7 +67,7 @@ export default function ProductDescriptionCard({
   };
 
   const handleRemoveImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+    setImages(images.filter((_, i) => i !== index));
     // TODO: Storage에서도 삭제할지 결정 (등록 완료 전이므로 보류)
   };
 

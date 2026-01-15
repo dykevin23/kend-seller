@@ -154,28 +154,35 @@ export default function ProductOptionCard({
           <Label className="w-full">옵션명</Label>
           <Label className="w-full">옵션값</Label>
         </div>
-        {productOptions.map((option, index) => (
-          <div className="flex" key={index}>
-            <div className="flex w-3/4 gap-4 pr-2">
-              <Select
-                options={systemOptions.map((option) => ({
-                  label: option.name,
-                  value: option.code,
-                }))}
-                value={option.optionKey}
-                onChange={handleChangeOptionKey(index)}
-              />
-              <TextField
-                value={option.values.join(",")}
-                // onChange={(e) => console.log("### onChange => ", e)}
-                onChange={handleChangeOptionValue(index)}
-              />
+        {productOptions.map((option, index) => {
+          // 이미 선택된 옵션 키 목록 (현재 인덱스 제외)
+          const selectedOptionKeys = productOptions
+            .map((opt, idx) => idx !== index && opt.optionKey)
+            .filter((key) => key !== false && key !== "");
+
+          return (
+            <div className="flex" key={index}>
+              <div className="flex w-3/4 gap-4 pr-2">
+                <Select
+                  options={systemOptions.map((sysOption) => ({
+                    label: sysOption.name,
+                    value: sysOption.code,
+                    disabled: selectedOptionKeys.includes(sysOption.code),
+                  }))}
+                  value={option.optionKey}
+                  onChange={handleChangeOptionKey(index)}
+                />
+                <TextField
+                  value={option.values.join(",")}
+                  onChange={handleChangeOptionValue(index)}
+                />
+              </div>
+              <Button size="icon-sm" onClick={handleAddOptions}>
+                <Plus />
+              </Button>
             </div>
-            <Button size="icon-sm" onClick={handleAddOptions}>
-              <Plus />
-            </Button>
-          </div>
-        ))}
+          );
+        })}
 
         <div>
           <Button onClick={handleAddOption}>옵션 추가하기</Button>
