@@ -138,3 +138,31 @@ export const createProductReturn = async (
   const { error } = await client.from("product_returns").insert(data);
   if (error) throw error;
 };
+
+// 상품 상태 변경
+export const updateProductStatus = async (
+  client: SupabaseClient,
+  productId: number,
+  status: string
+) => {
+  const { error } = await client
+    .from("products")
+    .update({ status })
+    .eq("id", productId);
+
+  if (error) throw error;
+};
+
+// SKU 상태 변경
+export const updateSKUStatus = async (
+  client: SupabaseClient,
+  skuId: number,
+  status: string
+) => {
+  const { error } = await client
+    .from("product_stock_keepings")
+    .update({ status })
+    .eq("id", skuId);
+
+  if (error) throw error;
+};

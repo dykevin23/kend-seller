@@ -5,11 +5,12 @@ export const GENDER_TYPES = [
 ] as const;
 
 export const SALES_STATUS = [
+  { label: "등록", value: "REGISTERED" },
   { label: "준비중", value: "PREPARE" },
   { label: "판매중", value: "SALE" },
   { label: "품절", value: "SOLD_OUT" },
   { label: "판매중지", value: "STOP" },
-  { label: "판매완료", value: "COMPLETE" },
+  { label: "판매종료", value: "END" },
 ] as const;
 
 export const IMAGE_TYPES = [

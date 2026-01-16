@@ -25,6 +25,11 @@ export const GenderType = pgEnum(
   GENDER_TYPES.map((type) => type.value) as [string, ...string[]]
 );
 
+export const SalesStatus = pgEnum(
+  "sales_status",
+  SALES_STATUS.map((type) => type.value) as [string, ...string[]]
+);
+
 export const products = pgTable("products", {
   id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
   storage_folder: text().notNull(),
@@ -36,6 +41,7 @@ export const products = pgTable("products", {
   seller_id: bigint({ mode: "number" }).references(() => sellers.id, {
     onDelete: "cascade",
   }),
+  status: SalesStatus().notNull().default("REGISTERED"),
   created_at: timestamp().notNull().defaultNow(),
   updated_at: timestamp().notNull().defaultNow(),
 });
@@ -50,11 +56,6 @@ export const product_detail = pgTable("product_details", {
   created_at: timestamp().notNull().defaultNow(),
   updated_at: timestamp().notNull().defaultNow(),
 });
-
-export const SalesStatus = pgEnum(
-  "sales_status",
-  SALES_STATUS.map((type) => type.value) as [string, ...string[]]
-);
 
 export const stockKeepings = pgTable("product_stock_keepings", {
   id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
