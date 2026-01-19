@@ -28,6 +28,7 @@
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.87.3",
     "@tanstack/react-table": "^8.21.3",
+    "@vercel/react-router": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "drizzle-orm": "^0.45.1",
     "isbot": "^5.1.31",
