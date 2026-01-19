@@ -70,7 +70,8 @@ export const loader = async ({
   if (user) {
     const profile = await getUserById(client, { id: user.id });
     if (profile) {
-      const seller = await getSellerInfo(client);
+      // admin은 seller 정보가 필요없음
+      const seller = profile.role === "seller" ? await getSellerInfo(client) : null;
       return { user, profile, seller, commonCodes };
     } else {
       await client.auth.signOut({ scope: "global" });

@@ -56,6 +56,13 @@ export type Database = {
             referencedRelation: "admin_sellers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "admin_seller_address_seller_id_admin_sellers_id_fk"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "seller_information_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
       admin_seller_members: {
@@ -86,6 +93,13 @@ export type Database = {
             columns: ["seller_id"]
             isOneToOne: false
             referencedRelation: "admin_sellers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_seller_members_seller_id_admin_sellers_id_fk"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "seller_information_view"
             referencedColumns: ["id"]
           },
           {
@@ -674,6 +688,13 @@ export type Database = {
             referencedRelation: "admin_sellers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "products_seller_id_admin_sellers_id_fk"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "seller_information_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
@@ -787,7 +808,32 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      seller_information_view: {
+        Row: {
+          address: string | null
+          address_detail: string | null
+          bizr_no: string | null
+          business: string | null
+          created_at: string | null
+          domain_id: string | null
+          domain_name: string | null
+          id: string | null
+          name: string | null
+          representative_name: string | null
+          seller_code: string | null
+          updated_at: string | null
+          zone_code: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_sellers_domain_id_domains_id_fk"
+            columns: ["domain_id"]
+            isOneToOne: false
+            referencedRelation: "domains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never

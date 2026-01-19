@@ -10,8 +10,24 @@ import {
   navigationMenuTriggerStyle,
 } from "./ui/navigation-menu";
 import { cn } from "~/lib/utils";
+import { useRootData } from "~/hooks/useRootData";
 
-const menus = [
+type Role = "seller" | "administrator";
+
+interface MenuItem {
+  name: string;
+  description: string;
+  to: string;
+}
+
+interface Menu {
+  name: string;
+  to: string;
+  items?: MenuItem[];
+  roles?: Role[]; // 접근 가능한 role 목록 (없으면 모두 접근 가능)
+}
+
+const menus: Menu[] = [
   {
     name: "Products",
     to: "/products",
@@ -52,6 +68,7 @@ const menus = [
   {
     name: "Seller Information",
     to: "/seller",
+    roles: ["seller"], // seller만 접근 가능
     items: [
       {
         name: "Delivery Address",
@@ -62,7 +79,8 @@ const menus = [
   },
   {
     name: "System",
-    to: "systems",
+    to: "/system",
+    roles: ["administrator"], // admin만 접근 가능
     items: [
       {
         name: "Domains",
@@ -89,6 +107,15 @@ const menus = [
 ];
 
 export default function Navigation() {
+  const { profile } = useRootData();
+  const userRole = profile?.role as Role | undefined;
+
+  // role에 따라 메뉴 필터링
+  const filteredMenus = menus.filter((menu) => {
+    if (!menu.roles) return true; // roles가 없으면 모두 접근 가능
+    if (!userRole) return false;
+    return menu.roles.includes(userRole);
+  });
   return (
     <nav className="flex px-20 h-16 items-center justify-between backdrop-blur fixed top-0 left-0 right-0 z-50 bg-background/50">
       <div className="flex items-center">
@@ -98,7 +125,7 @@ export default function Navigation() {
         <Separator orientation="vertical" className="h-6 mx-4" />
         <NavigationMenu>
           <NavigationMenuList>
-            {menus.map((menu) => (
+            {filteredMenus.map((menu) => (
               <NavigationMenuItem key={menu.name}>
                 {menu.items ? (
                   <>

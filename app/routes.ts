@@ -30,51 +30,53 @@ export default [
     ]),
   ]),
 
-  /* 시스템관리 */
-  ...prefix("system", [
-    // 도메인 관리
-    ...prefix("domains", [
-      index("features/system/pages/domains-page.tsx"),
-      route("/submit", "features/system/pages/submit-domain-page.tsx"),
-    ]),
-    // 카테고리 관리
-    ...prefix("categories", [
-      layout("features/system/layouts/category-layout.tsx", [
-        index("features/system/pages/main-categories-page.tsx"),
-        route("/submit", "features/system/pages/submit-main-category-page.tsx"),
-        ...prefix("/:categoryId", [
-          index("features/system/pages/main-category-page.tsx"),
+  /* 시스템관리 (admin 전용) */
+  layout("features/system/layouts/admin-layout.tsx", [
+    ...prefix("system", [
+      // 도메인 관리
+      ...prefix("domains", [
+        index("features/system/pages/domains-page.tsx"),
+        route("/submit", "features/system/pages/submit-domain-page.tsx"),
+      ]),
+      // 카테고리 관리
+      ...prefix("categories", [
+        layout("features/system/layouts/category-layout.tsx", [
+          index("features/system/pages/main-categories-page.tsx"),
+          route("/submit", "features/system/pages/submit-main-category-page.tsx"),
+          ...prefix("/:categoryId", [
+            index("features/system/pages/main-category-page.tsx"),
+            route(
+              "/submit",
+              "features/system/pages/submit-sub-categories-page.tsx"
+            ),
+            route(
+              "/sub/:subCategoryId",
+              "features/system/pages/sub-category-page.tsx"
+            ),
+          ]),
+        ]),
+      ]),
+      // 공통코드 관리
+      ...prefix("commonCodes", [
+        index("features/system/pages/common-code-groups-page.tsx"),
+        ...prefix("/group", [
+          ...prefix("/:groupId", [
+            index("features/system/pages/common-code-group-page.tsx"),
+            route("/submit", "features/system/pages/submit-common-code-page.tsx"),
+            route("/code/:codeId", "features/system/pages/common-code-page.tsx"),
+          ]),
           route(
             "/submit",
-            "features/system/pages/submit-sub-categories-page.tsx"
-          ),
-          route(
-            "/sub/:subCategoryId",
-            "features/system/pages/sub-category-page.tsx"
+            "features/system/pages/submit-common-code-group-page.tsx"
           ),
         ]),
       ]),
-    ]),
-    // 공통코드 관리
-    ...prefix("commonCodes", [
-      index("features/system/pages/common-code-groups-page.tsx"),
-      ...prefix("/group", [
-        ...prefix("/:groupId", [
-          index("features/system/pages/common-code-group-page.tsx"),
-          route("/submit", "features/system/pages/submit-common-code-page.tsx"),
-          route("/code/:codeId", "features/system/pages/common-code-page.tsx"),
-        ]),
-        route(
-          "/submit",
-          "features/system/pages/submit-common-code-group-page.tsx"
-        ),
+      // 시스템 옵션 관리
+      ...prefix("systemOptions", [
+        index("features/system/pages/system-options-page.tsx"),
+        route("/submit", "features/system/pages/submit-system-option-page.tsx"),
+        route("/:id", "features/system/pages/system-option-page.tsx"),
       ]),
-    ]),
-    // 시스템 옵션 관리
-    ...prefix("systemOptions", [
-      index("features/system/pages/system-options-page.tsx"),
-      route("/submit", "features/system/pages/submit-system-option-page.tsx"),
-      route("/:id", "features/system/pages/system-option-page.tsx"),
     ]),
   ]),
 

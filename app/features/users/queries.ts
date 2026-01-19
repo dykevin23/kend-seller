@@ -19,7 +19,7 @@ export const getUserById = async (
         role
       `
     )
-    .eq("role", "seller")
+    .in("role", ["seller", "administrator"])
     .eq("profile_id", id)
     .single();
 
