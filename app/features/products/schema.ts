@@ -1,10 +1,10 @@
 import {
-  bigint,
   integer,
   pgEnum,
   pgTable,
   text,
   timestamp,
+  uuid,
 } from "drizzle-orm/pg-core";
 import {
   DESCRIPTION_TYPES,
@@ -31,14 +31,15 @@ export const SalesStatus = pgEnum(
 );
 
 export const products = pgTable("products", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
+  product_code: text().notNull().unique(), // PR00000001
   storage_folder: text().notNull(),
   name: text().notNull(),
   gender: GenderType().default("MALE").notNull(),
-  domain_id: bigint({ mode: "number" }).references(() => domains.id),
+  domain_id: uuid().references(() => domains.id),
   main_category: text().notNull(),
   sub_category: text().notNull(),
-  seller_id: bigint({ mode: "number" }).references(() => sellers.id, {
+  seller_id: uuid().references(() => sellers.id, {
     onDelete: "cascade",
   }),
   status: SalesStatus().notNull().default("REGISTERED"),
@@ -47,8 +48,8 @@ export const products = pgTable("products", {
 });
 
 export const product_detail = pgTable("product_details", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  product_id: bigint({ mode: "number" }).references(() => products.id, {
+  id: uuid().primaryKey().defaultRandom(),
+  product_id: uuid().references(() => products.id, {
     onDelete: "cascade",
   }),
   brand: text(),
@@ -58,9 +59,9 @@ export const product_detail = pgTable("product_details", {
 });
 
 export const stockKeepings = pgTable("product_stock_keepings", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  sku_code: text().notNull(),
-  product_id: bigint({ mode: "number" }).references(() => products.id, {
+  id: uuid().primaryKey().defaultRandom(),
+  sku_code: text().notNull().unique(), // sku-1
+  product_id: uuid().references(() => products.id, {
     onDelete: "cascade",
   }),
   stock: integer().notNull().default(0),
@@ -72,11 +73,11 @@ export const stockKeepings = pgTable("product_stock_keepings", {
 });
 
 export const product_options = pgTable("product_options", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  product_id: bigint({ mode: "number" }).references(() => products.id, {
+  id: uuid().primaryKey().defaultRandom(),
+  product_id: uuid().references(() => products.id, {
     onDelete: "cascade",
   }),
-  system_option_id: bigint({ mode: "number" })
+  system_option_id: uuid()
     .references(() => system_options.id)
     .notNull(),
   option: text().notNull(),
@@ -90,11 +91,11 @@ export const ImageType = pgEnum(
 );
 
 export const product_images = pgTable("product_images", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  product_id: bigint({ mode: "number" }).references(() => products.id, {
+  id: uuid().primaryKey().defaultRandom(),
+  product_id: uuid().references(() => products.id, {
     onDelete: "cascade",
   }),
-  sku_id: bigint({ mode: "number" }).references(() => stockKeepings.id, {
+  sku_id: uuid().references(() => stockKeepings.id, {
     onDelete: "cascade",
   }),
   type: ImageType().notNull().default("MAIN"),
@@ -109,8 +110,8 @@ export const DescriptionType = pgEnum(
 );
 
 export const product_descriptions = pgTable("product_descriptions", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  product_id: bigint({ mode: "number" }).references(() => products.id, {
+  id: uuid().primaryKey().defaultRandom(),
+  product_id: uuid().references(() => products.id, {
     onDelete: "cascade",
   }),
   type: DescriptionType().notNull().default("IMAGE"),
@@ -151,13 +152,13 @@ export const CourierCompany = pgEnum(
 
 // 상품 배송정보
 export const product_deliveries = pgTable("product_deliveries", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  product_id: bigint({ mode: "number" })
+  id: uuid().primaryKey().defaultRandom(),
+  product_id: uuid()
     .references(() => products.id, {
       onDelete: "cascade",
     })
     .notNull(),
-  address_id: bigint({ mode: "number" })
+  address_id: uuid()
     .references(() => sellers_address.id)
     .notNull(),
   island_delivery: IslandDeliveryType().notNull().default("AVAILABLE"),
@@ -174,13 +175,13 @@ export const product_deliveries = pgTable("product_deliveries", {
 
 // 상품 반품/교환 정보
 export const product_returns = pgTable("product_returns", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  product_id: bigint({ mode: "number" })
+  id: uuid().primaryKey().defaultRandom(),
+  product_id: uuid()
     .references(() => products.id, {
       onDelete: "cascade",
     })
     .notNull(),
-  address_id: bigint({ mode: "number" })
+  address_id: uuid()
     .references(() => sellers_address.id)
     .notNull(),
   initial_shipping_fee: integer().notNull().default(0),

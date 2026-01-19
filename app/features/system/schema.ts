@@ -1,4 +1,4 @@
-import { bigint, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 /**
  * 도메인 테이블(domains)
@@ -8,7 +8,7 @@ import { bigint, pgTable, text, timestamp } from "drizzle-orm/pg-core";
  * use_yn: 사용유무
  */
 export const domains = pgTable("domains", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
   code: text().notNull().unique(),
   name: text().notNull(),
   use_yn: text().notNull(),
@@ -17,8 +17,8 @@ export const domains = pgTable("domains", {
 });
 
 export const main_categories = pgTable("main_categories", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  domain_id: bigint({ mode: "number" })
+  id: uuid().primaryKey().defaultRandom(),
+  domain_id: uuid()
     .references(() => domains.id)
     .notNull(),
   code: text().notNull().unique(),
@@ -28,8 +28,8 @@ export const main_categories = pgTable("main_categories", {
 });
 
 export const sub_categories = pgTable("sub_categories", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  main_category_code: bigint({ mode: "number" })
+  id: uuid().primaryKey().defaultRandom(),
+  main_category_id: uuid()
     .references(() => main_categories.id, { onDelete: "cascade" })
     .notNull(),
   code: text().notNull(),
@@ -39,8 +39,8 @@ export const sub_categories = pgTable("sub_categories", {
 });
 
 export const system_options = pgTable("system_options", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  domain_id: bigint({ mode: "number" })
+  id: uuid().primaryKey().defaultRandom(),
+  domain_id: uuid()
     .references(() => domains.id)
     .notNull(),
   code: text().notNull().unique(),
@@ -50,7 +50,7 @@ export const system_options = pgTable("system_options", {
 });
 
 export const common_code_group = pgTable("common_code_group", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
   code: text().notNull().unique(),
   name: text().notNull(),
   created_at: timestamp().notNull().defaultNow(),
@@ -58,11 +58,10 @@ export const common_code_group = pgTable("common_code_group", {
 });
 
 export const common_codes = pgTable("common_codes", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  group_code: bigint({ mode: "number" }).references(
-    () => common_code_group.id,
-    { onDelete: "cascade" }
-  ),
+  id: uuid().primaryKey().defaultRandom(),
+  group_id: uuid().references(() => common_code_group.id, {
+    onDelete: "cascade",
+  }),
   code: text().notNull().unique(),
   name: text().notNull(),
   use_yn: text().notNull().default("Y"),

@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "~/supa-client";
 
+// seller_code는 DB Trigger에서 자동 생성됨
 export const createSellerInformation = async (
   client: SupabaseClient<Database>,
   {
@@ -35,9 +36,9 @@ export const createSellerInformation = async (
       address: address,
       address_detail: addressDetail,
       business: business,
-      domain_id: Number(domain),
+      domain_id: domain,
     })
-    .select("id")
+    .select("id, seller_code")
     .single();
 
   if (sellerError) throw sellerError;

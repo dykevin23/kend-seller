@@ -17,14 +17,14 @@ export const getAllCommonCodes = async (client: SupabaseClient<Database>) => {
 
   const { data: codeData, error: codesError } = await client
     .from("common_codes")
-    .select(`id, group_code, code, name, use_yn`);
+    .select(`id, group_id, code, name, use_yn`);
   if (codesError) throw codesError;
 
   const commonCodegroup = groupData.map((group) => {
     return {
       ...group,
       children: codeData.filter(
-        (commonCode) => commonCode.group_code === group.id
+        (commonCode) => commonCode.group_id === group.id
       ),
     };
   });
@@ -41,14 +41,14 @@ export const getCategories = async (
     .select(`id, code, name, domain_id`);
 
   if (typeof domainId === "string") {
-    baseQuery.eq("domain_id", Number(domainId));
+    baseQuery.eq("domain_id", domainId);
   }
   const { data: mainCategories, error: mainError } = await baseQuery;
   if (mainError) throw mainError;
 
   const { data: subCategories, error: subError } = await client
     .from("sub_categories")
-    .select(`id, main_category_code, code, name`);
+    .select(`id, main_category_id, code, name`);
   if (subError) throw subError;
 
   const result = mainCategories.map((main) => {
@@ -58,13 +58,13 @@ export const getCategories = async (
       name: main.name,
       domainId: main.domain_id,
       children: subCategories
-        .filter((sub) => sub.main_category_code === main.id)
+        .filter((sub) => sub.main_category_id === main.id)
         .map((sub) => {
           return {
             id: sub.id,
             code: sub.code,
             name: sub.name,
-            mainCategoryId: sub.main_category_code,
+            mainCategoryId: sub.main_category_id,
           };
         }),
     };
@@ -85,7 +85,7 @@ export const getSystemOptions = async (client: SupabaseClient<Database>) => {
 
 export const getSystemOptionById = async (
   client: SupabaseClient<Database>,
-  id: number
+  id: string
 ) => {
   const { data, error } = await client
     .from("system_options")
@@ -99,7 +99,7 @@ export const getSystemOptionById = async (
 
 export const getSystemOptionsByDomain = async (
   client: SupabaseClient<Database>,
-  domainId: number
+  domainId: string
 ) => {
   const { data, error } = await client
     .from("system_options")

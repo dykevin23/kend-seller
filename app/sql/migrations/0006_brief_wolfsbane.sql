@@ -1,1 +1,0 @@
-ALTER TABLE "products" ADD COLUMN "storage_folder" text NOT NULL;

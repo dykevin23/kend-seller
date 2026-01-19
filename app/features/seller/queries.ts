@@ -6,13 +6,16 @@ export const getSellerInfo = async (client: SupabaseClient<Database>) => {
     .from("seller_information_view")
     .select("*")
     .maybeSingle();
-  if (error) throw error;
+  if (error) {
+    console.error("getSellerInfo error:", error);
+    return null;
+  }
   return data;
 };
 
 export const getSellerAddresses = async (
   client: SupabaseClient<Database>,
-  sellerId: number
+  sellerId: string
 ) => {
   const { data, error } = await client
     .from("admin_seller_address")

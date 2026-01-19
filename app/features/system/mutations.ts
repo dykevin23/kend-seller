@@ -54,7 +54,7 @@ export const createCommonCode = async (
   const { data, error } = await client.from("common_codes").insert({
     code: code,
     name: name,
-    group_code: Number(group_id),
+    group_id: group_id,
     use_yn: "Y",
   });
 
@@ -68,7 +68,7 @@ export const createMainCategory = async (
   const { data, error } = await client
     .from("main_categories")
     .insert({
-      domain_id: Number(domainId),
+      domain_id: domainId,
       code: code,
       name: name,
     })
@@ -84,7 +84,7 @@ export const createSubCategory = async (
   { categoryId, code, name }: { categoryId: string; code: string; name: string }
 ) => {
   const { error } = await client.from("sub_categories").insert({
-    main_category_code: Number(categoryId),
+    main_category_id: categoryId,
     code: code,
     name: name,
   });
@@ -105,7 +105,7 @@ export const createSystemOption = async (
   }
 ) => {
   const { error } = await client.from("system_options").insert({
-    domain_id: domainId ? Number(domainId) : null,
+    domain_id: domainId ?? null,
     code: code,
     name: name,
   });
@@ -121,7 +121,7 @@ export const updateSystemOption = async (
     code,
     name,
   }: {
-    id: number;
+    id: string;
     domainId?: string;
     code: string;
     name: string;
@@ -130,7 +130,7 @@ export const updateSystemOption = async (
   const { error } = await client
     .from("system_options")
     .update({
-      domain_id: domainId ? Number(domainId) : null,
+      domain_id: domainId ?? null,
       code: code,
       name: name,
     })

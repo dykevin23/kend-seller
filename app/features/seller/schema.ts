@@ -1,11 +1,4 @@
-import {
-  bigint,
-  pgEnum,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { domains } from "../system/schema";
 import { ADDRESS_TYPES } from "./constrants";
 import { profiles } from "../users/external/profiles";
@@ -23,7 +16,8 @@ import { profiles } from "../users/external/profiles";
  * domain_id: 대표 도메인
  */
 export const sellers = pgTable("admin_sellers", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid().primaryKey().defaultRandom(),
+  seller_code: text().notNull().unique(), // SL0001
   bizr_no: text().notNull(),
   name: text().notNull(),
   representative_name: text().notNull(),
@@ -31,14 +25,14 @@ export const sellers = pgTable("admin_sellers", {
   address: text().notNull(),
   address_detail: text().notNull(),
   business: text().notNull(),
-  domain_id: bigint({ mode: "number" }).references(() => domains.id),
+  domain_id: uuid().references(() => domains.id),
   created_at: timestamp().notNull().defaultNow(),
   updated_at: timestamp().notNull().defaultNow(),
 });
 
 export const seller_members = pgTable("admin_seller_members", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  seller_id: bigint({ mode: "number" }).references(() => sellers.id, {
+  id: uuid().primaryKey().defaultRandom(),
+  seller_id: uuid().references(() => sellers.id, {
     onDelete: "cascade",
   }),
   user_id: uuid().references(() => profiles.profile_id, {
@@ -64,8 +58,8 @@ export const AdminAddressType = pgEnum(
  * address_type: 출고지/반품지 주소타입
  */
 export const sellers_address = pgTable("admin_seller_address", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  seller_id: bigint({ mode: "number" }).references(() => sellers.id, {
+  id: uuid().primaryKey().defaultRandom(),
+  seller_id: uuid().references(() => sellers.id, {
     onDelete: "cascade",
   }),
   address_name: text().notNull(),

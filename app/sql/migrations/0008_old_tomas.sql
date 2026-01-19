@@ -1,2 +1,0 @@
-CREATE TYPE "public"."courier_company" AS ENUM('CJ', 'POST', 'HANJIN', 'LOGEN', 'LOTTE', 'KDEXP', 'DAESIN', 'GSM', 'ILYANG', 'HDEXP');--> statement-breakpoint
-ALTER TABLE "product_deliveries" ADD COLUMN "courier_company" "courier_company" DEFAULT 'CJ' NOT NULL;
