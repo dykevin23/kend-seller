@@ -634,7 +634,6 @@ export type Database = {
         Row: {
           created_at: string
           domain_id: string | null
-          gender: Database["public"]["Enums"]["gender_type"]
           id: string
           main_category: string
           name: string
@@ -643,12 +642,13 @@ export type Database = {
           status: Database["public"]["Enums"]["sales_status"]
           storage_folder: string
           sub_category: string
+          target_age: Database["public"]["Enums"]["target_age_type"]
+          target_gender: Database["public"]["Enums"]["target_gender_type"]
           updated_at: string
         }
         Insert: {
           created_at?: string
           domain_id?: string | null
-          gender?: Database["public"]["Enums"]["gender_type"]
           id?: string
           main_category: string
           name: string
@@ -657,12 +657,13 @@ export type Database = {
           status?: Database["public"]["Enums"]["sales_status"]
           storage_folder: string
           sub_category: string
+          target_age?: Database["public"]["Enums"]["target_age_type"]
+          target_gender?: Database["public"]["Enums"]["target_gender_type"]
           updated_at?: string
         }
         Update: {
           created_at?: string
           domain_id?: string | null
-          gender?: Database["public"]["Enums"]["gender_type"]
           id?: string
           main_category?: string
           name?: string
@@ -671,6 +672,8 @@ export type Database = {
           status?: Database["public"]["Enums"]["sales_status"]
           storage_folder?: string
           sub_category?: string
+          target_age?: Database["public"]["Enums"]["target_age_type"]
+          target_gender?: Database["public"]["Enums"]["target_gender_type"]
           updated_at?: string
         }
         Relationships: [
@@ -859,7 +862,6 @@ export type Database = {
         | "PURCHASE_AGENCY"
         | "INSTALLATION_DIRECT"
       description_type: "IMAGE" | "HTML"
-      gender_type: "MALE" | "FEMALE" | "UNISEX"
       image_type: "MAIN" | "ADDITIONAL"
       island_delivery_type: "AVAILABLE" | "UNAVAILABLE"
       role: "customer" | "seller" | "administrator"
@@ -871,6 +873,8 @@ export type Database = {
         | "STOP"
         | "END"
       shipping_fee_type: "FREE" | "PAID" | "COD" | "CONDITIONAL"
+      target_age_type: "BABY" | "KIDS"
+      target_gender_type: "GIRL" | "BOY" | "UNISEX"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1020,7 +1024,6 @@ export const Constants = {
         "INSTALLATION_DIRECT",
       ],
       description_type: ["IMAGE", "HTML"],
-      gender_type: ["MALE", "FEMALE", "UNISEX"],
       image_type: ["MAIN", "ADDITIONAL"],
       island_delivery_type: ["AVAILABLE", "UNAVAILABLE"],
       role: ["customer", "seller", "administrator"],
@@ -1033,6 +1036,8 @@ export const Constants = {
         "END",
       ],
       shipping_fee_type: ["FREE", "PAID", "COD", "CONDITIONAL"],
+      target_age_type: ["BABY", "KIDS"],
+      target_gender_type: ["GIRL", "BOY", "UNISEX"],
     },
   },
 } as const

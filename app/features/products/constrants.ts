@@ -1,7 +1,12 @@
-export const GENDER_TYPES = [
-  { label: "남성", value: "MALE" },
-  { label: "여성", value: "FEMALE" },
-  { label: "남여공용", value: "UNISEX" },
+export const TARGET_GENDER_TYPES = [
+  { label: "여아", value: "GIRL" },
+  { label: "남아", value: "BOY" },
+  { label: "공용", value: "UNISEX" },
+] as const;
+
+export const TARGET_AGE_TYPES = [
+  { label: "베이비(0~36개월)", value: "BABY" },
+  { label: "키즈(4~7세)", value: "KIDS" },
 ] as const;
 
 export const SALES_STATUS = [

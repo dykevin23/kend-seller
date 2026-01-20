@@ -8,7 +8,8 @@ import {
 } from "drizzle-orm/pg-core";
 import {
   DESCRIPTION_TYPES,
-  GENDER_TYPES,
+  TARGET_GENDER_TYPES,
+  TARGET_AGE_TYPES,
   IMAGE_TYPES,
   SALES_STATUS,
   ISLAND_DELIVERY_TYPES,
@@ -20,9 +21,14 @@ import {
 import { domains, system_options } from "../system/schema";
 import { sellers, sellers_address } from "../seller/schema";
 
-export const GenderType = pgEnum(
-  "gender_type",
-  GENDER_TYPES.map((type) => type.value) as [string, ...string[]]
+export const TargetGenderType = pgEnum(
+  "target_gender_type",
+  TARGET_GENDER_TYPES.map((type) => type.value) as [string, ...string[]]
+);
+
+export const TargetAgeType = pgEnum(
+  "target_age_type",
+  TARGET_AGE_TYPES.map((type) => type.value) as [string, ...string[]]
 );
 
 export const SalesStatus = pgEnum(
@@ -35,7 +41,8 @@ export const products = pgTable("products", {
   product_code: text().notNull().unique(), // PR00000001
   storage_folder: text().notNull(),
   name: text().notNull(),
-  gender: GenderType().default("MALE").notNull(),
+  target_gender: TargetGenderType().default("UNISEX").notNull(),
+  target_age: TargetAgeType().default("BABY").notNull(),
   domain_id: uuid().references(() => domains.id),
   main_category: text().notNull(),
   sub_category: text().notNull(),
