@@ -17,8 +17,8 @@ export default function CommonCodeGroupPage() {
   const navigate = useNavigate();
   const { commonCodes } = useRootData();
 
-  const handleRowClick = (id: number) => {
-    navigate(`./group/${id}`);
+  const handleRowClick = (code: string) => {
+    navigate(`./group/${code}`);
   };
 
   return (
@@ -40,7 +40,7 @@ export default function CommonCodeGroupPage() {
               {commonCodes.map((commonCode, index) => (
                 <TableRow
                   key={commonCode.id}
-                  onClick={() => handleRowClick(commonCode.id)}
+                  onClick={() => handleRowClick(commonCode.code)}
                 >
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{commonCode.code}</TableCell>

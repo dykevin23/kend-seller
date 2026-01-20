@@ -71,7 +71,8 @@ export const loader = async ({
     const profile = await getUserById(client, { id: user.id });
     if (profile) {
       // admin은 seller 정보가 필요없음
-      const seller = profile.role === "seller" ? await getSellerInfo(client) : null;
+      const seller =
+        profile.role === "seller" ? await getSellerInfo(client) : null;
       return { user, profile, seller, commonCodes };
     } else {
       await client.auth.signOut({ scope: "global" });
@@ -94,10 +95,12 @@ export default function App({ loaderData }: Route.ComponentProps) {
 
   const { alert } = useAlert();
   const isAuth = !pathname.includes("/auth/");
-  const isLoading = navigation.state === "loading" || navigation.state === "submitting";
+  const isLoading =
+    navigation.state === "loading" || navigation.state === "submitting";
 
   useEffect(() => {
     if (
+      loaderData.profile?.role === "seller" &&
       !loaderData.seller &&
       isAuth &&
       pathname !== "/seller/information/submit"

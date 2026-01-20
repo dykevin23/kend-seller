@@ -4,15 +4,30 @@ import TextField from "~/common/components/text-field";
 import { Button } from "~/common/components/ui/button";
 import type { Route } from "./+types/sub-category-page";
 
+interface SubCategory {
+  id: string;
+  code: string;
+  name: string;
+  mainCategoryId: string;
+}
+
+interface Category {
+  id: string;
+  code: string;
+  name: string;
+  domainId: string | null;
+  children: SubCategory[];
+}
+
 export default function SubCategoryPage({ params }: Route.ComponentProps) {
   const navigate = useNavigate();
-  const { categories } = useOutletContext<{ categories: any }>();
+  const { categories } = useOutletContext<{ categories: Category[] }>();
 
   const category = categories.find(
-    (item) => item.id === Number(params.categoryId)
+    (item) => item.code === params.categoryCode
   );
   const subCategory = category?.children.find(
-    (item) => item.id === Number(params.subCategoryId)
+    (item) => item.code === params.subCategoryCode
   );
 
   return (

@@ -6,6 +6,7 @@ import TextField from "~/common/components/text-field";
 import { z } from "zod";
 import { makeSSRClient } from "~/supa-client";
 import { createSubCategory } from "../mutations";
+import { getMainCategoryByCode } from "../queries";
 
 export const formSchema = z.object({
   code: z.string().min(3),
@@ -24,13 +25,16 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
   const { code, name } = data;
   const { client } = makeSSRClient(request);
 
+  // code로 조회하여 id 획득
+  const category = await getMainCategoryByCode(client, params.categoryCode);
+
   await createSubCategory(client, {
-    categoryId: params.categoryId,
+    categoryId: category.id,
     code: code,
     name: name,
   });
 
-  return redirect(`/system/categories/${params.categoryId}`);
+  return redirect(`/system/categories/${params.categoryCode}`);
 };
 
 export default function SubmitSubCategoriesPage({
@@ -39,7 +43,7 @@ export default function SubmitSubCategoriesPage({
   const navigate = useNavigate();
   const { categories } = useOutletContext<{ categories: any }>();
   const category = categories.find(
-    (item) => item.id === Number(params.categoryId)
+    (item: any) => item.code === params.categoryCode
   );
   return (
     <Form method="post" className="space-y-5">

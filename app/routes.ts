@@ -43,14 +43,14 @@ export default [
         layout("features/system/layouts/category-layout.tsx", [
           index("features/system/pages/main-categories-page.tsx"),
           route("/submit", "features/system/pages/submit-main-category-page.tsx"),
-          ...prefix("/:categoryId", [
+          ...prefix("/:categoryCode", [
             index("features/system/pages/main-category-page.tsx"),
             route(
               "/submit",
               "features/system/pages/submit-sub-categories-page.tsx"
             ),
             route(
-              "/sub/:subCategoryId",
+              "/sub/:subCategoryCode",
               "features/system/pages/sub-category-page.tsx"
             ),
           ]),
@@ -60,10 +60,10 @@ export default [
       ...prefix("commonCodes", [
         index("features/system/pages/common-code-groups-page.tsx"),
         ...prefix("/group", [
-          ...prefix("/:groupId", [
+          ...prefix("/:groupCode", [
             index("features/system/pages/common-code-group-page.tsx"),
             route("/submit", "features/system/pages/submit-common-code-page.tsx"),
-            route("/code/:codeId", "features/system/pages/common-code-page.tsx"),
+            route("/code/:codeValue", "features/system/pages/common-code-page.tsx"),
           ]),
           route(
             "/submit",
@@ -75,7 +75,7 @@ export default [
       ...prefix("systemOptions", [
         index("features/system/pages/system-options-page.tsx"),
         route("/submit", "features/system/pages/submit-system-option-page.tsx"),
-        route("/:id", "features/system/pages/system-option-page.tsx"),
+        route("/:optionCode", "features/system/pages/system-option-page.tsx"),
       ]),
     ]),
   ]),

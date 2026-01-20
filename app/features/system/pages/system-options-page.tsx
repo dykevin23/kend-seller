@@ -29,8 +29,8 @@ export default function SystemOptionsPage({
   const navigate = useNavigate();
   const { systemOptions, domains } = loaderData;
 
-  const handleRowClick = (id: number) => {
-    navigate(`./${id}`);
+  const handleRowClick = (code: string) => {
+    navigate(`./${code}`);
   };
 
   return (
@@ -54,7 +54,7 @@ export default function SystemOptionsPage({
                 systemOptions.map((option, index) => (
                   <TableRow
                     key={option.id}
-                    onClick={() => handleRowClick(option.id)}
+                    onClick={() => handleRowClick(option.code)}
                   >
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>

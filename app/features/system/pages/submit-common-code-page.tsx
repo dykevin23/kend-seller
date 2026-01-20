@@ -8,6 +8,7 @@ import type { Route } from "./+types/submit-common-code-page";
 import { z } from "zod";
 import { makeSSRClient } from "~/supa-client";
 import { createCommonCode } from "../mutations";
+import { getCommonCodeGroupByCode } from "../queries";
 import { useRootData } from "~/hooks/useRootData";
 
 export const formSchema = z.object({
@@ -26,16 +27,20 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
   }
 
   const { code, name } = data;
-  const { client, headers } = makeSSRClient(request);
-  await createCommonCode(client, { group_id: params.groupId, code, name });
-  return redirect(`/system/commonCodes/group/${params.groupId}`);
+  const { client } = makeSSRClient(request);
+
+  // code로 조회하여 id 획득
+  const group = await getCommonCodeGroupByCode(client, params.groupCode);
+
+  await createCommonCode(client, { group_id: group.id, code, name });
+  return redirect(`/system/commonCodes/${params.groupCode}`);
 };
 
 export default function SubmitCommonCodePage({ params }: Route.ComponentProps) {
   const navigate = useNavigate();
   const { commonCodes } = useRootData();
 
-  const group = commonCodes?.find((item) => item.id + "" === params.groupId);
+  const group = commonCodes?.find((item) => item.code === params.groupCode);
 
   return (
     <Content>

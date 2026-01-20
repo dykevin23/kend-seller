@@ -12,16 +12,31 @@ import {
   TableRow,
 } from "~/common/components/ui/table";
 
+interface SubCategory {
+  id: string;
+  code: string;
+  name: string;
+  mainCategoryId: string;
+}
+
+interface Category {
+  id: string;
+  code: string;
+  name: string;
+  domainId: string | null;
+  children: SubCategory[];
+}
+
 export default function MainCategoryPage({ params }: Route.ComponentProps) {
   const navigate = useNavigate();
-  const { categories } = useOutletContext<{ categories: any }>();
+  const { categories } = useOutletContext<{ categories: Category[] }>();
 
   const category = categories.find(
-    (item) => item.id === Number(params.categoryId)
+    (item) => item.code === params.categoryCode
   );
 
-  const handleRowClick = (id: string) => {
-    navigate(`./sub/${id}`);
+  const handleRowClick = (code: string) => {
+    navigate(`./sub/${code}`);
   };
 
   return (
@@ -46,7 +61,7 @@ export default function MainCategoryPage({ params }: Route.ComponentProps) {
         </TableHeader>
         <TableBody>
           {category?.children.map((code, index) => (
-            <TableRow key={code.id} onClick={() => handleRowClick(code.id)}>
+            <TableRow key={code.id} onClick={() => handleRowClick(code.code)}>
               <TableCell>{index + 1}</TableCell>
               <TableCell>{code.code}</TableCell>
               <TableCell>{code.name}</TableCell>

@@ -8,12 +8,13 @@ import { Button } from "~/common/components/ui/button";
 import { z } from "zod";
 import { makeSSRClient } from "~/supa-client";
 import { updateSystemOption } from "../mutations";
-import { getDomains, getSystemOptionById } from "../queries";
+import { getDomains, getSystemOptionByCode } from "../queries";
 import type { Route } from "./+types/system-option-page";
 
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const { client } = makeSSRClient(request);
-  const systemOption = await getSystemOptionById(client, Number(params.id));
+  // URL의 code로 조회
+  const systemOption = await getSystemOptionByCode(client, params.optionCode);
   const domains = await getDomains(client);
 
   return { systemOption, domains };
@@ -37,8 +38,11 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
 
   const { domainId, code, name } = data;
   const { client } = makeSSRClient(request);
+
+  // URL의 code로 id를 조회한 후 update
+  const systemOption = await getSystemOptionByCode(client, params.optionCode);
   await updateSystemOption(client, {
-    id: Number(params.id),
+    id: systemOption.id,
     domainId,
     code,
     name,

@@ -19,10 +19,10 @@ export default function CommonCodeGroupPage({ params }: Route.ComponentProps) {
   const navigate = useNavigate();
   const { commonCodes } = useRootData();
 
-  const group = commonCodes?.find((item) => item.id + "" === params.groupId);
+  const group = commonCodes?.find((item) => item.code === params.groupCode);
 
-  const handleRowClick = (id: string) => {
-    navigate(`./code/${id}`);
+  const handleRowClick = (code: string) => {
+    navigate(`./code/${code}`);
   };
 
   return (
@@ -50,7 +50,7 @@ export default function CommonCodeGroupPage({ params }: Route.ComponentProps) {
           </TableHeader>
           <TableBody>
             {group?.children.map((code, index) => (
-              <TableRow key={code.id} onClick={() => handleRowClick(code.id)}>
+              <TableRow key={code.id} onClick={() => handleRowClick(code.code)}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{code.code}</TableCell>
                 <TableCell>{code.name}</TableCell>

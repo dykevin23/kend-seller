@@ -10,15 +10,27 @@ import {
 import { Link, useNavigate, useOutletContext } from "react-router";
 import { Button } from "~/common/components/ui/button";
 
+interface Category {
+  id: string;
+  code: string;
+  name: string;
+  domainId: string | null;
+}
+
+interface Domain {
+  id: string;
+  name: string;
+}
+
 export default function MainCategoriesPage() {
   const navigate = useNavigate();
   const { categories, domains } = useOutletContext<{
-    categories: any;
-    domains: any;
+    categories: Category[];
+    domains: Domain[];
   }>();
 
-  const handleRowClick = (id: number) => {
-    navigate(`./${id}`);
+  const handleRowClick = (code: string) => {
+    navigate(`./${code}`);
   };
 
   return (
@@ -39,12 +51,12 @@ export default function MainCategoriesPage() {
               categories.map((category) => (
                 <TableRow
                   key={category.id}
-                  onClick={() => handleRowClick(category.id)}
+                  onClick={() => handleRowClick(category.code)}
                 >
                   <TableCell>
                     {
-                      domains.find((domain) => domain.id === category.domain_id)
-                        .name
+                      domains.find((domain) => domain.id === category.domainId)
+                        ?.name ?? "-"
                     }
                   </TableCell>
                   <TableCell>{category.code}</TableCell>

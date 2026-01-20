@@ -97,6 +97,20 @@ export const getSystemOptionById = async (
   return data;
 };
 
+export const getSystemOptionByCode = async (
+  client: SupabaseClient<Database>,
+  code: string
+) => {
+  const { data, error } = await client
+    .from("system_options")
+    .select("*")
+    .eq("code", code)
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
 export const getSystemOptionsByDomain = async (
   client: SupabaseClient<Database>,
   domainId: string
@@ -115,4 +129,32 @@ export const getSystemOptionsByDomain = async (
     name: item.name,
     domainId: item.domain_id,
   }));
+};
+
+export const getMainCategoryByCode = async (
+  client: SupabaseClient<Database>,
+  code: string
+) => {
+  const { data, error } = await client
+    .from("main_categories")
+    .select("*")
+    .eq("code", code)
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const getCommonCodeGroupByCode = async (
+  client: SupabaseClient<Database>,
+  code: string
+) => {
+  const { data, error } = await client
+    .from("common_code_group")
+    .select("*")
+    .eq("code", code)
+    .single();
+
+  if (error) throw error;
+  return data;
 };

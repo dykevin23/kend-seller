@@ -11,9 +11,9 @@ export default function CommonCodePage({ params }: Route.ComponentProps) {
   const navigate = useNavigate();
   const { commonCodes } = useRootData();
 
-  const group = commonCodes?.find((item) => item.id + "" === params.groupId);
+  const group = commonCodes?.find((item) => item.code === params.groupCode);
   const commonCode = group?.children.find(
-    (item) => (item.id = Number(params.codeId))
+    (item) => item.code === params.codeValue
   );
 
   return (
