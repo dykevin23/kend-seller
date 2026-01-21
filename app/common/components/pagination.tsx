@@ -17,22 +17,21 @@ export default function Pagination({
   totalPages,
   onPageChange,
 }: PaginationProps) {
+  const displayTotalPages = Math.max(1, totalPages);
   const canGoPrevious = currentPage > 1;
-  const canGoNext = currentPage < totalPages;
+  const canGoNext = currentPage < displayTotalPages;
 
   // 페이지 번호 배열 생성 (현재 페이지 기준 앞뒤 2개씩)
   const getPageNumbers = () => {
     const pages: number[] = [];
     const start = Math.max(1, currentPage - 2);
-    const end = Math.min(totalPages, currentPage + 2);
+    const end = Math.min(displayTotalPages, currentPage + 2);
 
     for (let i = start; i <= end; i++) {
       pages.push(i);
     }
     return pages;
   };
-
-  if (totalPages <= 1) return null;
 
   return (
     <div className="flex items-center justify-center gap-1">
@@ -75,7 +74,7 @@ export default function Pagination({
       <Button
         variant="outline"
         size="icon-sm"
-        onClick={() => onPageChange(totalPages)}
+        onClick={() => onPageChange(displayTotalPages)}
         disabled={!canGoNext}
       >
         <ChevronsRight className="size-4" />
