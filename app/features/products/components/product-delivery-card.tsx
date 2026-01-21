@@ -15,7 +15,7 @@ import {
 
 interface ProductDeliveryCardProps {
   addressList: Array<{
-    id: number;
+    id: string;
     address_name: string;
     zone_code: string;
     address: string;
@@ -60,12 +60,12 @@ export default function ProductDeliveryCard({
             {shippingAddresses.length === 0 ? (
               <div className="flex items-center justify-between py-4 px-4 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="text-gray-600">등록된 출고지가 없습니다.</p>
-                <Button onClick={handleOpenModal}>등록</Button>
+                <Button type="button" onClick={handleOpenModal}>등록</Button>
               </div>
             ) : shippingAddresses.length > 1 ? (
               <div className="flex items-center justify-between py-4 px-4 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="text-gray-600">출고지를 선택해주세요.</p>
-                <Button onClick={handleOpenModal}>조회</Button>
+                <Button type="button" onClick={handleOpenModal}>조회</Button>
               </div>
             ) : (
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -73,7 +73,7 @@ export default function ProductDeliveryCard({
                   <h3 className="font-semibold text-lg">
                     {currentAddress.address_name}
                   </h3>
-                  <Button variant="outline" size="sm" onClick={handleOpenModal}>
+                  <Button type="button" variant="outline" size="sm" onClick={handleOpenModal}>
                     변경
                   </Button>
                 </div>
@@ -199,7 +199,7 @@ export default function ProductDeliveryCard({
 
       <SubmitAddressModal
         open={submitAddressModalOpen}
-        addressType="shipping"
+        addressType="SHIPPING"
         onClose={() => setSubmitAddressModalOpen(false)}
       />
     </>

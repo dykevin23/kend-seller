@@ -229,7 +229,7 @@ export default function ProductImageCard({
                   {additionalImages.length}/{MAX_ADDITIONAL_IMAGES}
                 </Label>
               </div>
-              <div className="flex gap-2 overflow-x-auto pb-2">
+              <div className="flex gap-2">
                 <div
                   className="shrink-0 flex justify-center items-center w-30 h-30 bg-gray-100 border border-dashed border-gray-300 rounded cursor-pointer hover:bg-gray-200 transition-colors"
                   onClick={handleAdditionalImg}
@@ -240,23 +240,25 @@ export default function ProductImageCard({
                     <Plus className="w-6 h-6 text-gray-400" />
                   )}
                 </div>
-                {additionalImages.map((image, index) => (
-                  <div key={index} className="relative w-30 h-30 shrink-0 group">
-                    <img
-                      src={image.url}
-                      alt={`추가 이미지 ${index + 1}`}
-                      className="w-full h-full object-cover rounded border border-gray-200"
-                    />
-                    <Button
-                      type="button"
-                      size="icon"
-                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-white/90 hover:bg-white border border-gray-300 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                      onClick={() => handleRemoveAdditionalImage(index)}
-                    >
-                      <X className="w-4 h-4 text-black" />
-                    </Button>
-                  </div>
-                ))}
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {additionalImages.map((image, index) => (
+                    <div key={index} className="relative w-30 h-30 shrink-0 group">
+                      <img
+                        src={image.url}
+                        alt={`추가 이미지 ${index + 1}`}
+                        className="w-full h-full object-cover rounded border border-gray-200"
+                      />
+                      <Button
+                        type="button"
+                        size="icon"
+                        className="absolute top-1 right-1 w-6 h-6 rounded-full bg-white/90 hover:bg-white border border-gray-300 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                        onClick={() => handleRemoveAdditionalImage(index)}
+                      >
+                        <X className="w-4 h-4 text-black" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
               </div>
               <input
                 type="file"

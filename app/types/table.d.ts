@@ -13,4 +13,4 @@ declare module "@tanstack/react-table" {
   }
 }
 
-export type AddressType = "shipping" | "return";
+export type AddressType = "SHIPPING" | "RETURN";

@@ -84,7 +84,7 @@ export default function ProductBasicCard({ categories }: BasicCardProps) {
             name="mainCategory"
             options={mainCategories.map((category) => ({
               label: category.name,
-              value: category.id.toString(),
+              value: category.id,
             }))}
             value={selectedCategory.main}
             onChange={handleMainCategory}
@@ -98,10 +98,10 @@ export default function ProductBasicCard({ categories }: BasicCardProps) {
             options={
               selectedCategory.main
                 ? mainCategories
-                    .find((item) => item.id === Number(selectedCategory.main))
+                    .find((item) => item.id === selectedCategory.main)
                     ?.children.map((item) => ({
                       label: item.name,
-                      value: item.id.toString(),
+                      value: item.id,
                     })) || []
                 : []
             }

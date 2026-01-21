@@ -76,9 +76,19 @@ export default function ProductOptionCard({
     }
   };
 
+  // 옵션 추가하기 버튼 클릭 시 SKU 목록 생성
   const handleAddOption = () => {
-    const optionKeys = productOptions.map((item) => item.optionKey);
-    const values = productOptions.map((item) => item.values);
+    // 유효한 옵션만 필터링 (optionKey와 values가 있는 것만)
+    const validOptions = productOptions.filter(
+      (opt) => opt.optionKey !== "" && opt.values.length > 0 && opt.values[0] !== ""
+    );
+
+    if (validOptions.length === 0) {
+      return;
+    }
+
+    const optionKeys = validOptions.map((item) => item.optionKey);
+    const values = validOptions.map((item) => item.values);
 
     const skuItems = values.reduce(
       (acc, curr) => {
@@ -109,20 +119,28 @@ export default function ProductOptionCard({
     setData(list);
   };
 
+  // 테이블 컬럼은 실제 data 기반으로 생성 (옵션 추가하기 버튼 클릭 후에만 반영)
+  const getColumnsFromData = () => {
+    if (data.length === 0) return [];
+    const optionKeys = Object.keys(data[0].options || {});
+    return optionKeys.map((key) => {
+      const option = systemOptions.find((opt) => opt.code === key);
+      return {
+        accessorKey: `option-${key}`,
+        header: () => <span>{option?.name || key}</span>,
+        cell: ({ row }: { row: any }) => {
+          const options = row.getValue("options") as { [key: string]: any };
+          return <div>{options[key]}</div>;
+        },
+      };
+    });
+  };
+
   const columns: ColumnDef<ProductOptionArrayProps>[] = [
     {
       accessorKey: "options",
       header: () => <span>옵션</span>,
-      columns: productOptions.map((option, index) => {
-        return {
-          accessorKey: `option-${option.optionKey}`,
-          header: () => <span>{option.optionName}</span>,
-          cell: ({ row }: { row: any }) => {
-            const options = row.getValue("options") as { [key: string]: any };
-            return <div>{Object.values(options)[index]}</div>;
-          },
-        };
-      }),
+      columns: getColumnsFromData(),
     },
     {
       accessorKey: "regularPrice",
@@ -142,7 +160,7 @@ export default function ProductOptionCard({
     {
       accessorKey: "delete",
       header: () => <span>삭제</span>,
-      cell: () => <Button>삭제</Button>,
+      cell: () => <Button type="button">삭제</Button>,
     },
   ];
 
@@ -177,7 +195,7 @@ export default function ProductOptionCard({
                   onChange={handleChangeOptionValue(index)}
                 />
               </div>
-              <Button size="icon-sm" onClick={handleAddOptions}>
+              <Button type="button" size="icon-sm" onClick={handleAddOptions}>
                 <Plus />
               </Button>
             </div>
@@ -185,7 +203,7 @@ export default function ProductOptionCard({
         })}
 
         <div>
-          <Button onClick={handleAddOption}>옵션 추가하기</Button>
+          <Button type="button" onClick={handleAddOption}>옵션 추가하기</Button>
         </div>
       </div>
 

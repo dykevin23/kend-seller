@@ -198,10 +198,9 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
       await createProductOptions(client, uniqueOptions);
 
-      // SKU 재고정보 저장
+      // SKU 재고정보 저장 (sku_code는 DB Trigger에서 자동 생성)
       const stockKeepings = data.productOptions.map((sku) => ({
         product_id: productId,
-        sku_code: sku.id,
         stock: sku.stocks,
         regular_price: sku.regularPrice,
         sale_price: sku.salePrice,
@@ -259,7 +258,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     // 6. 상품 배송정보 저장
     await createProductDelivery(client, {
       product_id: productId,
-      address_id: Number(data.addressId),
+      address_id: data.addressId,
       island_delivery: data.islandDelivery,
       courier_company: data.courierCompany,
       delivery_method: data.deliveryMethod,
@@ -273,7 +272,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
     // 7. 상품 반품/교환 정보 저장
     await createProductReturn(client, {
       product_id: productId,
-      address_id: Number(data.returnAddressId),
+      address_id: data.returnAddressId,
       initial_shipping_fee: data.initialShippingFee,
       return_shipping_fee: data.returnShippingFee,
     });

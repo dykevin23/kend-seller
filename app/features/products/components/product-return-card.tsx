@@ -6,7 +6,7 @@ import TextField from "~/common/components/text-field";
 
 interface ProductReturnCardProps {
   addressList: Array<{
-    id: number;
+    id: string;
     address_name: string;
     zone_code: string;
     address: string;
@@ -46,12 +46,12 @@ export default function ProductReturnCard({
             {returnAddresses.length === 0 ? (
               <div className="flex items-center justify-between py-4 px-4 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="text-gray-600">등록된 반품지가 없습니다.</p>
-                <Button onClick={handleOpenModal}>등록</Button>
+                <Button type="button" onClick={handleOpenModal}>등록</Button>
               </div>
             ) : returnAddresses.length > 1 ? (
               <div className="flex items-center justify-between py-4 px-4 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="text-gray-600">반품지를 선택해주세요.</p>
-                <Button onClick={handleOpenModal}>조회</Button>
+                <Button type="button" onClick={handleOpenModal}>조회</Button>
               </div>
             ) : (
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -59,7 +59,7 @@ export default function ProductReturnCard({
                   <h3 className="font-semibold text-lg">
                     {currentAddress.address_name}
                   </h3>
-                  <Button variant="outline" size="sm" onClick={handleOpenModal}>
+                  <Button type="button" variant="outline" size="sm" onClick={handleOpenModal}>
                     변경
                   </Button>
                 </div>

@@ -23,26 +23,35 @@ export default function SubmitAddressModal({
   onClose,
 }: SubmitAddressModalProps) {
   const [address, setAddress] = useState<IAddressType>();
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const handleZoneCode = (data: IAddressType) => {
     setAddress(data);
   };
 
-  const fetcher = useFetcher();
+  const fetcher = useFetcher({ key: `submit-address-${addressType}` });
 
+  // 모달이 닫힐 때 상태 초기화
   useEffect(() => {
-    if (!open) setAddress({ zoneCode: "", address: "", addressType: "" });
+    if (!open) {
+      setAddress({ zoneCode: "", address: "", addressType: "" });
+      setIsSubmitted(false);
+    }
   }, [open]);
 
+  // fetcher 응답 처리 (제출 후에만)
   useEffect(() => {
-    if (fetcher) {
-      const { state, data } = fetcher;
-      if (state !== "loading") {
-        if (data?.ok) {
-          onClose();
-        }
+    if (isSubmitted && fetcher.state === "idle" && fetcher.data) {
+      if (fetcher.data?.ok) {
+        onClose();
       }
+      setIsSubmitted(false);
     }
-  }, [fetcher]);
+  }, [fetcher.state, fetcher.data, isSubmitted, onClose]);
+
+  const handleSubmit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsSubmitted(true);
+  };
 
   return (
     open && (
@@ -118,7 +127,7 @@ export default function SubmitAddressModal({
             >
               취소
             </Button>
-            <Button type="submit" size="sm" className="px-5">
+            <Button type="submit" size="sm" className="px-5" onClick={handleSubmit}>
               등록
             </Button>
           </div>

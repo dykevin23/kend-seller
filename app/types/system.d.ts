@@ -1,21 +1,21 @@
 export type SubCategory = {
-  id: number;
+  id: string;
   code: string;
   name: string;
-  mainCategoryId: number;
+  mainCategoryId: string;
 };
 
 export type Category = {
-  id: number;
+  id: string;
   code: string;
   name: string;
-  domainId: number;
+  domainId: string;
   children: SubCategory[];
 };
 
 export type SystemOption = {
-  id: number;
+  id: string;
   code: string;
   name: string;
-  domainId: number;
+  domainId: string;
 };
