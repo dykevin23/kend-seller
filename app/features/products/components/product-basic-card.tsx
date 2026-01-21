@@ -2,7 +2,7 @@ import Card from "~/common/components/card";
 import RadioGroup from "~/common/components/radio-group";
 import Select from "~/common/components/select";
 import TextField from "~/common/components/text-field";
-import { GENDER_TYPES } from "../constrants";
+import { TARGET_GENDER_TYPES, TARGET_AGE_TYPES } from "../constrants";
 import { useRootData } from "~/hooks/useRootData";
 import { useState } from "react";
 import type { Category } from "~/types/system";
@@ -19,7 +19,7 @@ export default function ProductBasicCard({ categories }: BasicCardProps) {
   }>({ main: "", sub: "" });
 
   const mainCategories = categories.filter(
-    (item) => item.domainId === seller?.domain_id
+    (item) => item.domainId === seller?.domain_id,
   );
 
   const handleMainCategory = (value: string) => {
@@ -34,15 +34,6 @@ export default function ProductBasicCard({ categories }: BasicCardProps) {
       <div className="grid grid-cols-2 gap-10 mx-auto">
         <div className="space-y-5">
           <TextField id="productName" name="productName" label="상품명" />
-          <RadioGroup
-            label="성별"
-            id="gender"
-            name="gender"
-            options={GENDER_TYPES.map((type) => ({
-              label: type.label,
-              value: type.value,
-            }))}
-          />
         </div>
         <div className="space-y-5">
           <TextField
@@ -58,6 +49,30 @@ export default function ProductBasicCard({ categories }: BasicCardProps) {
             name="domainId"
             value={seller?.domain_id}
             onChange={() => {}}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-10 mx-auto">
+        <div className="space-y-5">
+          <RadioGroup
+            label="대상 성별"
+            id="targetGender"
+            name="targetGender"
+            options={TARGET_GENDER_TYPES.map((type) => ({
+              label: type.label,
+              value: type.value,
+            }))}
+          />
+        </div>
+        <div className="space-y-5">
+          <RadioGroup
+            label="대상 연령"
+            id="targetAge"
+            name="targetAge"
+            options={TARGET_AGE_TYPES.map((type) => ({
+              label: type.label,
+              value: type.value,
+            }))}
           />
         </div>
       </div>

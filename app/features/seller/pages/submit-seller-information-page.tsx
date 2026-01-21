@@ -14,10 +14,9 @@ import { Form, useNavigate } from "react-router";
 import { Button } from "~/common/components/ui/button";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { useCommonCodes } from "~/hooks/useCommonCodes";
 import { getLoggedInUserId } from "~/features/users/queries";
 import { createSellerInformation } from "../mutations";
-import { useRootData } from "~/hooks/useRootData";
+import { BUSINESS_TYPES } from "../constrants";
 
 const formSchema = z.object({
   bizrNo: z.string().length(10).nonempty(),
@@ -58,8 +57,6 @@ export default function SubmitSellerInformationPage({
   actionData,
 }: Route.ComponentProps) {
   const navigate = useNavigate();
-  const { commonCodes } = useRootData();
-  const business = useCommonCodes("BUSINESS_TYPE", commonCodes);
 
   const [address, setAddress] = useState<IAddressType>();
   const handleZoneCode = (data: IAddressType) => {
@@ -137,9 +134,9 @@ export default function SubmitSellerInformationPage({
             id="business"
             name="business"
             label="비즈니스 형태"
-            options={business.map((code) => ({
-              label: code.name,
-              value: code.id + "",
+            options={BUSINESS_TYPES.map((type) => ({
+              label: type.label,
+              value: type.value,
             }))}
             direction="row"
             className="w-1/4"

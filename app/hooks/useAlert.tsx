@@ -27,6 +27,7 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
     primaryButton: { label: "", onClick: () => {} },
   };
   const [alerts, setAlerts] = useState<AlertProps>(initialAlert);
+  const [alertKey, setAlertKey] = useState<string>("");
 
   const initialState = () => {
     setAlerts(initialAlert);
@@ -35,10 +36,10 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
   const handleAlert = (props: AlertsProps) => {
     const { title, message, primaryButton, secondaryButton } = props;
 
-    const alertKey = uuidv4();
+    const newAlertKey = uuidv4();
+    setAlertKey(newAlertKey);
 
     setAlerts({
-      key: alertKey,
       open: true,
       title: title,
       message: message,
@@ -60,7 +61,7 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
         : undefined,
     });
 
-    return alertKey;
+    return newAlertKey;
   };
 
   return (
@@ -73,7 +74,7 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
       }}
     >
       {children}
-      <Alert {...alerts} />
+      <Alert key={alertKey} {...alerts} />
     </AlertContext.Provider>
   );
 };

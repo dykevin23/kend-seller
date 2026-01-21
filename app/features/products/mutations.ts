@@ -6,7 +6,8 @@ export const createProduct = async (
   data: {
     storage_folder: string;
     name: string;
-    gender: string;
+    target_gender: string;
+    target_age: string;
     domain_id: string;
     main_category: string;
     sub_category: string;

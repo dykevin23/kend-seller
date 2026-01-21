@@ -19,7 +19,6 @@ import { makeSSRClient } from "./supa-client";
 import { getUserById } from "./features/users/queries";
 import { useEffect } from "react";
 import { AlertProvider, useAlert } from "./hooks/useAlert";
-import { getAllCommonCodes } from "./features/system/queries";
 import { getSellerInfo } from "./features/seller/queries";
 import type { RootLoaderData } from "./hooks/useRootData";
 import { LoadingOverlay } from "./common/components/ui/spinner";
@@ -65,7 +64,6 @@ export const loader = async ({
   const {
     data: { user },
   } = await client.auth.getUser();
-  const commonCodes = await getAllCommonCodes(client);
 
   if (user) {
     const profile = await getUserById(client, { id: user.id });
@@ -73,7 +71,7 @@ export const loader = async ({
       // admin은 seller 정보가 필요없음
       const seller =
         profile.role === "seller" ? await getSellerInfo(client) : null;
-      return { user, profile, seller, commonCodes };
+      return { user, profile, seller };
     } else {
       await client.auth.signOut({ scope: "global" });
       return redirect("/auth/login", { headers });
@@ -85,7 +83,7 @@ export const loader = async ({
       return redirect("/auth/login", { headers });
     }
   }
-  return { user: null, profile: null, commonCodes, seller: null };
+  return { user: null, profile: null, seller: null };
 };
 
 export default function App({ loaderData }: Route.ComponentProps) {

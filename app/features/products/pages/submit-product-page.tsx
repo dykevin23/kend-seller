@@ -58,7 +58,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 const formSchema = z.object({
   // 기본정보
   productName: z.string().min(1, "상품명을 입력해주세요"),
-  gender: z.string().min(1, "성별을 선택해주세요"),
+  targetGender: z.string().min(1, "대상 성별을 선택해주세요"),
+  targetAge: z.string().min(1, "대상 연령을 선택해주세요"),
   domainId: z.string().min(1, "도메인 정보가 필요합니다"),
   mainCategory: z.string().min(1, "카테고리를 선택해주세요"),
   subCategory: z.string().min(1, "상세 카테고리를 선택해주세요"),
@@ -147,8 +148,9 @@ export const action = async ({ request }: Route.ActionArgs) => {
     const productId = await createProduct(client, {
       storage_folder: data.storageFolder,
       name: data.productName,
-      gender: data.gender,
-      domain_id: Number(data.domainId),
+      target_gender: data.targetGender,
+      target_age: data.targetAge,
+      domain_id: data.domainId,
       main_category: data.mainCategory,
       sub_category: data.subCategory,
       seller_id: seller.id,
