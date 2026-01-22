@@ -13,6 +13,18 @@ import {
   COURIER_COMPANIES,
 } from "../constrants";
 
+interface DefaultValues {
+  addressId?: string;
+  islandDelivery?: string;
+  courierCompany?: string;
+  deliveryMethod?: string;
+  bundleDelivery?: string;
+  shippingFeeType?: string;
+  shippingFee?: number;
+  freeShippingCondition?: number;
+  shippingDays?: number;
+}
+
 interface ProductDeliveryCardProps {
   addressList: Array<{
     id: string;
@@ -22,21 +34,34 @@ interface ProductDeliveryCardProps {
     address_detail: string;
     address_type: string;
   }>;
+  defaultValues?: DefaultValues;
 }
 
 export default function ProductDeliveryCard({
   addressList,
+  defaultValues,
 }: ProductDeliveryCardProps) {
   const [submitAddressModalOpen, setSubmitAddressModalOpen] =
     useState<boolean>(false);
-  const [selectedAddress, setSelectedAddress] = useState<
-    (typeof addressList)[0] | null
-  >(null);
-  const [shippingFeeType, setShippingFeeType] = useState<string>("FREE");
 
   // SHIPPING 타입 주소만 필터링
   const shippingAddresses = addressList.filter(
     (addr) => addr.address_type === "SHIPPING"
+  );
+
+  // defaultValues에서 주소 찾기 또는 첫 번째 주소 선택
+  const getInitialAddress = () => {
+    if (defaultValues?.addressId) {
+      return shippingAddresses.find((addr) => addr.id === defaultValues.addressId) || null;
+    }
+    return shippingAddresses[0] || null;
+  };
+
+  const [selectedAddress, setSelectedAddress] = useState<
+    (typeof addressList)[0] | null
+  >(getInitialAddress());
+  const [shippingFeeType, setShippingFeeType] = useState<string>(
+    defaultValues?.shippingFeeType || "FREE"
   );
 
   // 첫 번째 주소를 기본으로 선택 (있는 경우)
@@ -106,6 +131,7 @@ export default function ProductDeliveryCard({
                 label: type.label,
                 value: type.value,
               }))}
+              defaultValue={defaultValues?.islandDelivery}
             />
 
             {/* 택배사 */}
@@ -117,6 +143,7 @@ export default function ProductDeliveryCard({
                 label: type.label,
                 value: type.value,
               }))}
+              defaultValue={defaultValues?.courierCompany}
             />
           </div>
 
@@ -130,6 +157,7 @@ export default function ProductDeliveryCard({
                 label: type.label,
                 value: type.value,
               }))}
+              defaultValue={defaultValues?.deliveryMethod}
             />
 
             {/* 출고소요일 */}
@@ -139,7 +167,7 @@ export default function ProductDeliveryCard({
               name="shippingDays"
               type="number"
               placeholder="1"
-              defaultValue="1"
+              defaultValue={defaultValues?.shippingDays?.toString() || "1"}
             />
           </div>
 
@@ -152,6 +180,7 @@ export default function ProductDeliveryCard({
               label: type.label,
               value: type.value,
             }))}
+            defaultValue={defaultValues?.bundleDelivery}
           />
 
           {/* 배송비 종류 */}
@@ -165,6 +194,7 @@ export default function ProductDeliveryCard({
                 value: type.value,
               }))}
               onChange={handleShippingFeeTypeChange}
+              defaultValue={defaultValues?.shippingFeeType}
             />
 
             {/* 배송비 입력 (유료배송, 착불배송, 조건부배송) */}
@@ -178,7 +208,7 @@ export default function ProductDeliveryCard({
                   name="shippingFee"
                   type="number"
                   placeholder="0"
-                  defaultValue="0"
+                  defaultValue={defaultValues?.shippingFee?.toString() || "0"}
                 />
                 {/* 무료배송조건 (조건부배송만) */}
                 {shippingFeeType === "CONDITIONAL" && (
@@ -188,7 +218,7 @@ export default function ProductDeliveryCard({
                     name="freeShippingCondition"
                     type="number"
                     placeholder="0"
-                    defaultValue="0"
+                    defaultValue={defaultValues?.freeShippingCondition?.toString() || "0"}
                   />
                 )}
               </div>

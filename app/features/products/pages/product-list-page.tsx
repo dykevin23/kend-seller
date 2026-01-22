@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router";
+import { useNavigate, useSearchParams, useFetcher } from "react-router";
 import Content from "~/common/components/content";
 import Title from "~/common/components/title";
 import Card from "~/common/components/card";
+import { useAlert } from "~/hooks/useAlert";
 import {
   Table,
   TableBody,
@@ -28,8 +29,34 @@ import type { Route } from "./+types/product-list-page";
 import { makeSSRClient } from "~/supa-client";
 import { getProducts, type ProductListItem } from "../queries";
 import { getSellerInfo } from "~/features/seller/queries";
+import { updateProductsStatus } from "../mutations";
 
 const ITEMS_PER_PAGE = 10;
+
+export const action = async ({ request }: Route.ActionArgs) => {
+  const { client } = makeSSRClient(request);
+  const formData = await request.formData();
+  const intent = formData.get("intent");
+
+  if (intent === "updateStatus") {
+    const productIds = JSON.parse(formData.get("productIds") as string);
+    const status = formData.get("status") as string;
+
+    const seller = await getSellerInfo(client);
+    if (!seller) {
+      return { success: false, error: "판매자 정보를 찾을 수 없습니다." };
+    }
+
+    try {
+      await updateProductsStatus(client, productIds, status, seller.id);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: "상태 변경에 실패했습니다." };
+    }
+  }
+
+  return { success: false, error: "알 수 없는 요청입니다." };
+};
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client } = makeSSRClient(request);
@@ -66,7 +93,10 @@ export default function ProductListPage({ loaderData }: Route.ComponentProps) {
     status: initialStatus,
     keyword: initialKeyword,
   } = loaderData;
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { confirm } = useAlert();
+  const fetcher = useFetcher();
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   // 검색 필터 상태 (초기값은 URL 파라미터에서)
@@ -121,10 +151,34 @@ export default function ProductListPage({ loaderData }: Route.ComponentProps) {
   };
 
   const handleStatusChange = (newStatus: string) => {
-    // TODO: 선택된 상품들 상태 변경
-    console.log("상태 변경:", {
-      selectedIds: Array.from(selectedIds),
-      newStatus,
+    if (selectedIds.size === 0) {
+      return;
+    }
+
+    const statusLabel =
+      SALES_STATUS.find((s) => s.value === newStatus)?.label ?? newStatus;
+
+    confirm({
+      title: "상태 변경",
+      message: `선택한 ${selectedIds.size}개 상품의 상태를 "${statusLabel}"(으)로 변경하시겠습니까?`,
+      primaryButton: {
+        label: "변경",
+        onClick: () => {
+          fetcher.submit(
+            {
+              intent: "updateStatus",
+              productIds: JSON.stringify(Array.from(selectedIds)),
+              status: newStatus,
+            },
+            { method: "POST" }
+          );
+          setSelectedIds(new Set());
+        },
+      },
+      secondaryButton: {
+        label: "취소",
+        onClick: () => {},
+      },
     });
   };
 
@@ -179,7 +233,10 @@ export default function ProductListPage({ loaderData }: Route.ComponentProps) {
             {selectedIds.size > 0 && `${selectedIds.size}개 선택됨`}
           </div>
           <div className="flex items-center gap-2">
-            <Select onValueChange={handleStatusChange}>
+            <Select
+              onValueChange={handleStatusChange}
+              disabled={selectedIds.size === 0}
+            >
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="상태 변경" />
               </SelectTrigger>
@@ -223,8 +280,12 @@ export default function ProductListPage({ loaderData }: Route.ComponentProps) {
           <TableBody>
             {products.length > 0 ? (
               products.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>
+                <TableRow
+                  key={product.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => navigate(`/products/${product.product_code}`)}
+                >
+                  <TableCell onClick={(e) => e.stopPropagation()}>
                     <Checkbox
                       checked={selectedIds.has(product.id)}
                       onCheckedChange={(checked) =>

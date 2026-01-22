@@ -5,8 +5,19 @@ import { Checkbox } from "~/common/components/ui/checkbox";
 import { Label } from "~/common/components/ui/label";
 import { cn } from "~/lib/utils";
 
-export default function ProductDetailCard() {
-  const [nobrand, setNobrand] = useState<boolean>(false);
+interface DefaultValues {
+  brand?: string;
+  maker?: string;
+}
+
+interface ProductDetailCardProps {
+  defaultValues?: DefaultValues;
+}
+
+export default function ProductDetailCard({
+  defaultValues,
+}: ProductDetailCardProps) {
+  const [nobrand, setNobrand] = useState<boolean>(!defaultValues?.brand);
   return (
     <Card>
       <h2 className="text-xl font-bold">상품 상세정보</h2>
@@ -19,6 +30,7 @@ export default function ProductDetailCard() {
               id="brand"
               name="brand"
               readOnly={nobrand}
+              defaultValue={defaultValues?.brand}
               className={cn({
                 "bg-gray-200": nobrand,
               })}
@@ -33,7 +45,13 @@ export default function ProductDetailCard() {
           </div>
         </div>
 
-        <TextField id="maker" name="maker" label="제조사" className="w-1/2" />
+        <TextField
+          id="maker"
+          name="maker"
+          label="제조사"
+          className="w-1/2"
+          defaultValue={defaultValues?.maker}
+        />
       </div>
     </Card>
   );

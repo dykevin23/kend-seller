@@ -1,0 +1,1 @@
+ALTER TABLE "product_stock_keepings" ADD COLUMN "options" jsonb;

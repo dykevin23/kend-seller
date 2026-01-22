@@ -4,6 +4,12 @@ import { Button } from "~/common/components/ui/button";
 import SubmitAddressModal from "~/features/seller/components/submit-address-modal";
 import TextField from "~/common/components/text-field";
 
+interface DefaultValues {
+  returnAddressId?: string;
+  initialShippingFee?: number;
+  returnShippingFee?: number;
+}
+
 interface ProductReturnCardProps {
   addressList: Array<{
     id: string;
@@ -13,21 +19,32 @@ interface ProductReturnCardProps {
     address_detail: string;
     address_type: string;
   }>;
+  defaultValues?: DefaultValues;
 }
 
 export default function ProductReturnCard({
   addressList,
+  defaultValues,
 }: ProductReturnCardProps) {
   const [submitAddressModalOpen, setSubmitAddressModalOpen] =
     useState<boolean>(false);
-  const [selectedAddress, setSelectedAddress] = useState<
-    (typeof addressList)[0] | null
-  >(null);
 
   // RETURN 타입 주소만 필터링
   const returnAddresses = addressList.filter(
     (addr) => addr.address_type === "RETURN"
   );
+
+  // defaultValues에서 주소 찾기 또는 첫 번째 주소 선택
+  const getInitialAddress = () => {
+    if (defaultValues?.returnAddressId) {
+      return returnAddresses.find((addr) => addr.id === defaultValues.returnAddressId) || null;
+    }
+    return returnAddresses[0] || null;
+  };
+
+  const [selectedAddress, setSelectedAddress] = useState<
+    (typeof addressList)[0] | null
+  >(getInitialAddress());
 
   // 첫 번째 주소를 기본으로 선택 (있는 경우)
   const currentAddress = selectedAddress || returnAddresses[0] || null;
@@ -89,7 +106,7 @@ export default function ProductReturnCard({
               name="initialShippingFee"
               type="number"
               placeholder="0"
-              defaultValue="0"
+              defaultValue={defaultValues?.initialShippingFee?.toString() || "0"}
             />
             <TextField
               label="반품배송비 (편도, 원)"
@@ -97,7 +114,7 @@ export default function ProductReturnCard({
               name="returnShippingFee"
               type="number"
               placeholder="0"
-              defaultValue="0"
+              defaultValue={defaultValues?.returnShippingFee?.toString() || "0"}
             />
           </div>
         </div>

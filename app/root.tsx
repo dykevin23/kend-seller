@@ -96,6 +96,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
   const isLoading =
     navigation.state === "loading" || navigation.state === "submitting";
 
+  console.log("### loaderData => ", loaderData);
   useEffect(() => {
     if (
       loaderData.profile?.role === "seller" &&

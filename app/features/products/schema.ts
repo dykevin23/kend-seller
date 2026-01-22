@@ -1,5 +1,6 @@
 import {
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   text,
@@ -71,6 +72,7 @@ export const stockKeepings = pgTable("product_stock_keepings", {
   product_id: uuid().references(() => products.id, {
     onDelete: "cascade",
   }),
+  options: jsonb().$type<Record<string, string>>(), // {"color": "빨강", "size": "M"}
   stock: integer().notNull().default(0),
   regular_price: integer().default(0),
   sale_price: integer().default(0),

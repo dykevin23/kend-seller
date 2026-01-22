@@ -13,6 +13,7 @@ interface RadioGroupProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   options: OptionProps[];
   vertical?: boolean;
+  defaultValue?: string;
 }
 
 export default function RadioGroup({
@@ -20,6 +21,7 @@ export default function RadioGroup({
   options,
   vertical = false,
   name,
+  defaultValue,
   ...rest
 }: RadioGroupProps) {
   return (
@@ -30,7 +32,7 @@ export default function RadioGroup({
           "flex flex-col": vertical,
           "flex flex-row": !vertical,
         })}
-        defaultValue={options[0].value}
+        defaultValue={defaultValue || options[0]?.value}
         name={name}
       >
         {options.map((option) => (

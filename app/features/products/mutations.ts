@@ -155,6 +155,22 @@ export const updateProductStatus = async (
   if (error) throw error;
 };
 
+// 상품 상태 일괄 변경
+export const updateProductsStatus = async (
+  client: SupabaseClient,
+  productIds: string[],
+  status: string,
+  sellerId: string
+) => {
+  const { error } = await client
+    .from("products")
+    .update({ status })
+    .in("id", productIds)
+    .eq("seller_id", sellerId);
+
+  if (error) throw error;
+};
+
 // SKU 상태 변경
 export const updateSKUStatus = async (
   client: SupabaseClient,

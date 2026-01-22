@@ -7,16 +7,32 @@ import { useRootData } from "~/hooks/useRootData";
 import { useState } from "react";
 import type { Category } from "~/types/system";
 
-interface BasicCardProps {
-  categories: Category[];
+interface DefaultValues {
+  productName?: string;
+  targetGender?: string;
+  targetAge?: string;
+  domainId?: string;
+  mainCategory?: string;
+  subCategory?: string;
 }
 
-export default function ProductBasicCard({ categories }: BasicCardProps) {
+interface BasicCardProps {
+  categories: Category[];
+  defaultValues?: DefaultValues;
+}
+
+export default function ProductBasicCard({
+  categories,
+  defaultValues,
+}: BasicCardProps) {
   const { seller } = useRootData();
   const [selectedCategory, setSelectedCategory] = useState<{
     main: string;
     sub: string;
-  }>({ main: "", sub: "" });
+  }>({
+    main: defaultValues?.mainCategory || "",
+    sub: defaultValues?.subCategory || "",
+  });
 
   const mainCategories = categories.filter(
     (item) => item.domainId === seller?.domain_id,
@@ -33,7 +49,12 @@ export default function ProductBasicCard({ categories }: BasicCardProps) {
       <h2 className="text-xl font-bold">상품 기본정보</h2>
       <div className="grid grid-cols-2 gap-10 mx-auto">
         <div className="space-y-5">
-          <TextField id="productName" name="productName" label="상품명" />
+          <TextField
+            id="productName"
+            name="productName"
+            label="상품명"
+            defaultValue={defaultValues?.productName}
+          />
         </div>
         <div className="space-y-5">
           <TextField
@@ -62,6 +83,7 @@ export default function ProductBasicCard({ categories }: BasicCardProps) {
               label: type.label,
               value: type.value,
             }))}
+            defaultValue={defaultValues?.targetGender}
           />
         </div>
         <div className="space-y-5">
@@ -73,6 +95,7 @@ export default function ProductBasicCard({ categories }: BasicCardProps) {
               label: type.label,
               value: type.value,
             }))}
+            defaultValue={defaultValues?.targetAge}
           />
         </div>
       </div>
