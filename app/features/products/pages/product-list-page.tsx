@@ -106,6 +106,9 @@ export default function ProductListPage({ loaderData }: Route.ComponentProps) {
   // 선택된 행
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
+  // 일괄 상태 변경 Select 값
+  const [bulkStatus, setBulkStatus] = useState<string>("");
+
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       setSelectedIds(new Set(products.map((p) => p.id)));
@@ -152,6 +155,7 @@ export default function ProductListPage({ loaderData }: Route.ComponentProps) {
 
   const handleStatusChange = (newStatus: string) => {
     if (selectedIds.size === 0) {
+      setBulkStatus("");
       return;
     }
 
@@ -173,11 +177,14 @@ export default function ProductListPage({ loaderData }: Route.ComponentProps) {
             { method: "POST" }
           );
           setSelectedIds(new Set());
+          setBulkStatus("");
         },
       },
       secondaryButton: {
         label: "취소",
-        onClick: () => {},
+        onClick: () => {
+          setBulkStatus("");
+        },
       },
     });
   };
@@ -234,6 +241,7 @@ export default function ProductListPage({ loaderData }: Route.ComponentProps) {
           </div>
           <div className="flex items-center gap-2">
             <Select
+              value={bulkStatus}
               onValueChange={handleStatusChange}
               disabled={selectedIds.size === 0}
             >
