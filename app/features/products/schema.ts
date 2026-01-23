@@ -19,7 +19,12 @@ import {
   SHIPPING_FEE_TYPES,
   COURIER_COMPANIES,
 } from "./constrants";
-import { domains, system_options } from "../system/schema";
+import {
+  domains,
+  main_categories,
+  sub_categories,
+  system_options,
+} from "../system/schema";
 import { sellers, sellers_address } from "../seller/schema";
 
 export const TargetGenderType = pgEnum(
@@ -45,8 +50,12 @@ export const products = pgTable("products", {
   target_gender: TargetGenderType().default("UNISEX").notNull(),
   target_age: TargetAgeType().default("BABY").notNull(),
   domain_id: uuid().references(() => domains.id),
-  main_category: text().notNull(),
-  sub_category: text().notNull(),
+  main_category: uuid()
+    .references(() => main_categories.id)
+    .notNull(),
+  sub_category: uuid()
+    .references(() => sub_categories.id)
+    .notNull(),
   seller_id: uuid().references(() => sellers.id, {
     onDelete: "cascade",
   }),

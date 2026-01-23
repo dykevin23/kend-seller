@@ -688,6 +688,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "products_main_category_main_categories_id_fk"
+            columns: ["main_category"]
+            isOneToOne: false
+            referencedRelation: "main_categories"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "products_seller_id_admin_sellers_id_fk"
             columns: ["seller_id"]
             isOneToOne: false
@@ -699,6 +706,13 @@ export type Database = {
             columns: ["seller_id"]
             isOneToOne: false
             referencedRelation: "seller_information_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_sub_category_sub_categories_id_fk"
+            columns: ["sub_category"]
+            isOneToOne: false
+            referencedRelation: "sub_categories"
             referencedColumns: ["id"]
           },
         ]

@@ -1,0 +1,4 @@
+ALTER TABLE "products" ALTER COLUMN "main_category" SET DATA TYPE uuid USING main_category::uuid;--> statement-breakpoint
+ALTER TABLE "products" ALTER COLUMN "sub_category" SET DATA TYPE uuid USING sub_category::uuid;--> statement-breakpoint
+ALTER TABLE "products" ADD CONSTRAINT "products_main_category_main_categories_id_fk" FOREIGN KEY ("main_category") REFERENCES "public"."main_categories"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "products" ADD CONSTRAINT "products_sub_category_sub_categories_id_fk" FOREIGN KEY ("sub_category") REFERENCES "public"."sub_categories"("id") ON DELETE no action ON UPDATE no action;
