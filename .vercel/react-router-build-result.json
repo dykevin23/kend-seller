@@ -1,0 +1,599 @@
+{
+  "buildManifest": {
+    "serverBundles": {
+      "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0": {
+        "id": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+        "file": "build/server/nodejs_eyJydW50aW1lIjoibm9kZWpzIn0/index.js",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    },
+    "routeIdToServerBundleId": {
+      "common/pages/home-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/products/pages/product-list-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/products/pages/submit-product-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/products/pages/product-detail-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/seller/pages/submit-seller-information-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/seller/pages/address-list-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/seller/pages/post-address-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/domains-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/submit-domain-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/main-categories-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/submit-main-category-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/main-category-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/submit-sub-categories-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/sub-category-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/common-code-groups-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/common-code-group-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/submit-common-code-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/common-code-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/submit-common-code-group-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/system-options-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/submit-system-option-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/system/pages/system-option-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/auth/pages/login-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "features/auth/pages/join-page": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "app/root.tsx",
+        "path": "",
+        "config": {}
+      },
+      "common/pages/home-page": {
+        "id": "common/pages/home-page",
+        "parentId": "root",
+        "file": "app/common/pages/home-page.tsx",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/products/pages/product-list-page": {
+        "id": "features/products/pages/product-list-page",
+        "parentId": "root",
+        "file": "app/features/products/pages/product-list-page.tsx",
+        "path": "products",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/products/pages/submit-product-page": {
+        "id": "features/products/pages/submit-product-page",
+        "parentId": "root",
+        "file": "app/features/products/pages/submit-product-page.tsx",
+        "path": "products/submit",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/products/pages/product-detail-page": {
+        "id": "features/products/pages/product-detail-page",
+        "parentId": "root",
+        "file": "app/features/products/pages/product-detail-page.tsx",
+        "path": "products/:productCode",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/seller/pages/submit-seller-information-page": {
+        "id": "features/seller/pages/submit-seller-information-page",
+        "parentId": "root",
+        "file": "app/features/seller/pages/submit-seller-information-page.tsx",
+        "path": "seller/information/submit",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/seller/pages/address-list-page": {
+        "id": "features/seller/pages/address-list-page",
+        "parentId": "root",
+        "file": "app/features/seller/pages/address-list-page.tsx",
+        "path": "seller/address",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/seller/pages/post-address-page": {
+        "id": "features/seller/pages/post-address-page",
+        "parentId": "root",
+        "file": "app/features/seller/pages/post-address-page.tsx",
+        "path": "seller/address/post",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/layouts/admin-layout": {
+        "id": "features/system/layouts/admin-layout",
+        "parentId": "root",
+        "file": "app/features/system/layouts/admin-layout.tsx",
+        "config": {}
+      },
+      "features/system/pages/domains-page": {
+        "id": "features/system/pages/domains-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "app/features/system/pages/domains-page.tsx",
+        "path": "system/domains",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/pages/submit-domain-page": {
+        "id": "features/system/pages/submit-domain-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "app/features/system/pages/submit-domain-page.tsx",
+        "path": "system/domains/submit",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/layouts/category-layout": {
+        "id": "features/system/layouts/category-layout",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "app/features/system/layouts/category-layout.tsx",
+        "config": {}
+      },
+      "features/system/pages/main-categories-page": {
+        "id": "features/system/pages/main-categories-page",
+        "parentId": "features/system/layouts/category-layout",
+        "file": "app/features/system/pages/main-categories-page.tsx",
+        "path": "system/categories",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/pages/submit-main-category-page": {
+        "id": "features/system/pages/submit-main-category-page",
+        "parentId": "features/system/layouts/category-layout",
+        "file": "app/features/system/pages/submit-main-category-page.tsx",
+        "path": "system/categories/submit",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/pages/main-category-page": {
+        "id": "features/system/pages/main-category-page",
+        "parentId": "features/system/layouts/category-layout",
+        "file": "app/features/system/pages/main-category-page.tsx",
+        "path": "system/categories/:categoryCode",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/pages/submit-sub-categories-page": {
+        "id": "features/system/pages/submit-sub-categories-page",
+        "parentId": "features/system/layouts/category-layout",
+        "file": "app/features/system/pages/submit-sub-categories-page.tsx",
+        "path": "system/categories/:categoryCode/submit",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/pages/sub-category-page": {
+        "id": "features/system/pages/sub-category-page",
+        "parentId": "features/system/layouts/category-layout",
+        "file": "app/features/system/pages/sub-category-page.tsx",
+        "path": "system/categories/:categoryCode/sub/:subCategoryCode",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/pages/common-code-groups-page": {
+        "id": "features/system/pages/common-code-groups-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "app/features/system/pages/common-code-groups-page.tsx",
+        "path": "system/commonCodes",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/pages/common-code-group-page": {
+        "id": "features/system/pages/common-code-group-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "app/features/system/pages/common-code-group-page.tsx",
+        "path": "system/commonCodes/group/:groupCode",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/pages/submit-common-code-page": {
+        "id": "features/system/pages/submit-common-code-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "app/features/system/pages/submit-common-code-page.tsx",
+        "path": "system/commonCodes/group/:groupCode/submit",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/pages/common-code-page": {
+        "id": "features/system/pages/common-code-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "app/features/system/pages/common-code-page.tsx",
+        "path": "system/commonCodes/group/:groupCode/code/:codeValue",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/pages/submit-common-code-group-page": {
+        "id": "features/system/pages/submit-common-code-group-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "app/features/system/pages/submit-common-code-group-page.tsx",
+        "path": "system/commonCodes/group/submit",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/pages/system-options-page": {
+        "id": "features/system/pages/system-options-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "app/features/system/pages/system-options-page.tsx",
+        "path": "system/systemOptions",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/pages/submit-system-option-page": {
+        "id": "features/system/pages/submit-system-option-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "app/features/system/pages/submit-system-option-page.tsx",
+        "path": "system/systemOptions/submit",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/system/pages/system-option-page": {
+        "id": "features/system/pages/system-option-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "app/features/system/pages/system-option-page.tsx",
+        "path": "system/systemOptions/:optionCode",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/auth/pages/login-page": {
+        "id": "features/auth/pages/login-page",
+        "parentId": "root",
+        "file": "app/features/auth/pages/login-page.tsx",
+        "path": "auth/login",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "features/auth/pages/join-page": {
+        "id": "features/auth/pages/join-page",
+        "parentId": "root",
+        "file": "app/features/auth/pages/join-page.tsx",
+        "path": "auth/join",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    }
+  },
+  "reactRouterConfig": {
+    "appDirectory": "/Users/dyk/Desktop/workspace/kend-seller/app",
+    "basename": "/",
+    "buildDirectory": "/Users/dyk/Desktop/workspace/kend-seller/build",
+    "future": {
+      "v8_middleware": false,
+      "unstable_optimizeDeps": false,
+      "unstable_splitRouteModules": false,
+      "unstable_subResourceIntegrity": false,
+      "unstable_viteEnvironmentApi": false
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "root.tsx",
+        "path": ""
+      },
+      "common/pages/home-page": {
+        "id": "common/pages/home-page",
+        "parentId": "root",
+        "file": "common/pages/home-page.tsx",
+        "index": true
+      },
+      "features/products/pages/product-list-page": {
+        "id": "features/products/pages/product-list-page",
+        "parentId": "root",
+        "file": "features/products/pages/product-list-page.tsx",
+        "path": "products",
+        "index": true
+      },
+      "features/products/pages/submit-product-page": {
+        "id": "features/products/pages/submit-product-page",
+        "parentId": "root",
+        "file": "features/products/pages/submit-product-page.tsx",
+        "path": "products/submit"
+      },
+      "features/products/pages/product-detail-page": {
+        "id": "features/products/pages/product-detail-page",
+        "parentId": "root",
+        "file": "features/products/pages/product-detail-page.tsx",
+        "path": "products/:productCode"
+      },
+      "features/seller/pages/submit-seller-information-page": {
+        "id": "features/seller/pages/submit-seller-information-page",
+        "parentId": "root",
+        "file": "features/seller/pages/submit-seller-information-page.tsx",
+        "path": "seller/information/submit"
+      },
+      "features/seller/pages/address-list-page": {
+        "id": "features/seller/pages/address-list-page",
+        "parentId": "root",
+        "file": "features/seller/pages/address-list-page.tsx",
+        "path": "seller/address",
+        "index": true
+      },
+      "features/seller/pages/post-address-page": {
+        "id": "features/seller/pages/post-address-page",
+        "parentId": "root",
+        "file": "features/seller/pages/post-address-page.tsx",
+        "path": "seller/address/post"
+      },
+      "features/system/layouts/admin-layout": {
+        "id": "features/system/layouts/admin-layout",
+        "parentId": "root",
+        "file": "features/system/layouts/admin-layout.tsx"
+      },
+      "features/system/pages/domains-page": {
+        "id": "features/system/pages/domains-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "features/system/pages/domains-page.tsx",
+        "path": "system/domains",
+        "index": true
+      },
+      "features/system/pages/submit-domain-page": {
+        "id": "features/system/pages/submit-domain-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "features/system/pages/submit-domain-page.tsx",
+        "path": "system/domains/submit"
+      },
+      "features/system/layouts/category-layout": {
+        "id": "features/system/layouts/category-layout",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "features/system/layouts/category-layout.tsx"
+      },
+      "features/system/pages/main-categories-page": {
+        "id": "features/system/pages/main-categories-page",
+        "parentId": "features/system/layouts/category-layout",
+        "file": "features/system/pages/main-categories-page.tsx",
+        "path": "system/categories",
+        "index": true
+      },
+      "features/system/pages/submit-main-category-page": {
+        "id": "features/system/pages/submit-main-category-page",
+        "parentId": "features/system/layouts/category-layout",
+        "file": "features/system/pages/submit-main-category-page.tsx",
+        "path": "system/categories/submit"
+      },
+      "features/system/pages/main-category-page": {
+        "id": "features/system/pages/main-category-page",
+        "parentId": "features/system/layouts/category-layout",
+        "file": "features/system/pages/main-category-page.tsx",
+        "path": "system/categories/:categoryCode",
+        "index": true
+      },
+      "features/system/pages/submit-sub-categories-page": {
+        "id": "features/system/pages/submit-sub-categories-page",
+        "parentId": "features/system/layouts/category-layout",
+        "file": "features/system/pages/submit-sub-categories-page.tsx",
+        "path": "system/categories/:categoryCode/submit"
+      },
+      "features/system/pages/sub-category-page": {
+        "id": "features/system/pages/sub-category-page",
+        "parentId": "features/system/layouts/category-layout",
+        "file": "features/system/pages/sub-category-page.tsx",
+        "path": "system/categories/:categoryCode/sub/:subCategoryCode"
+      },
+      "features/system/pages/common-code-groups-page": {
+        "id": "features/system/pages/common-code-groups-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "features/system/pages/common-code-groups-page.tsx",
+        "path": "system/commonCodes",
+        "index": true
+      },
+      "features/system/pages/common-code-group-page": {
+        "id": "features/system/pages/common-code-group-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "features/system/pages/common-code-group-page.tsx",
+        "path": "system/commonCodes/group/:groupCode",
+        "index": true
+      },
+      "features/system/pages/submit-common-code-page": {
+        "id": "features/system/pages/submit-common-code-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "features/system/pages/submit-common-code-page.tsx",
+        "path": "system/commonCodes/group/:groupCode/submit"
+      },
+      "features/system/pages/common-code-page": {
+        "id": "features/system/pages/common-code-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "features/system/pages/common-code-page.tsx",
+        "path": "system/commonCodes/group/:groupCode/code/:codeValue"
+      },
+      "features/system/pages/submit-common-code-group-page": {
+        "id": "features/system/pages/submit-common-code-group-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "features/system/pages/submit-common-code-group-page.tsx",
+        "path": "system/commonCodes/group/submit"
+      },
+      "features/system/pages/system-options-page": {
+        "id": "features/system/pages/system-options-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "features/system/pages/system-options-page.tsx",
+        "path": "system/systemOptions",
+        "index": true
+      },
+      "features/system/pages/submit-system-option-page": {
+        "id": "features/system/pages/submit-system-option-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "features/system/pages/submit-system-option-page.tsx",
+        "path": "system/systemOptions/submit"
+      },
+      "features/system/pages/system-option-page": {
+        "id": "features/system/pages/system-option-page",
+        "parentId": "features/system/layouts/admin-layout",
+        "file": "features/system/pages/system-option-page.tsx",
+        "path": "system/systemOptions/:optionCode"
+      },
+      "features/auth/pages/login-page": {
+        "id": "features/auth/pages/login-page",
+        "parentId": "root",
+        "file": "features/auth/pages/login-page.tsx",
+        "path": "auth/login"
+      },
+      "features/auth/pages/join-page": {
+        "id": "features/auth/pages/join-page",
+        "parentId": "root",
+        "file": "features/auth/pages/join-page.tsx",
+        "path": "auth/join"
+      }
+    },
+    "routeDiscovery": {
+      "mode": "lazy",
+      "manifestPath": "/__manifest"
+    },
+    "serverBuildFile": "index.js",
+    "serverModuleFormat": "esm",
+    "ssr": true,
+    "unstable_routeConfig": [
+      {
+        "id": "root",
+        "path": "",
+        "file": "root.tsx",
+        "children": [
+          {
+            "file": "common/pages/home-page.tsx",
+            "index": true
+          },
+          {
+            "file": "features/products/pages/product-list-page.tsx",
+            "index": true,
+            "path": "products"
+          },
+          {
+            "file": "features/products/pages/submit-product-page.tsx",
+            "path": "products/submit"
+          },
+          {
+            "file": "features/products/pages/product-detail-page.tsx",
+            "path": "products/:productCode"
+          },
+          {
+            "file": "features/seller/pages/submit-seller-information-page.tsx",
+            "path": "seller/information/submit"
+          },
+          {
+            "file": "features/seller/pages/address-list-page.tsx",
+            "index": true,
+            "path": "seller/address"
+          },
+          {
+            "file": "features/seller/pages/post-address-page.tsx",
+            "path": "seller/address/post"
+          },
+          {
+            "file": "features/system/layouts/admin-layout.tsx",
+            "children": [
+              {
+                "file": "features/system/pages/domains-page.tsx",
+                "index": true,
+                "path": "system/domains"
+              },
+              {
+                "file": "features/system/pages/submit-domain-page.tsx",
+                "path": "system/domains/submit"
+              },
+              {
+                "file": "features/system/layouts/category-layout.tsx",
+                "children": [
+                  {
+                    "file": "features/system/pages/main-categories-page.tsx",
+                    "index": true,
+                    "path": "system/categories"
+                  },
+                  {
+                    "file": "features/system/pages/submit-main-category-page.tsx",
+                    "path": "system/categories/submit"
+                  },
+                  {
+                    "file": "features/system/pages/main-category-page.tsx",
+                    "index": true,
+                    "path": "system/categories/:categoryCode"
+                  },
+                  {
+                    "file": "features/system/pages/submit-sub-categories-page.tsx",
+                    "path": "system/categories/:categoryCode/submit"
+                  },
+                  {
+                    "file": "features/system/pages/sub-category-page.tsx",
+                    "path": "system/categories/:categoryCode/sub/:subCategoryCode"
+                  }
+                ]
+              },
+              {
+                "file": "features/system/pages/common-code-groups-page.tsx",
+                "index": true,
+                "path": "system/commonCodes"
+              },
+              {
+                "file": "features/system/pages/common-code-group-page.tsx",
+                "index": true,
+                "path": "system/commonCodes/group/:groupCode"
+              },
+              {
+                "file": "features/system/pages/submit-common-code-page.tsx",
+                "path": "system/commonCodes/group/:groupCode/submit"
+              },
+              {
+                "file": "features/system/pages/common-code-page.tsx",
+                "path": "system/commonCodes/group/:groupCode/code/:codeValue"
+              },
+              {
+                "file": "features/system/pages/submit-common-code-group-page.tsx",
+                "path": "system/commonCodes/group/submit"
+              },
+              {
+                "file": "features/system/pages/system-options-page.tsx",
+                "index": true,
+                "path": "system/systemOptions"
+              },
+              {
+                "file": "features/system/pages/submit-system-option-page.tsx",
+                "path": "system/systemOptions/submit"
+              },
+              {
+                "file": "features/system/pages/system-option-page.tsx",
+                "path": "system/systemOptions/:optionCode"
+              }
+            ]
+          },
+          {
+            "file": "features/auth/pages/login-page.tsx",
+            "path": "auth/login"
+          },
+          {
+            "file": "features/auth/pages/join-page.tsx",
+            "path": "auth/join"
+          }
+        ]
+      }
+    ]
+  },
+  "viteConfig": {
+    "build": {
+      "assetsDir": "assets"
+    }
+  }
+}

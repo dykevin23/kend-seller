@@ -149,6 +149,7 @@ Rules:
 - Application 코드는 항상 최신 typegen 결과를 기준으로 한다.
 
 **IMPORTANT: Database 변경 작업 순서**
+
 1. `/app/features/**/schema.ts` 파일 수정
 2. `npm run db:generate` - migration 파일 생성
 3. `npm run db:migrate` - migration 실행
@@ -164,11 +165,13 @@ Rules:
 **언제 매핑이 필요한가?**
 
 ✅ **매핑 필요 (Query에서 snake_case → camelCase 변환)**
+
 - Array 데이터를 컴포넌트 props로 전달하는 경우
 - 타입 추론이 안 되어 `/app/types/*.d.ts`에 별도 타입을 정의하는 경우
 - 여러 컴포넌트에서 props drilling으로 전달되는 경우
 
 ❌ **매핑 불필요**
+
 - loader/action에서 데이터를 가져와 바로 화면에 렌더링하는 경우
 - Object 데이터를 개별 props로 분해하여 전달하는 경우 (컴포넌트 props 타입만 camelCase로 선언)
 
@@ -180,9 +183,9 @@ export const getSystemOptionsByDomain = async (client, domainId) => {
   const { data } = await client.from("system_options").select("*");
 
   // ✅ Array는 Query에서 매핑
-  return data.map(item => ({
+  return data.map((item) => ({
     id: item.id,
-    domainId: item.domain_id,  // snake_case → camelCase
+    domainId: item.domain_id, // snake_case → camelCase
     code: item.code,
   }));
 };
@@ -195,7 +198,7 @@ export type SystemOption = {
 };
 
 // 컴포넌트에서 사용
-<ProductCard systemOptions={systemOptions} />
+<ProductCard systemOptions={systemOptions} />;
 
 // Case 2: Object를 개별 props로 전달 → 컴포넌트 타입만 camelCase
 // Query는 그대로
@@ -206,14 +209,15 @@ export const getSeller = async (client) => {
 
 // 컴포넌트 props는 camelCase
 interface SellerCardProps {
-  domainId: number;  // camelCase
+  domainId: number; // camelCase
 }
 
 // 사용 시 직접 연결
-<SellerCard domainId={seller.domain_id} />
+<SellerCard domainId={seller.domain_id} />;
 ```
 
 **적용 원칙:**
+
 - 화면 레벨(컴포넌트)에서 매핑 작업을 하지 않는다.
 - 매핑이 필요하면 Query 함수에서 수행한다.
 - `/app/types/*.d.ts`의 모든 타입은 camelCase로 작성한다.
@@ -244,7 +248,10 @@ const { categoryCode } = params;
 const category = await getCategoryByCode(client, categoryCode);
 
 // 3. FK 관계가 필요한 경우 id를 사용
-const subCategories = await getSubCategoriesByMainCategoryId(client, category.id);
+const subCategories = await getSubCategoriesByMainCategoryId(
+  client,
+  category.id,
+);
 ```
 
 ### FK(Foreign Key) 참조
@@ -268,11 +275,13 @@ const subCategories = await getSubCategoriesByMainCategoryId(client, category.id
 각 feature 폴더에는 데이터베이스 쿼리를 담당하는 파일들을 다음과 같이 분리하여 작성한다.
 
 ### queries.ts
+
 - **목적**: 조회(Read) 쿼리만 작성
 - **함수 네이밍**: `get` 접두어 사용
 - **예시**: `getProductById`, `getProductsByCategory`
 
 ### mutations.ts
+
 - **목적**: 생성(Create), 수정(Update), 삭제(Delete) 쿼리 작성
 - **함수 네이밍**:
   - 생성: `create` 접두어 (예: `createProduct`)
@@ -280,6 +289,7 @@ const subCategories = await getSubCategoriesByMainCategoryId(client, category.id
   - 삭제: `delete` 접두어 (예: `deleteProduct`)
 
 **파일 구조 예시:**
+
 ```
 /app/features/products/
   ├── schema.ts
