@@ -1,6 +1,19 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "~/supa-client";
 
+export const searchHashtags = async (
+  client: SupabaseClient<Database>,
+  query: string
+) => {
+  const { data, error } = await client
+    .from("hashtags")
+    .select("id, name")
+    .ilike("name", `%${query}%`)
+    .limit(10);
+  if (error) throw error;
+  return data || [];
+};
+
 export const getDomains = async (client: SupabaseClient<Database>) => {
   const { data, error } = await client.from("domains").select("*");
 

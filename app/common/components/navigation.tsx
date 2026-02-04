@@ -71,8 +71,13 @@ const menus: Menu[] = [
     roles: ["seller"], // seller만 접근 가능
     items: [
       {
+        name: "Seller Profile",
+        description: "판매자 프로필 관리",
+        to: "/seller/information/submit",
+      },
+      {
         name: "Delivery Address",
-        description: "See the top categories in your community",
+        description: "배송지/반품지 관리",
         to: "/seller/address",
       },
     ],

@@ -68,3 +68,15 @@ export const common_codes = pgTable("common_codes", {
   created_at: timestamp().notNull().defaultNow(),
   updated_at: timestamp().notNull().defaultNow(),
 });
+
+/**
+ * 해시태그 마스터 테이블(hashtags)
+ * id: 해시태그 id(pk)
+ * name: 해시태그 이름 (unique, e.g. "키즈패션", "유아용품")
+ */
+export const hashtags = pgTable("hashtags", {
+  id: uuid().primaryKey().defaultRandom(),
+  name: text().notNull().unique(),
+  created_at: timestamp().notNull().defaultNow(),
+  updated_at: timestamp().notNull().defaultNow(),
+});

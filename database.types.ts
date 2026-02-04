@@ -511,6 +511,27 @@ export type Database = {
           },
         ]
       }
+      hashtags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       main_categories: {
         Row: {
           code: string
@@ -1242,6 +1263,52 @@ export type Database = {
           username?: string
         }
         Relationships: []
+      }
+      seller_hashtags: {
+        Row: {
+          created_at: string
+          hashtag_id: string
+          id: string
+          seller_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hashtag_id: string
+          id?: string
+          seller_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hashtag_id?: string
+          id?: string
+          seller_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_hashtags_hashtag_id_hashtags_id_fk"
+            columns: ["hashtag_id"]
+            isOneToOne: false
+            referencedRelation: "hashtags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_hashtags_seller_id_admin_sellers_id_fk"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "admin_sellers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_hashtags_seller_id_admin_sellers_id_fk"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "seller_information_view"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sub_categories: {
         Row: {

@@ -1,6 +1,27 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "~/supa-client";
 
+export const createHashtag = async (
+  client: SupabaseClient<Database>,
+  name: string
+) => {
+  const { data: existing } = await client
+    .from("hashtags")
+    .select("id, name")
+    .eq("name", name)
+    .maybeSingle();
+
+  if (existing) return existing;
+
+  const { data, error } = await client
+    .from("hashtags")
+    .insert({ name })
+    .select("id, name")
+    .single();
+  if (error) throw error;
+  return data;
+};
+
 export const createDomain = async (
   client: SupabaseClient<Database>,
   {

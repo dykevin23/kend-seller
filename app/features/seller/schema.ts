@@ -1,5 +1,12 @@
-import { pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
-import { domains } from "../system/schema";
+import {
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from "drizzle-orm/pg-core";
+import { domains, hashtags } from "../system/schema";
 import { ADDRESS_TYPES } from "./constrants";
 import { profiles } from "../users/external/profiles";
 
@@ -70,3 +77,24 @@ export const sellers_address = pgTable("admin_seller_address", {
   created_at: timestamp().notNull().defaultNow(),
   updated_at: timestamp().notNull().defaultNow(),
 });
+
+/**
+ * 판매자 해시태그 연결 테이블(seller_hashtags)
+ * seller_id: 판매자 id (FK → admin_sellers)
+ * hashtag_id: 해시태그 id (FK → hashtags)
+ */
+export const seller_hashtags = pgTable(
+  "seller_hashtags",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    seller_id: uuid()
+      .references(() => sellers.id, { onDelete: "cascade" })
+      .notNull(),
+    hashtag_id: uuid()
+      .references(() => hashtags.id, { onDelete: "cascade" })
+      .notNull(),
+    created_at: timestamp().notNull().defaultNow(),
+    updated_at: timestamp().notNull().defaultNow(),
+  },
+  (table) => [unique().on(table.seller_id, table.hashtag_id)]
+);

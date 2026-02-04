@@ -1,6 +1,29 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "~/supa-client";
 
+export const setSellerHashtags = async (
+  client: SupabaseClient<Database>,
+  sellerId: string,
+  hashtagIds: string[]
+) => {
+  const { error: deleteError } = await client
+    .from("seller_hashtags")
+    .delete()
+    .eq("seller_id", sellerId);
+  if (deleteError) throw deleteError;
+
+  if (hashtagIds.length > 0) {
+    const rows = hashtagIds.map((hashtagId) => ({
+      seller_id: sellerId,
+      hashtag_id: hashtagId,
+    }));
+    const { error: insertError } = await client
+      .from("seller_hashtags")
+      .insert(rows);
+    if (insertError) throw insertError;
+  }
+};
+
 // seller_code는 DB Trigger에서 자동 생성됨
 export const createSellerInformation = async (
   client: SupabaseClient<Database>,
