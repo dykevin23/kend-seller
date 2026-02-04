@@ -39,6 +39,9 @@ export default function SellerHashtagInput({
     // # 접두어가 있으면 제거 (텍스트만 저장)
     const name = trimmed.startsWith("#") ? trimmed.slice(1) : trimmed;
 
+    // 길이 제한 (10자)
+    if (name.length > 10) return;
+
     // 중복 체크
     if (tags.some((tag) => tag.name === name)) {
       setInputValue("");
@@ -70,7 +73,8 @@ export default function SellerHashtagInput({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="해시태그 입력 (예: 유기농)"
+          maxLength={11}
+          placeholder="해시태그 입력 (예: 유기농, 최대 10자)"
           className="w-60"
         />
         <Button type="button" variant="outline" onClick={addTag}>
