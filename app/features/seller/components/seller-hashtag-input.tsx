@@ -36,8 +36,8 @@ export default function SellerHashtagInput({
     const trimmed = inputValue.trim();
     if (!trimmed) return;
 
-    // # 접두어 제거 후 다시 붙이기 (통일)
-    const name = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+    // # 접두어가 있으면 제거 (텍스트만 저장)
+    const name = trimmed.startsWith("#") ? trimmed.slice(1) : trimmed;
 
     // 중복 체크
     if (tags.some((tag) => tag.name === name)) {
@@ -84,7 +84,7 @@ export default function SellerHashtagInput({
               key={tag.id}
               className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-sm"
             >
-              {tag.name}
+              #{tag.name}
               <button
                 type="button"
                 onClick={() => removeTag(index)}
