@@ -32,11 +32,11 @@ All outputs must comply with these documents.
 
 변경사항이 기존 문서의 성격에 해당하면, 해당 문서를 직접 업데이트한다.
 
-| 문서 | 업데이트 시점 |
-|------|-------------|
-| `database.md` | 테이블 추가/삭제, 소유권 변경 시 Table Ownership Matrix 업데이트 |
-| `application-architecture.md` | 라우팅 구조, 디렉토리 구조, 기술 스택 변경 시 |
-| `auth-model.md` | 인증/인가 정책 변경 시 |
+| 문서                          | 업데이트 시점                                                    |
+| ----------------------------- | ---------------------------------------------------------------- |
+| `database.md`                 | 테이블 추가/삭제, 소유권 변경 시 Table Ownership Matrix 업데이트 |
+| `application-architecture.md` | 라우팅 구조, 디렉토리 구조, 기술 스택 변경 시                    |
+| `auth-model.md`               | 인증/인가 정책 변경 시                                           |
 
 ### 별도 문서 생성
 

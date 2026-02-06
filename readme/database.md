@@ -43,8 +43,8 @@
 | system_options         | Kend-Seller | admin                     | 시스템 옵션(시스템에서 정의한 기본 제공 옵션) |
 | common_code_group      | Kend-Seller | admin                     | 공통코드 그룹                                 |
 | common_codes           | Kend-Seller | admin                     | 공통코드                                      |
-| hashtags               | Shared      | admin                     | 공통 해시태그 마스터 (상품/판매자 등 공유)     |
-| seller_hashtags        | Kend-Seller | seller                    | 판매자-해시태그 연결                           |
+| hashtags               | Shared      | admin                     | 공통 해시태그 마스터 (상품/판매자 등 공유)    |
+| seller_hashtags        | Kend-Seller | seller                    | 판매자-해시태그 연결                          |
 
 <!-- | children    | Kend        | customer                  | 사용자 자녀 데이터       |
 
