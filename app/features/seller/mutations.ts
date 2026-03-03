@@ -24,6 +24,70 @@ export const setSellerHashtags = async (
   }
 };
 
+export const createSellerBanner = async (
+  client: SupabaseClient<Database>,
+  data: {
+    seller_id: string;
+    title: string;
+    image_url: string;
+    display_order: number;
+  }
+) => {
+  const { data: result, error } = await client
+    .from("seller_banners")
+    .insert(data)
+    .select("id")
+    .single();
+  if (error) throw error;
+  return result;
+};
+
+export const updateSellerBanner = async (
+  client: SupabaseClient<Database>,
+  bannerId: string,
+  data: {
+    display_order?: number;
+    is_active?: boolean;
+  }
+) => {
+  const { error } = await client
+    .from("seller_banners")
+    .update(data)
+    .eq("id", bannerId);
+  if (error) throw error;
+};
+
+export const swapBannerOrder = async (
+  client: SupabaseClient<Database>,
+  bannerIdA: string,
+  orderA: number,
+  bannerIdB: string,
+  orderB: number
+) => {
+  const { error: errorA } = await client
+    .from("seller_banners")
+    .update({ display_order: orderB })
+    .eq("id", bannerIdA);
+  if (errorA) throw errorA;
+
+  const { error: errorB } = await client
+    .from("seller_banners")
+    .update({ display_order: orderA })
+    .eq("id", bannerIdB);
+  if (errorB) throw errorB;
+};
+
+export const deleteSellerBannerRecord = async (
+  client: SupabaseClient<Database>,
+  bannerId: string
+) => {
+  const { error } = await client
+    .from("seller_banners")
+    .delete()
+    .eq("id", bannerId);
+  if (error) throw error;
+};
+
 // seller_code는 DB Trigger에서 자동 생성됨
 export const createSellerInformation = async (
   client: SupabaseClient<Database>,

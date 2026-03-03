@@ -8,6 +8,19 @@
 
 ---
 
+## 2026-03-03
+
+### [KEND-SELLER] 판매자 스토어 배너 관리 기능 추가
+
+- **`seller_banners` 테이블 추가**: 배너 제목(`title`, 관리자 식별용), 이미지 URL, 표시 순서(`display_order`), 활성 여부(`is_active`) 컬럼 구성
+- **배너 이미지 Storage 연동**: 기존 `sellers` 버킷 재사용, `{seller_code}/banners/banner_{timestamp}.{ext}` 경로로 업로드
+- **배너 등록 폼**: 이미지 선택 시 로컬 미리보기(7:3 비율) 표시 → 관리용 제목 입력 → 등록 버튼으로 저장 (최대 5개)
+- **배너 목록 관리**: ↑↓ 버튼으로 인접 배너 순서 swap, 활성/비활성 토글, 삭제 기능
+- **라우트 추가**: `/seller/banners` (목록/등록 페이지), `/seller/banners/post` (CRUD action)
+- **네비게이션 메뉴 추가**: Seller Information 하위에 "Store Banners" 항목 추가
+
+---
+
 ## 2026-02-10
 
 ### [KEND] TossPayments Widget SDK 결제 연동

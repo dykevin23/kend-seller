@@ -56,6 +56,59 @@ export const deleteSellerLogo = async (
  * @param sellerCode 판매자 코드
  * @returns 공개 URL
  */
+/**
+ * Supabase Storage에 판매자 배너 이미지 업로드
+ * @param client Supabase 클라이언트 (browserClient)
+ * @param file 업로드할 파일
+ * @param sellerCode 판매자 코드 (e.g. 'SL0001')
+ * @returns 업로드된 파일의 공개 URL
+ */
+export const uploadSellerBanner = async (
+  client: SupabaseClient<Database>,
+  file: File,
+  sellerCode: string,
+): Promise<string> => {
+  const ext = file.name.split(".").pop() || "jpg";
+  const filePath = `${sellerCode}/banners/banner_${Date.now()}.${ext}`;
+
+  const { error: uploadError } = await client.storage
+    .from("sellers")
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    throw new Error(`배너 업로드 실패: ${uploadError.message}`);
+  }
+
+  const {
+    data: { publicUrl },
+  } = client.storage.from("sellers").getPublicUrl(filePath);
+
+  return publicUrl;
+};
+
+/**
+ * Supabase Storage에서 판매자 배너 이미지 삭제
+ * @param client Supabase 클라이언트
+ * @param imageUrl 배너 이미지의 전체 공개 URL
+ */
+export const deleteSellerBanner = async (
+  client: SupabaseClient<Database>,
+  imageUrl: string,
+): Promise<void> => {
+  const pathMatch = imageUrl.split("/sellers/")[1];
+  if (!pathMatch) {
+    throw new Error("잘못된 배너 URL입니다.");
+  }
+
+  const { error } = await client.storage.from("sellers").remove([pathMatch]);
+  if (error) {
+    throw new Error(`배너 삭제 실패: ${error.message}`);
+  }
+};
+
 export const getSellerLogoUrl = (
   client: SupabaseClient<Database>,
   sellerCode: string,

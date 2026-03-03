@@ -1353,6 +1353,54 @@ export type Database = {
         }
         Relationships: []
       }
+      seller_banners: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          image_url: string
+          is_active: boolean
+          seller_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url: string
+          is_active?: boolean
+          seller_id: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          seller_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_banners_seller_id_admin_sellers_id_fk"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "admin_sellers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_banners_seller_id_admin_sellers_id_fk"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "seller_information_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       seller_hashtags: {
         Row: {
           created_at: string

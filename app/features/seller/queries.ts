@@ -25,6 +25,19 @@ export const getSellerInfo = async (client: SupabaseClient<Database>) => {
   return data;
 };
 
+export const getSellerBanners = async (
+  client: SupabaseClient<Database>,
+  sellerId: string
+) => {
+  const { data, error } = await client
+    .from("seller_banners")
+    .select("id, title, image_url, display_order, is_active, created_at")
+    .eq("seller_id", sellerId)
+    .order("display_order", { ascending: true });
+  if (error) throw error;
+  return data || [];
+};
+
 export const getSellerAddresses = async (
   client: SupabaseClient<Database>,
   sellerId: string

@@ -3,6 +3,9 @@ export const ADDRESS_TYPES = [
   { label: "반품지", value: "RETURN" },
 ] as const;
 
+export const MAX_BANNERS = 5;
+export const BANNER_ASPECT_RATIO = "7/3";
+
 export const BUSINESS_TYPES = [
   { label: "브랜드/제조사", value: "MANUFACTURER" },
   { label: "위탁 판매", value: "DROP_SHIPPING" },

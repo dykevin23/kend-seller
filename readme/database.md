@@ -45,6 +45,7 @@
 | common_codes           | Kend-Seller | admin                     | 공통코드                                      |
 | hashtags               | Shared      | admin                     | 공통 해시태그 마스터 (상품/판매자 등 공유)    |
 | seller_hashtags        | Kend-Seller | seller                    | 판매자-해시태그 연결                          |
+| seller_banners         | Kend-Seller | seller                    | 판매자 스토어 배너 이미지                     |
 
 <!-- | children    | Kend        | customer                  | 사용자 자녀 데이터       |
 

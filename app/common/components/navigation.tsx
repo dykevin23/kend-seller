@@ -80,6 +80,11 @@ const menus: Menu[] = [
         description: "배송지/반품지 관리",
         to: "/seller/address",
       },
+      {
+        name: "Store Banners",
+        description: "스토어 배너 관리",
+        to: "/seller/banners",
+      },
     ],
   },
   {

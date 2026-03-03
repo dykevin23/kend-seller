@@ -1,4 +1,6 @@
 import {
+  boolean,
+  integer,
   pgEnum,
   pgTable,
   text,
@@ -98,3 +100,25 @@ export const seller_hashtags = pgTable(
   },
   (table) => [unique().on(table.seller_id, table.hashtag_id)]
 );
+
+/**
+ * 판매자 배너 테이블(seller_banners)
+ * id: 배너id(pk)
+ * seller_id: 판매자id (FK → admin_sellers)
+ * title: 배너 제목 (관리자 식별용, 사용자앱에 노출되지 않음)
+ * image_url: 배너 이미지 URL (Supabase Storage 공개 URL)
+ * display_order: 표시 순서 (스와이퍼 정렬용)
+ * is_active: 활성 여부 (비활성 배너는 사용자앱에 노출되지 않음)
+ */
+export const seller_banners = pgTable("seller_banners", {
+  id: uuid().primaryKey().defaultRandom(),
+  seller_id: uuid()
+    .references(() => sellers.id, { onDelete: "cascade" })
+    .notNull(),
+  title: text().notNull(),
+  image_url: text().notNull(),
+  display_order: integer().notNull().default(0),
+  is_active: boolean().notNull().default(true),
+  created_at: timestamp().notNull().defaultNow(),
+  updated_at: timestamp().notNull().defaultNow(),
+});

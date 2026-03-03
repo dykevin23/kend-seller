@@ -30,6 +30,10 @@ export default [
       index("features/seller/pages/address-list-page.tsx"),
       route("/post", "features/seller/pages/post-address-page.tsx"),
     ]),
+    ...prefix("banners", [
+      index("features/seller/pages/banner-list-page.tsx"),
+      route("/post", "features/seller/pages/post-banner-page.tsx"),
+    ]),
   ]),
 
   /* 시스템관리 (admin 전용) */
