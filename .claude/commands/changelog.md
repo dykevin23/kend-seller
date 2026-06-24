@@ -1,12 +1,21 @@
-오늘 작업 내역을 시스템별 changelog에 기록해줘.
+현재까지의 작업을 정리한다 — **changelog와 overview를 함께 갱신**한다.
+(작업을 마치거나 다음 작업으로 넘어갈 때 사용자가 직접 호출한다. 완료/미완료 모두 가능.)
 
-- **대상 파일**:
-  - `[KEND-SELLER]` 작업 → `readme/changelog-seller.md`
-  - `[KEND]` 작업 → `readme/changelog-kend.md`
-  - `[KEND-NATIVE]` 작업 → `readme/changelog-native.md`
-- 날짜는 오늘 날짜로, 기존 날짜가 같으면 해당 섹션에 추가
-- 항목 제목 맨 앞에 `[KEND]` / `[KEND-SELLER]` / `[KEND-NATIVE]` prefix 사용
-- 최신 내용이 위로 오도록 역순으로 작성
-- 기존 changelog 형식을 참고해서 작성
-- 기록 대상: 기능 추가, DB 스키마 변경, 아키텍처 변경, 주요 버그 수정, 문서화
-- 제외: 버튼 스타일/투명도 등 UI 미세 조정, 중요도 낮은 사소한 작업
+## 1. changelog-seller.md 갱신 (과거를 쌓는다 · git 기준 · append)
+- `git log`를 확인해 **changelog에 아직 안 적힌 커밋/변경들을 시간순으로 따라잡아 추가**한다 (그동안 누락된 것까지).
+- 커밋 메시지를 그대로 베끼지 말고, 기존 changelog 형식으로 다듬는다:
+  - 해당 날짜 섹션에 추가, 같은 날짜면 그 섹션에 합침
+  - 항목 제목에 `[KEND-SELLER]` prefix
+  - 최신이 위로 오도록 역순
+- 과거 항목은 바꾸지 않는다. **사실 이력을 쌓아가는** 문서.
+
+## 2. overview.md 갱신 (현재를 정리한다 · CRUD · 가변)
+- `core/readme-structure-guide.md §8` 표준의 섹션 골격을 따른다.
+- 「지금 상황 / 최근 완료 / 진행 중 / 다음 작업」을 현재 상태에 맞게 **추가·수정·삭제**한다. 끝난 건 빼고, 바뀐 건 고치고, 새 건 넣는다. 상단 "최종 업데이트" 날짜를 오늘로.
+- ⚠️ **완료(✅·최근완료)는 테스트로 동작 확인된 것만.** 아직이면 "진행 중" 또는 "구현됨(테스트 대기)"로 정확히 표기.
+- 항상 한 화면 분량 유지 — 오래된 최근완료 항목은 빼고 (이력은 changelog에 남아 있음).
+
+---
+
+> - KEND / KEND-NATIVE 변경사항은 각각 `changelog-kend.md` / `changelog-native.md`에 별도 관리 (사용자가 수동 sync).
+> - **이 명령어는 사용자가 직접 호출한다. Claude는 changelog/overview를 선제적으로 작성하지 않는다.**
