@@ -7,6 +7,17 @@ KEND-NATIVE React Native WebView 앱의 주요 변경사항을 날짜별로 기�
 
 ---
 
+## 2026-05-07
+
+### [KEND-NATIVE] swipe back 시 로딩 오버레이 차단
+
+- `onShouldStartLoadWithRequest` 핸들러 추가, `navigationType === "backforward"` 시 `isBackForwardRef`에 기록
+- `handleLoadStart`에서 backforward 네비게이션이면 로딩 오버레이 setTimeout 자체 스킵
+- 효과: swipe back 또는 헤더 백 버튼 시 주황색 로딩 오버레이가 더 이상 깜빡이지 않음 (단, "이전 화면 잠깐 보임" 현상 자체는 웹쪽 `clientLoader` 캐시로 해결됨)
+- 참고: [changelog-kend.md 2026-05-07](./changelog-kend.md)
+
+---
+
 ## 2026-04-20
 
 ### [KEND-NATIVE] 뒤로가기 UX 개선 — URL Blacklist 기반 스와이프/백버튼 차단
@@ -20,7 +31,7 @@ KEND-NATIVE React Native WebView 앱의 주요 변경사항을 날짜별로 기�
 
 - **로딩 오버레이 debounce(300ms)**: 캐시된 back/forward 네비게이션에서 로딩 오버레이가 번쩍이는 현상 완화 — 300ms 이내 완료되는 네비게이션은 오버레이 미표시
 - **WebView bounce 제거**: iOS `bounces={false}`, Android `overScrollMode="never"` 설정 — 스크롤 없는 화면에서 세로 over-scroll 방지
-- **참고**: "이전 화면이 잠깐 보였다가 재로드되는" 현상은 WKWebView의 back-forward cache(bfcache)가 SSR 응답 헤더(`Cache-Control: no-store` 등)로 인해 비활성화되어 발생 → 웹앱 쪽 헤더 조정이 근본 해결책
+- **참고**: "이전 화면이 잠깐 보였다가 재로드되는" 현상의 근본 원인은 **2026-05-07 진단으로 정정** — bfcache가 아니라 React Router v7 single fetch가 popstate 시 loader를 재실행하는 것이 원인. 해결책은 웹앱 쪽 `clientLoader` 캐시. 자세한 내용은 [changelog-kend.md 2026-05-07](./changelog-kend.md) 참고
 
 ### [KEND-NATIVE] 빌드/배포 스크립트 추가
 
@@ -101,6 +112,6 @@ KEND-NATIVE React Native WebView 앱의 주요 변경사항을 날짜별로 기�
 - **불필요한 의존성 제거**: Expo 템플릿 기본 패키지 중 미사용 항목 정리 (`bottom-tabs`, `blur`, `haptics`, `image`, `symbols`, `web-browser`, `gesture-handler`, `reanimated`, `react-native-web`, `react-dom` 등)
 - **app.json 배포 설정**: 앱 이름(`Kend`), 안드로이드 패키지명(`com.kend.app`), iOS 번들 ID, `versionCode`, URL 스킴(`kend://`) 설정
 - **WebView 개선**: 안드로이드 하드웨어 뒤로가기 버튼 처리, iOS 스와이프 뒤로가기, 로딩 인디케이터, 네트워크 에러 화면(다시 시도 버튼), 상태바 설정
-- **\_layout.tsx 정리**: Stack 네비게이션 헤더 숨김, 스플래시 화면 제어(`expo-splash-screen`)
+- **_layout.tsx 정리**: Stack 네비게이션 헤더 숨김, 스플래시 화면 제어(`expo-splash-screen`)
 - **eas.json 생성**: EAS Build 프로필 설정 (`development`, `preview`, `production`), Google Play 제출 설정
 - **kend-native.md 문서 작성**: 프로젝트 구조, 빌드/배포 방법, 버전 관리 규칙, 아이콘 교체 방법, 향후 네이티브 기능 확장 가이드
