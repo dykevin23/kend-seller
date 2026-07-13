@@ -14,11 +14,14 @@ export type Seller = {
   bizr_no: string;
   business: string;
   created_at: string;
-  domain_id: number;
+  domain_id: string;
   domain_name: string;
-  id: number;
+  id: string;
   name: string;
   representative_name: string;
+  seller_code: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  rejection_reason: string | null;
   updated_at: string;
   zone_code: string;
 };

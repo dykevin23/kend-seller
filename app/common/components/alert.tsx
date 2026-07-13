@@ -34,7 +34,9 @@ export default function Alert({
         </AlertDialogHeader>
         <AlertDialogFooter>
           {secondaryButton && (
-            <AlertDialogCancel>{secondaryButton.label}</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => secondaryButton.onClick()}>
+              {secondaryButton.label}
+            </AlertDialogCancel>
           )}
           <AlertDialogAction onClick={() => primaryButton.onClick()}>
             {primaryButton.label}

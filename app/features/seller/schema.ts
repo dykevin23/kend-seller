@@ -9,8 +9,13 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { domains, hashtags } from "../system/schema";
-import { ADDRESS_TYPES } from "./constrants";
+import { ADDRESS_TYPES, SELLER_STATUS } from "./constrants";
 import { profiles } from "../users/external/profiles";
+
+export const SellerStatus = pgEnum(
+  "seller_status",
+  SELLER_STATUS.map((status) => status.value) as [string, ...string[]]
+);
 
 /**
  * 판매자 테이블(sellers)
@@ -23,6 +28,8 @@ import { profiles } from "../users/external/profiles";
  * address_detail: 사업장 상세주소
  * business: 비즈니스 형태
  * domain_id: 대표 도메인
+ * status: 승인 상태(PENDING/APPROVED/REJECTED)
+ * rejection_reason: 반려 사유(REJECTED일 때만 사용)
  */
 export const sellers = pgTable("admin_sellers", {
   id: uuid().primaryKey().defaultRandom(),
@@ -35,6 +42,8 @@ export const sellers = pgTable("admin_sellers", {
   address_detail: text().notNull(),
   business: text().notNull(),
   domain_id: uuid().references(() => domains.id),
+  status: SellerStatus().notNull().default("PENDING"),
+  rejection_reason: text(),
   created_at: timestamp().notNull().defaultNow(),
   updated_at: timestamp().notNull().defaultNow(),
 });

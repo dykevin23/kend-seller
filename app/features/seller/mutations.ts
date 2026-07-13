@@ -138,3 +138,71 @@ export const createSellerInformation = async (
 
   if (memberError) throw memberError;
 };
+
+// 반려 후 재제출: 정보 갱신 + 상태를 PENDING으로 리셋
+export const updateSellerInformation = async (
+  client: SupabaseClient<Database>,
+  sellerId: string,
+  {
+    bizrNo,
+    companyName,
+    representativeName,
+    zoneCode,
+    address,
+    addressDetail,
+    business,
+    domain,
+  }: {
+    bizrNo: string;
+    companyName: string;
+    representativeName: string;
+    zoneCode: string;
+    address: string;
+    addressDetail: string;
+    business: string;
+    domain: string;
+  }
+) => {
+  const { error } = await client
+    .from("admin_sellers")
+    .update({
+      bizr_no: bizrNo,
+      name: companyName,
+      representative_name: representativeName,
+      zone_code: zoneCode,
+      address: address,
+      address_detail: addressDetail,
+      business: business,
+      domain_id: domain,
+      status: "PENDING",
+      rejection_reason: null,
+    })
+    .eq("id", sellerId);
+
+  if (error) throw error;
+};
+
+export const approveSeller = async (
+  client: SupabaseClient<Database>,
+  sellerId: string
+) => {
+  const { error } = await client
+    .from("admin_sellers")
+    .update({ status: "APPROVED", rejection_reason: null })
+    .eq("id", sellerId);
+
+  if (error) throw error;
+};
+
+export const rejectSeller = async (
+  client: SupabaseClient<Database>,
+  sellerId: string,
+  reason: string
+) => {
+  const { error } = await client
+    .from("admin_sellers")
+    .update({ status: "REJECTED", rejection_reason: reason })
+    .eq("id", sellerId);
+
+  if (error) throw error;
+};

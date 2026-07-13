@@ -38,6 +38,16 @@ export const getSellerBanners = async (
   return data || [];
 };
 
+// 관리자 승인 화면용: RLS 스코프 없이 전체 판매자 조회
+export const getAllSellers = async (client: SupabaseClient<Database>) => {
+  const { data, error } = await client
+    .from("admin_sellers")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data || [];
+};
+
 export const getSellerAddresses = async (
   client: SupabaseClient<Database>,
   sellerId: string

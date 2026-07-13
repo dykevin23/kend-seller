@@ -12,3 +12,9 @@ export const BUSINESS_TYPES = [
   { label: "매입 판매", value: "RESELLER" },
   { label: "해외직구/병행수입", value: "OVERSEAS" },
 ] as const;
+
+export const SELLER_STATUS = [
+  { label: "승인대기", value: "PENDING" },
+  { label: "승인", value: "APPROVED" },
+  { label: "반려", value: "REJECTED" },
+] as const;

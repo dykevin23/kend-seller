@@ -57,6 +57,13 @@
       "when": 1771914092992,
       "tag": "0007_swift_madame_hydra",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1783671408569,
+      "tag": "0008_daffy_sleeper",
+      "breakpoints": true
     }
   ]
 }

@@ -71,6 +71,18 @@ export const loader = async ({
       // admin은 seller 정보가 필요없음
       const seller =
         profile.role === "seller" ? await getSellerInfo(client) : null;
+
+      // seller는 승인(APPROVED) 전까지 정보 등록/조회 화면 외 접근 불가
+      if (profile.role === "seller") {
+        const pathname = new URL(request.url).pathname;
+        if (
+          pathname !== "/seller/information/submit" &&
+          (!seller || seller.status !== "APPROVED")
+        ) {
+          return redirect("/seller/information/submit", { headers });
+        }
+      }
+
       return { user, profile, seller };
     } else {
       await client.auth.signOut({ scope: "global" });

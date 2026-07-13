@@ -17,7 +17,11 @@ import { Button } from "~/common/components/ui/button";
 import { useCallback, useState } from "react";
 import { z } from "zod";
 import { getLoggedInUserId } from "~/features/users/queries";
-import { createSellerInformation, setSellerHashtags } from "../mutations";
+import {
+  createSellerInformation,
+  updateSellerInformation,
+  setSellerHashtags,
+} from "../mutations";
 import { getSellerInfo, getSellerHashtags } from "../queries";
 import { getSellerLogoUrl } from "../storage";
 import { BUSINESS_TYPES } from "../constrants";
@@ -55,6 +59,24 @@ export const action = async ({ request }: Route.ActionArgs) => {
     }
 
     await setSellerHashtags(client, seller.id, hashtagIds);
+    return { ok: true };
+  }
+
+  // 반려 후 재제출: 정보 갱신 + 상태 PENDING으로 리셋
+  if (intent === "resubmit") {
+    const { success, data, error } = formSchema.safeParse(
+      Object.fromEntries(formData)
+    );
+
+    if (!success) {
+      return { formErrors: error.flatten().fieldErrors };
+    }
+
+    const seller = await getSellerInfo(client);
+    if (!seller) return { ok: false };
+
+    await updateSellerInformation(client, seller.id, data);
+
     return { ok: true };
   }
 
@@ -104,85 +126,149 @@ export default function SubmitSellerInformationPage({
     setHasChanges(changed);
   }, []);
 
-  // seller가 있으면 Step 2 (관리 모드)
-  if (seller) {
+  // seller가 없으면 Step 1 (등록 모드)
+  if (!seller) {
+    return <SellerRegistrationForm loaderData={loaderData} intent="register" />;
+  }
+
+  // 승인 대기중이면 대기 안내 화면
+  if (seller.status === "PENDING") {
+    return <SellerPendingNotice seller={seller} />;
+  }
+
+  // 반려되었으면 사유 노출 + 재제출 폼
+  if (seller.status === "REJECTED") {
     return (
-      <Content>
-        <Title title="판매자 정보 관리" />
-        <Form method="post" className="space-y-5">
-          {/* 대표 이미지 (로고) */}
-          <Card>
-            <h2 className="text-xl font-bold">대표 이미지</h2>
-            <SellerLogoUpload
-              sellerCode={seller.seller_code}
-              logoUrl={logoUrl}
-            />
-          </Card>
-
-          {/* 기본 정보 (읽기 전용) */}
-          <Card>
-            <h2 className="text-xl font-bold">기본정보</h2>
-            <InfoRow label="판매자 코드" value={seller.seller_code} />
-            <Separator />
-            <InfoRow label="사업자 등록번호" value={seller.bizr_no} />
-            <Separator />
-            <InfoRow
-              label="대표자 명"
-              value={seller.representative_name}
-            />
-            <InfoRow label="상호명" value={seller.name} />
-            <Separator />
-            <InfoRow
-              label="사업장 주소"
-              value={`(${seller.zone_code}) ${seller.address} ${seller.address_detail}`}
-            />
-            <Separator />
-            <InfoRow label="비즈니스 형태" value={seller.business} />
-            <InfoRow
-              label="대표 서비스"
-              value={seller.domain_name ?? "-"}
-            />
-          </Card>
-
-          {/* 해시태그 */}
-          <Card>
-            <h2 className="text-xl font-bold">해시태그</h2>
-            <SellerHashtagInput
-              initialHashtags={hashtags}
-              onChanged={handleHashtagChanged}
-            />
-          </Card>
-
-          <input type="hidden" name="intent" value="saveHashtags" />
-          <div className="flex justify-end">
-            <Button type="submit" disabled={!hasChanges}>
-              저장
-            </Button>
-          </div>
-        </Form>
-      </Content>
+      <SellerRegistrationForm
+        loaderData={loaderData}
+        seller={seller}
+        intent="resubmit"
+      />
     );
   }
 
-  // seller가 없으면 Step 1 (등록 모드)
-  return <SellerRegistrationForm loaderData={loaderData} />;
+  // 승인 완료(APPROVED)면 Step 2 (관리 모드)
+  return (
+    <Content>
+      <Title title="판매자 정보 관리" />
+      <Form method="post" className="space-y-5">
+        {/* 대표 이미지 (로고) */}
+        <Card>
+          <h2 className="text-xl font-bold">대표 이미지</h2>
+          <SellerLogoUpload sellerCode={seller.seller_code} logoUrl={logoUrl} />
+        </Card>
+
+        {/* 기본 정보 (읽기 전용) */}
+        <Card>
+          <h2 className="text-xl font-bold">기본정보</h2>
+          <InfoRow label="판매자 코드" value={seller.seller_code} />
+          <Separator />
+          <InfoRow label="사업자 등록번호" value={seller.bizr_no} />
+          <Separator />
+          <InfoRow label="대표자 명" value={seller.representative_name} />
+          <InfoRow label="상호명" value={seller.name} />
+          <Separator />
+          <InfoRow
+            label="사업장 주소"
+            value={`(${seller.zone_code}) ${seller.address} ${seller.address_detail}`}
+          />
+          <Separator />
+          <InfoRow label="비즈니스 형태" value={seller.business} />
+          <InfoRow label="대표 서비스" value={seller.domain_name ?? "-"} />
+        </Card>
+
+        {/* 해시태그 */}
+        <Card>
+          <h2 className="text-xl font-bold">해시태그</h2>
+          <SellerHashtagInput
+            initialHashtags={hashtags}
+            onChanged={handleHashtagChanged}
+          />
+        </Card>
+
+        <input type="hidden" name="intent" value="saveHashtags" />
+        <div className="flex justify-end">
+          <Button type="submit" disabled={!hasChanges}>
+            저장
+          </Button>
+        </div>
+      </Form>
+    </Content>
+  );
+}
+
+function SellerPendingNotice({
+  seller,
+}: {
+  seller: NonNullable<Route.ComponentProps["loaderData"]["seller"]>;
+}) {
+  return (
+    <Content className="space-y-4">
+      <Title title="판매자 정보 관리" />
+      <Card className="border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950">
+        <h2 className="text-lg font-bold mb-2 text-amber-700 dark:text-amber-400">
+          승인 대기 중입니다
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          제출하신 업체 정보를 관리자가 확인하고 있습니다. 승인 완료 후
+          정상적으로 이용하실 수 있습니다.
+        </p>
+      </Card>
+      <Card>
+        <h2 className="text-xl font-bold">제출한 정보</h2>
+        <InfoRow label="사업자 등록번호" value={seller.bizr_no} />
+        <Separator />
+        <InfoRow label="대표자 명" value={seller.representative_name} />
+        <InfoRow label="상호명" value={seller.name} />
+        <Separator />
+        <InfoRow
+          label="사업장 주소"
+          value={`(${seller.zone_code}) ${seller.address} ${seller.address_detail}`}
+        />
+        <Separator />
+        <InfoRow label="비즈니스 형태" value={seller.business} />
+      </Card>
+    </Content>
+  );
 }
 
 function SellerRegistrationForm({
   loaderData,
+  seller,
+  intent,
 }: {
   loaderData: Route.ComponentProps["loaderData"];
+  seller?: NonNullable<Route.ComponentProps["loaderData"]["seller"]>;
+  intent: "register" | "resubmit";
 }) {
-  const [address, setAddress] = useState<IAddressType>();
+  const [address, setAddress] = useState<IAddressType | undefined>(
+    seller
+      ? { zoneCode: seller.zone_code, address: seller.address, addressType: "" }
+      : undefined
+  );
   const handleZoneCode = (data: IAddressType) => {
     setAddress(data);
   };
 
   return (
-    <Content>
-      <Title title="판매자 정보 입력" />
+    <Content className="space-y-4">
+      <Title title={intent === "resubmit" ? "판매자 정보 관리" : "판매자 정보 입력"} />
+
+      {intent === "resubmit" && seller?.rejection_reason && (
+        <Card className="border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950">
+          <h2 className="text-lg font-bold mb-2 text-red-700 dark:text-red-400">
+            승인 결과: 반려
+          </h2>
+          <p className="text-sm text-muted-foreground mb-3">
+            제출하신 업체 정보가 반려되었습니다. 아래 사유를 확인하고 정보를
+            수정한 뒤 다시 제출해주세요.
+          </p>
+          <p className="text-sm font-medium">{seller.rejection_reason}</p>
+        </Card>
+      )}
 
       <Form className="space-y-5" method="post">
+        <input type="hidden" name="intent" value={intent} />
         <Card>
           <h2 className="text-xl font-bold">기본정보</h2>
           <TextField
@@ -191,6 +277,7 @@ function SellerRegistrationForm({
             label="사업자 등록번호"
             direction="row"
             className="w-1/4"
+            defaultValue={seller?.bizr_no}
           />
           <Separator />
           <TextField
@@ -199,6 +286,7 @@ function SellerRegistrationForm({
             label="대표자 명"
             direction="row"
             className="w-1/3"
+            defaultValue={seller?.representative_name}
           />
           <TextField
             id="companyName"
@@ -206,6 +294,7 @@ function SellerRegistrationForm({
             label="상호명"
             direction="row"
             className="w-1/3"
+            defaultValue={seller?.name}
           />
           <div className="flex flex-col gap-2">
             <TextField
@@ -239,6 +328,7 @@ function SellerRegistrationForm({
               direction="row"
               placeholder="상세주소"
               className="w-2/3"
+              defaultValue={seller?.address_detail}
             />
           </div>
           <Select
@@ -251,6 +341,7 @@ function SellerRegistrationForm({
             }))}
             direction="row"
             className="w-1/4"
+            defaultValue={seller?.business}
           />
           <Select
             id="domain"
@@ -262,10 +353,13 @@ function SellerRegistrationForm({
             }))}
             direction="row"
             className="w-1/4"
+            defaultValue={seller?.domain_id ?? undefined}
           />
         </Card>
         <div className="flex justify-end">
-          <Button type="submit">등록</Button>
+          <Button type="submit">
+            {intent === "resubmit" ? "재제출" : "등록"}
+          </Button>
         </div>
       </Form>
     </Content>

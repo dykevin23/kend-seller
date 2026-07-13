@@ -83,6 +83,11 @@ export default [
         route("/submit", "features/system/pages/submit-system-option-page.tsx"),
         route("/:optionCode", "features/system/pages/system-option-page.tsx"),
       ]),
+      // 판매자 승인 관리
+      ...prefix("sellers", [
+        index("features/seller/pages/seller-approval-list-page.tsx"),
+        route("/post", "features/seller/pages/post-seller-approval-page.tsx"),
+      ]),
     ]),
   ]),
 
@@ -90,5 +95,6 @@ export default [
   ...prefix("auth", [
     route("/login", "features/auth/pages/login-page.tsx"),
     route("/join", "features/auth/pages/join-page.tsx"),
+    route("/logout", "features/auth/pages/logout-page.tsx"),
   ]),
 ] satisfies RouteConfig;

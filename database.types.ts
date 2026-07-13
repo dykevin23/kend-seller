@@ -121,8 +121,10 @@ export type Database = {
           domain_id: string | null
           id: string
           name: string
+          rejection_reason: string | null
           representative_name: string
           seller_code: string
+          status: Database["public"]["Enums"]["seller_status"]
           updated_at: string
           zone_code: string
         }
@@ -135,8 +137,10 @@ export type Database = {
           domain_id?: string | null
           id?: string
           name: string
+          rejection_reason?: string | null
           representative_name: string
           seller_code: string
+          status?: Database["public"]["Enums"]["seller_status"]
           updated_at?: string
           zone_code: string
         }
@@ -149,8 +153,10 @@ export type Database = {
           domain_id?: string | null
           id?: string
           name?: string
+          rejection_reason?: string | null
           representative_name?: string
           seller_code?: string
+          status?: Database["public"]["Enums"]["seller_status"]
           updated_at?: string
           zone_code?: string
         }
@@ -213,6 +219,7 @@ export type Database = {
           created_at: string
           gender: Database["public"]["Enums"]["child_gender"] | null
           id: string
+          is_dummy: boolean
           name: string | null
           nickname: string
           profile_image_url: string | null
@@ -225,6 +232,7 @@ export type Database = {
           created_at?: string
           gender?: Database["public"]["Enums"]["child_gender"] | null
           id?: string
+          is_dummy?: boolean
           name?: string | null
           nickname: string
           profile_image_url?: string | null
@@ -237,6 +245,7 @@ export type Database = {
           created_at?: string
           gender?: Database["public"]["Enums"]["child_gender"] | null
           id?: string
+          is_dummy?: boolean
           name?: string | null
           nickname?: string
           profile_image_url?: string | null
@@ -1580,8 +1589,10 @@ export type Database = {
           domain_name: string | null
           id: string | null
           name: string | null
+          rejection_reason: string | null
           representative_name: string | null
           seller_code: string | null
+          status: Database["public"]["Enums"]["seller_status"] | null
           updated_at: string | null
           zone_code: string | null
         }
@@ -1597,7 +1608,15 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      get_growth_percentile_history: {
+        Args: { p_child_id: string; p_type: string }
+        Returns: {
+          age_months: number
+          measured_at: string
+          percentile: number
+          value: number
+        }[]
+      }
     }
     Enums: {
       admin_address_type: "SHIPPING" | "RETURN"
@@ -1665,6 +1684,7 @@ export type Database = {
         | "SOLD_OUT"
         | "STOP"
         | "END"
+      seller_status: "PENDING" | "APPROVED" | "REJECTED"
       shipping_fee_type: "FREE" | "PAID" | "COD" | "CONDITIONAL"
       target_age_type: "BABY" | "KIDS"
       target_gender_type: "GIRL" | "BOY" | "UNISEX"
@@ -1868,6 +1888,7 @@ export const Constants = {
         "STOP",
         "END",
       ],
+      seller_status: ["PENDING", "APPROVED", "REJECTED"],
       shipping_fee_type: ["FREE", "PAID", "COD", "CONDITIONAL"],
       target_age_type: ["BABY", "KIDS"],
       target_gender_type: ["GIRL", "BOY", "UNISEX"],

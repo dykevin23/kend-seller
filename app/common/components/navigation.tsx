@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Form, Link } from "react-router";
 import { Separator } from "./ui/separator";
 import {
   NavigationMenu,
@@ -9,6 +9,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "./ui/navigation-menu";
+import { Button } from "./ui/button";
 import { cn } from "~/lib/utils";
 import { useRootData } from "~/hooks/useRootData";
 
@@ -112,6 +113,11 @@ const menus: Menu[] = [
         description: "시스템 옵션 관리",
         to: "/system/systemOptions",
       },
+      {
+        name: "Seller Approvals",
+        description: "판매자 승인 관리",
+        to: "/system/sellers",
+      },
     ],
   },
 ];
@@ -181,6 +187,12 @@ export default function Navigation() {
           </NavigationMenuList>
         </NavigationMenu>
       </div>
+
+      <Form method="post" action="/auth/logout">
+        <Button type="submit" variant="ghost" size="sm">
+          로그아웃
+        </Button>
+      </Form>
     </nav>
   );
 }
