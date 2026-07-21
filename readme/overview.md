@@ -1,6 +1,6 @@
 # KEND-SELLER 현재 상황 (Overview)
 
-> 최종 업데이트: 2026-06-24 (골격 적용 — 동적 현황은 seller 작업 시 갱신)
+> 최종 업데이트: 2026-07-21 (P2-1 판매자 승인 flow 완료 반영)
 > KEND-SELLER의 현재 상태 단일 대시보드. 개발 진행마다 갱신한다.
 > 작성 표준 → [core/readme-structure-guide.md](./core/readme-structure-guide.md) §8 (방식 vs 내용)
 > 완료 상세 → [changelog-seller.md](./changelog-seller.md) / 큰 계획 → [kend-roadmap-to-launch.md](./kend-roadmap-to-launch.md)
@@ -17,14 +17,16 @@
 
 > ← _seller에서 작업 시 갱신_
 
-- (참고) 판매자 정보/상품/배너 관리 등 기반 기능 일부 구현됨 — [changelog-seller.md](./changelog-seller.md) 참조
-- 다음 큰 블록은 Phase 2 (판매자 기반 + 주문/배송 관리). 상세는 roadmap
+- **P2-1 판매자 기반 완료**: 로그인/가입, 업체 등록+승인 flow(대기/승인/반려/재제출), 프로필·사업자 정보 관리까지 로컬 테스트로 동작 확인 완료
+- 다음은 **P2-2 주문 관리 화면** (kend 쪽 주문 스키마·결제·취소환불은 이미 구현돼 있어 그 위에 seller UI만 얹으면 됨)
 
 ---
 
 ## ✅ 최근 완료
 
 > ← _[changelog-seller.md](./changelog-seller.md)에서 핵심 항목 요약_
+
+- 판매자 업체 등록 승인(approval) flow (2026-07-13): 승인 전 접근 차단, 대기/반려/승인 상태별 화면, 관리자 승인 화면(`/system/sellers`), 전역 로그아웃 버튼. 가입→대기→승인, 반려→재제출 플로우 실제 테스트 확인
 
 ---
 
@@ -36,7 +38,10 @@
 
 ## 📋 다음 작업
 
-> ← _seller 작업 시 채울 것_ — Phase 2: 판매자 로그인/업체 등록 승인, 주문 관리 화면, 배송 처리, 정산
+> ← _seller 작업 시 채울 것_
+- **P2-2 주문 관리 화면** (다음 착수 후보): 주문 목록/상세, 상태 변경 액션, 신규 주문 알림
+- 이후 P2-3 배송 처리(EXT-4 스마트택배 API 신청 선행 필요) → P2-4 재고 차감 → P3 정산
+- (후순위) 승인 flow UX 보완 3건 — [todo/seller-approval-ux-followups.md](./todo/seller-approval-ux-followups.md)
 
 ---
 
@@ -68,7 +73,7 @@
 
 ## 🚧 출시 전 반드시 필요한 작업 (체크리스트)
 
-- [ ] 판매자 기반 (로그인/인증, 업체 등록+승인 flow, 프로필/사업자 정보)
+- [x] 판매자 기반 (로그인/인증, 업체 등록+승인 flow, 프로필/사업자 정보) — ✅ 완료 (2026-07-13)
 - [ ] 주문 관리 화면 (목록/상세, 상태 변경, 신규 주문 알림)
 - [ ] 배송 처리 (송장 입력, 스마트택배 추적 연동)
 - [ ] 재고 차감 연동
