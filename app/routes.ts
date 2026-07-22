@@ -18,6 +18,12 @@ export default [
     route("/:productCode", "features/products/pages/product-detail-page.tsx"),
   ]),
 
+  /* 주문 관리 */
+  ...prefix("orders", [
+    route("/list", "features/orders/pages/order-list-page.tsx"),
+    route("/:orderNumber", "features/orders/pages/order-detail-page.tsx"),
+  ]),
+
   /* 판매자정보 */
   ...prefix("seller", [
     ...prefix("information", [
