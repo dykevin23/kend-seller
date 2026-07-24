@@ -9,6 +9,14 @@ KEND 웹앱(React Router SSR + WebView)의 주요 변경사항을 날짜별로 �
 
 ## 2026-07-22
 
+### [KEND] 판매자 계정 kend 로그인 차단 + 주문취소 팝업 개선
+
+- **`root.tsx`**: 전역 loader에서 로그인 후 `profiles.role`을 조회, `seller`면 즉시 `signOut()` + `/auth/login`으로 리다이렉트. 일반 로그인 실패와 동일한 문구·에러코드(`invalid_credentials`)를 사용해 판매자 계정 존재 여부가 드러나지 않게 처리
+  - 계기: 결제 테스트 데이터 점검 중 판매자(NBA KIDS) 계정이 kend에 로그인해 실제로 구매까지 할 수 있었던 것을 발견 — `profiles.role`이 스키마에만 정의돼 있고 어디서도 체크되지 않던 상태였음
+- **`login-page.tsx`**: 위 리다이렉트의 에러 메시지 표시 로직 추가. 기존에 죽어있던 `naver_*` 에러 쿼리 파라미터 처리도 함께 살림
+- **`order-group-card.tsx`**: 주문취소 확인 팝업에 확인 버튼만 있고 되돌릴 방법이 없던 문제 수정 — `secondaryButton`(취소) 추가 (다른 화면의 기존 confirm 패턴과 동일)
+- (참고) 점검 과정에서 발견된 테스트용 주문/결제 데이터(order_groups 5건 등, 전부 테스트 키)는 DB에서 삭제 완료
+
 ### [KEND] 스토어 목록에서 상품 없는 판매자 제외
 
 - `getStoresWithProducts`(`stores/queries.ts`)가 `admin_sellers`를 조건 없이 조회해, 판매 가능한 상품이 하나도 없는 판매자도 No-Image 카드로 노출되던 문제 수정
