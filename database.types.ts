@@ -335,6 +335,7 @@ export type Database = {
           shipping_fee: number
           status: Database["public"]["Enums"]["delivery_status"]
           tracking_number: string | null
+          tracking_synced_at: string | null
           updated_at: string
         }
         Insert: {
@@ -347,6 +348,7 @@ export type Database = {
           shipping_fee?: number
           status?: Database["public"]["Enums"]["delivery_status"]
           tracking_number?: string | null
+          tracking_synced_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -359,6 +361,7 @@ export type Database = {
           shipping_fee?: number
           status?: Database["public"]["Enums"]["delivery_status"]
           tracking_number?: string | null
+          tracking_synced_at?: string | null
           updated_at?: string
         }
         Relationships: [

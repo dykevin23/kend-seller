@@ -14,3 +14,27 @@ export const ORDER_STATUS_ACTIONS = [
   { label: "배송준비중", value: "preparing" },
   { label: "취소", value: "cancelled" },
 ] as const;
+
+// deliveries.status 라벨 (스마트택배 폴링으로 in_transit/delivered까지 갱신됨)
+export const DELIVERY_STATUS_LABELS: Record<string, string> = {
+  pending: "배송준비중",
+  preparing: "배송준비중",
+  shipped: "배송중(발송)",
+  in_transit: "배송중",
+  delivered: "배송완료",
+};
+
+// courier_company enum → 스마트택배(SweetTracker) t_code 매핑
+// 출처: GET https://info.sweettracker.co.kr/api/v1/companylist (2026-07 확인)
+export const COURIER_TO_SWEETTRACKER_CODE: Record<string, string> = {
+  POST: "01",
+  CJ: "04",
+  HANJIN: "05",
+  LOGEN: "06",
+  LOTTE: "08",
+  ILYANG: "11",
+  DAESIN: "22",
+  KDEXP: "23",
+  GSM: "28",
+  HDEXP: "32",
+};

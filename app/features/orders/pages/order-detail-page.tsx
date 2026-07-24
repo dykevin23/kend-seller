@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useFetcher, useNavigate } from "react-router";
 import Content from "~/common/components/content";
 import Title from "~/common/components/title";
@@ -5,13 +6,26 @@ import Card from "~/common/components/card";
 import { Separator } from "~/common/components/ui/separator";
 import { Label } from "~/common/components/ui/label";
 import { Button } from "~/common/components/ui/button";
+import { Input } from "~/common/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/common/components/ui/select";
 import { useAlert } from "~/hooks/useAlert";
 import { formatNumber } from "~/common/utils/format";
-import { ORDER_STATUS, ORDER_STATUS_ACTIONS } from "../constrants";
+import {
+  ORDER_STATUS,
+  ORDER_STATUS_ACTIONS,
+  DELIVERY_STATUS_LABELS,
+} from "../constrants";
+import { COURIER_COMPANIES } from "~/features/products/constrants";
 import type { Route } from "./+types/order-detail-page";
 import { makeSSRClient } from "~/supa-client";
 import { getSellerOrderDetail } from "../queries";
-import { updateOrderStatus } from "../mutations";
+import { updateOrderStatus, markOrderShipped } from "../mutations";
 import { getSellerInfo } from "~/features/seller/queries";
 
 const ALLOWED_TRANSITIONS: Record<string, string[]> = {
@@ -23,7 +37,7 @@ const ALLOWED_TRANSITIONS: Record<string, string[]> = {
 export const action = async ({ request, params }: Route.ActionArgs) => {
   const { client } = makeSSRClient(request);
   const formData = await request.formData();
-  const status = formData.get("status") as string;
+  const intent = formData.get("intent");
 
   const seller = await getSellerInfo(client);
   if (!seller) {
@@ -38,6 +52,23 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
     return { success: false, error: "주문을 찾을 수 없습니다." };
   }
 
+  if (intent === "ship") {
+    const courier = formData.get("courier") as string;
+    const trackingNumber = formData.get("trackingNumber") as string;
+
+    if (!courier || !trackingNumber) {
+      return { success: false, error: "배송사와 송장번호를 모두 입력해주세요." };
+    }
+
+    return await markOrderShipped(client, {
+      orderId: order.id,
+      sellerId: seller.id,
+      courier,
+      trackingNumber,
+    });
+  }
+
+  const status = formData.get("status") as string;
   const result = await updateOrderStatus(client, {
     orderIds: [order.id],
     sellerId: seller.id,
@@ -73,6 +104,9 @@ export default function OrderDetailPage({
   const navigate = useNavigate();
   const { confirm } = useAlert();
   const fetcher = useFetcher();
+  const shipFetcher = useFetcher();
+  const [courier, setCourier] = useState("");
+  const [trackingNumber, setTrackingNumber] = useState("");
 
   if (!order) {
     return (
@@ -96,6 +130,24 @@ export default function OrderDetailPage({
   const nextActions = ORDER_STATUS_ACTIONS.filter((action) =>
     ALLOWED_TRANSITIONS[order.status]?.includes(action.value)
   );
+
+  const handleShip = () => {
+    if (!courier || !trackingNumber) return;
+    confirm({
+      title: "배송 처리",
+      message: `배송사 "${COURIER_COMPANIES.find((c) => c.value === courier)?.label}", 송장번호 "${trackingNumber}"로 배송 처리하시겠습니까?`,
+      primaryButton: {
+        label: "배송 처리",
+        onClick: () => {
+          shipFetcher.submit(
+            { intent: "ship", courier, trackingNumber },
+            { method: "post" }
+          );
+        },
+      },
+      secondaryButton: { label: "취소", onClick: () => {} },
+    });
+  };
 
   const handleStatusChange = (status: string, label: string) => {
     confirm({
@@ -138,6 +190,87 @@ export default function OrderDetailPage({
           </div>
         )}
       </Card>
+
+      {order.status === "preparing" && (
+        <Card>
+          <h2 className="text-xl font-bold">배송 처리</h2>
+          <div className="flex items-end gap-2 mt-3">
+            <div className="flex flex-col gap-1">
+              <Label className="text-xs text-muted-foreground">배송사</Label>
+              <Select value={courier} onValueChange={setCourier}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="배송사 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COURIER_COMPANIES.map((c) => (
+                    <SelectItem key={c.value} value={c.value}>
+                      {c.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1 flex-1">
+              <Label className="text-xs text-muted-foreground">송장번호</Label>
+              <Input
+                value={trackingNumber}
+                onChange={(e) => setTrackingNumber(e.target.value)}
+                placeholder="송장번호 입력"
+              />
+            </div>
+            <Button
+              onClick={handleShip}
+              disabled={!courier || !trackingNumber}
+            >
+              배송 처리
+            </Button>
+          </div>
+          {shipFetcher.data?.error && (
+            <p className="text-sm text-red-500 mt-2">
+              {shipFetcher.data.error}
+            </p>
+          )}
+        </Card>
+      )}
+
+      {order.delivery && (
+        <Card>
+          <h2 className="text-xl font-bold">배송 정보</h2>
+          <InfoRow
+            label="배송사"
+            value={
+              COURIER_COMPANIES.find((c) => c.value === order.delivery!.courier)
+                ?.label ??
+              order.delivery.courier ??
+              "-"
+            }
+          />
+          <Separator />
+          <InfoRow
+            label="송장번호"
+            value={order.delivery.tracking_number ?? "-"}
+          />
+          <Separator />
+          <InfoRow
+            label="배송상태"
+            value={
+              DELIVERY_STATUS_LABELS[order.delivery.status] ??
+              order.delivery.status
+            }
+          />
+          {order.delivery.tracking_synced_at && (
+            <>
+              <Separator />
+              <InfoRow
+                label="마지막 확인"
+                value={new Date(order.delivery.tracking_synced_at).toLocaleString(
+                  "ko-KR"
+                )}
+              />
+            </>
+          )}
+        </Card>
+      )}
 
       <Card>
         <h2 className="text-xl font-bold">수령인 정보</h2>

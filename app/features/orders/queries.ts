@@ -139,6 +139,12 @@ export interface OrderDetail {
       receipt_url: string | null;
     } | null;
   };
+  delivery: {
+    courier: string | null;
+    tracking_number: string | null;
+    status: string;
+    tracking_synced_at: string | null;
+  } | null;
 }
 
 // 주문 상세 조회 (판매자 소유 검증 포함)
@@ -164,7 +170,8 @@ export const getSellerOrderDetail = async (
         recipient_name, recipient_phone, zone_code, address, address_detail,
         delivery_message, payment_method, status, paid_at,
         payments ( method, status, receipt_url )
-      )
+      ),
+      deliveries ( courier, tracking_number, status, tracking_synced_at )
     `
     )
     .eq("seller_id", sellerId)
@@ -175,6 +182,10 @@ export const getSellerOrderDetail = async (
   if (error || !data) return null;
 
   const group = data.order_groups as any;
+  const deliveryRaw = data.deliveries as any;
+  const delivery = Array.isArray(deliveryRaw)
+    ? (deliveryRaw[0] ?? null)
+    : (deliveryRaw ?? null);
 
   return {
     id: data.id,
@@ -197,6 +208,14 @@ export const getSellerOrderDetail = async (
       paid_at: group.paid_at,
       payment: group.payments?.[0] ?? null,
     },
+    delivery: delivery
+      ? {
+          courier: delivery.courier,
+          tracking_number: delivery.tracking_number,
+          status: delivery.status,
+          tracking_synced_at: delivery.tracking_synced_at,
+        }
+      : null,
   };
 };
 

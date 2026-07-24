@@ -56,3 +56,62 @@ export const updateOrderStatus = async (
     skippedCount: orderIds.length - validIds.length,
   };
 };
+
+export interface MarkOrderShippedResult {
+  success: boolean;
+  error?: string;
+}
+
+// 배송 처리: 배송준비중 주문에 배송사+송장번호를 입력해 배송중 상태로 전환.
+// 이후 배송완료 전환은 스마트택배 폴링(스케줄러)이 수행하므로 여기서 다루지 않는다.
+export const markOrderShipped = async (
+  client: SupabaseClient,
+  {
+    orderId,
+    sellerId,
+    courier,
+    trackingNumber,
+  }: {
+    orderId: string;
+    sellerId: string;
+    courier: string;
+    trackingNumber: string;
+  }
+): Promise<MarkOrderShippedResult> => {
+  const { data: order, error: fetchError } = await client
+    .from("orders")
+    .select("id, status")
+    .eq("id", orderId)
+    .eq("seller_id", sellerId)
+    .maybeSingle();
+
+  if (fetchError) throw fetchError;
+  if (!order || order.status !== "preparing") {
+    return {
+      success: false,
+      error: "배송준비중 상태의 주문만 배송 처리할 수 있습니다.",
+    };
+  }
+
+  const { error: deliveryError } = await client
+    .from("deliveries")
+    .update({
+      courier,
+      tracking_number: trackingNumber,
+      status: "shipped",
+      shipped_at: new Date().toISOString(),
+    })
+    .eq("order_id", orderId);
+
+  if (deliveryError) throw deliveryError;
+
+  const { error: orderError } = await client
+    .from("orders")
+    .update({ status: "shipped" })
+    .eq("id", orderId)
+    .eq("seller_id", sellerId);
+
+  if (orderError) throw orderError;
+
+  return { success: true };
+};
