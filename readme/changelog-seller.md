@@ -8,6 +8,19 @@ KEND-SELLER 판매자 관리자 웹의 주요 변경사항을 날짜별로 기�
 
 ---
 
+## 2026-08-04
+
+### [KEND-SELLER] 재고 배지(품절/재고부족) 추가 + 취소 주문 노출 버그 수정 (P2-4 착수)
+
+- **품절/재고부족 배지** (`product-list-page.tsx`): 재고수량 컬럼에 `total_stock === 0`이면 품절, `0 < total_stock ≤ LOW_STOCK_THRESHOLD(10)`이면 재고부족 배지 표시. `status` 필드가 아닌 `total_stock` 값을 직접 계산해 판단 — 재고 0 도달 시 자동으로 상태를 갱신해주는 주체가 아직 없어, 별도 동기화 없이 항상 정확한 값을 보여주기 위함
+- **버그 수정 — 취소된 주문이 판매자 목록/상세에서 사라짐**: kend에 새로 배포된 주문취소 트리거(`handle_order_cancelled`)가 `orders.status` 취소 시 `order_groups.status`도 함께 `cancelled`로 바꾸면서, "결제완료(paid/partially_refunded)만 노출"하던 화이트리스트 필터(`orders/queries.ts`)에 걸려 조회 자체가 안 되던 문제. "결제 미완료(payment_in_progress/payment_pending/failed)만 제외"하는 블랙리스트 방식으로 전환해 해결
+  - kend 트리거 정의를 교차 확인한 결과, 다중 판매자 order_group(그룹 내 판매자 2인 이상 섞인 케이스, 실데이터 기준 11개 중 2개 존재)에서도 "그룹 내 모든 orders가 cancelled일 때만" 그룹 상태를 바꾸도록 이미 안전하게 처리돼 있음을 확인 — 별도 수정 불필요
+- **dev 서버 포트 5174로 고정**: kend와 동일한 Vite 기본 포트(5173) 사용으로 동시 실행 시 충돌하던 문제 해결
+- **재고관리 화면 스코프 확정**: `navigation.tsx`에 "Stocks Keeping"(`/products/stocks-keeping`) 메뉴가 기획 초기부터 있었으나 라우트·페이지 구현이 없던 죽은 링크였음을 확인. SKU별 재고 조회+수정 화면으로 정식 착수 예정(다음 작업). 차감/복구 트랜잭션(주문생성·취소 시)은 kend이 DB 트랜잭션으로 담당하기로 R&R 합의, kend-seller는 배지·조회/수정 화면만 담당
+- (참고) 조사 중 상품 등록 후 **수정 기능 자체가 없음**(재고뿐 아니라 이름·가격 등 전체)을 확인 — 별도 이슈로 기록만 해둠
+
+---
+
 ## 2026-07-24
 
 ### [KEND-SELLER] 배송 처리(스마트택배 연동) 추가 (P2-3)
