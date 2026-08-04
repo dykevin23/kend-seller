@@ -1,3 +1,6 @@
+// 재고부족 배지 임계치 — 이 수량 이하(0 초과)면 "재고부족" 표시
+export const LOW_STOCK_THRESHOLD = 10;
+
 export const TARGET_GENDER_TYPES = [
   { label: "여아", value: "GIRL" },
   { label: "남아", value: "BOY" },

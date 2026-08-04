@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "~/common/components/ui/select";
 import Pagination from "~/common/components/pagination";
-import { SALES_STATUS } from "../constrants";
+import { SALES_STATUS, LOW_STOCK_THRESHOLD } from "../constrants";
 import { formatNumber } from "~/common/utils/format";
 import type { Route } from "./+types/product-list-page";
 import { makeSSRClient } from "~/supa-client";
@@ -320,9 +320,24 @@ export default function ProductListPage({ loaderData }: Route.ComponentProps) {
                     {getStatusLabel(product.status)}
                   </TableCell>
                   <TableCell className="text-center">
-                    {product.total_stock != null
-                      ? formatNumber(product.total_stock)
-                      : "-"}
+                    {product.total_stock != null ? (
+                      <span className="inline-flex items-center gap-1.5">
+                        {formatNumber(product.total_stock)}
+                        {product.total_stock === 0 && (
+                          <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-400">
+                            품절
+                          </span>
+                        )}
+                        {product.total_stock > 0 &&
+                          product.total_stock <= LOW_STOCK_THRESHOLD && (
+                            <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+                              재고부족
+                            </span>
+                          )}
+                      </span>
+                    ) : (
+                      "-"
+                    )}
                   </TableCell>
                 </TableRow>
               ))
