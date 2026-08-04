@@ -1,8 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-// 판매자에게 노출 가능한 order_group 상태 (결제 완료된 건만)
-// payment_in_progress/payment_pending/failed는 결제 미완료 상태라 제외
-const PAID_ORDER_GROUP_STATUSES = ["paid", "partially_refunded"];
+// 판매자에게 숨겨야 하는 order_group 상태 — 결제 자체가 안 된 "유령 주문"만 제외.
+// paid 이후 상태(취소/환불 포함)는 판매자가 계속 볼 수 있어야 하므로 화이트리스트가 아닌
+// 블랙리스트로 필터링한다 (order_groups.status가 cancelled/refunded로 바뀌어도 계속 노출됨).
+const UNPAID_ORDER_GROUP_STATUSES = ["payment_in_progress", "payment_pending", "failed"];
 
 export interface OrderListItem {
   id: string;
@@ -46,7 +47,11 @@ export const getSellerOrders = async (
       { count: "exact" }
     )
     .eq("seller_id", sellerId)
-    .in("order_groups.status", PAID_ORDER_GROUP_STATUSES)
+    .not(
+      "order_groups.status",
+      "in",
+      `(${UNPAID_ORDER_GROUP_STATUSES.join(",")})`
+    )
     .order("created_at", { ascending: false });
 
   if (status && status !== "ALL") {
@@ -176,7 +181,11 @@ export const getSellerOrderDetail = async (
     )
     .eq("seller_id", sellerId)
     .eq("order_number", orderNumber)
-    .in("order_groups.status", PAID_ORDER_GROUP_STATUSES)
+    .not(
+      "order_groups.status",
+      "in",
+      `(${UNPAID_ORDER_GROUP_STATUSES.join(",")})`
+    )
     .maybeSingle();
 
   if (error || !data) return null;
@@ -232,7 +241,11 @@ export const getNewOrderCount = async (
     })
     .eq("seller_id", sellerId)
     .eq("status", "pending")
-    .in("order_groups.status", PAID_ORDER_GROUP_STATUSES);
+    .not(
+      "order_groups.status",
+      "in",
+      `(${UNPAID_ORDER_GROUP_STATUSES.join(",")})`
+    );
 
   if (error) throw error;
   return count || 0;

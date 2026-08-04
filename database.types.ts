@@ -1611,6 +1611,11 @@ export type Database = {
       }
     }
     Functions: {
+      decrement_stock: {
+        Args: { p_quantity: number; p_sku_id: string }
+        Returns: undefined
+      }
+      expire_pending_orders: { Args: never; Returns: number }
       get_growth_percentile_history: {
         Args: { p_child_id: string; p_type: string }
         Returns: {
