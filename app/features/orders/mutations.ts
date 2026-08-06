@@ -43,9 +43,15 @@ export const updateOrderStatus = async (
     return { updatedCount: 0, skippedCount: orderIds.length };
   }
 
+  // confirmed_at은 최초 접수확인 시점(발송 SLA 기산점)이라 그 이후 상태전이에선 건드리지 않는다
+  const updatePayload: Record<string, unknown> = { status };
+  if (status === "confirmed") {
+    updatePayload.confirmed_at = new Date().toISOString();
+  }
+
   const { error: updateError } = await client
     .from("orders")
-    .update({ status })
+    .update(updatePayload)
     .in("id", validIds)
     .eq("seller_id", sellerId);
 

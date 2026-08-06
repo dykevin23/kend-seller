@@ -381,6 +381,7 @@ export type Database = {
           id: string
           order_item_id: string
           quantity: number
+          reason: Database["public"]["Enums"]["return_reason_type"] | null
           status: Database["public"]["Enums"]["delivery_item_status"]
           updated_at: string
         }
@@ -390,6 +391,7 @@ export type Database = {
           id?: string
           order_item_id: string
           quantity: number
+          reason?: Database["public"]["Enums"]["return_reason_type"] | null
           status?: Database["public"]["Enums"]["delivery_item_status"]
           updated_at?: string
         }
@@ -399,6 +401,7 @@ export type Database = {
           id?: string
           order_item_id?: string
           quantity?: number
+          reason?: Database["public"]["Enums"]["return_reason_type"] | null
           status?: Database["public"]["Enums"]["delivery_item_status"]
           updated_at?: string
         }
@@ -675,6 +678,7 @@ export type Database = {
           regular_price: number
           sale_price: number
           ship_from_region: string | null
+          shipping_fee_bearer: Database["public"]["Enums"]["shipping_fee_bearer"]
           shipping_fee_type: Database["public"]["Enums"]["shipping_fee_type"]
           sku_code: string
           sku_id: string | null
@@ -695,6 +699,7 @@ export type Database = {
           regular_price: number
           sale_price: number
           ship_from_region?: string | null
+          shipping_fee_bearer?: Database["public"]["Enums"]["shipping_fee_bearer"]
           shipping_fee_type: Database["public"]["Enums"]["shipping_fee_type"]
           sku_code: string
           sku_id?: string | null
@@ -715,6 +720,7 @@ export type Database = {
           regular_price?: number
           sale_price?: number
           ship_from_region?: string | null
+          shipping_fee_bearer?: Database["public"]["Enums"]["shipping_fee_bearer"]
           shipping_fee_type?: Database["public"]["Enums"]["shipping_fee_type"]
           sku_code?: string
           sku_id?: string | null
@@ -746,6 +752,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          confirmed_at: string | null
           created_at: string
           id: string
           order_group_id: string
@@ -760,6 +767,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          confirmed_at?: string | null
           created_at?: string
           id?: string
           order_group_id: string
@@ -774,6 +782,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          confirmed_at?: string | null
           created_at?: string
           id?: string
           order_group_id?: string
@@ -1616,6 +1625,7 @@ export type Database = {
         Returns: undefined
       }
       expire_pending_orders: { Args: never; Returns: number }
+      expire_unconfirmed_orders: { Args: never; Returns: number }
       get_growth_percentile_history: {
         Args: { p_child_id: string; p_type: string }
         Returns: {
@@ -1660,6 +1670,7 @@ export type Database = {
         | "shipped"
         | "in_transit"
         | "delivered"
+        | "returning"
       description_type: "IMAGE" | "HTML"
       image_type: "MAIN" | "ADDITIONAL"
       island_delivery_type: "AVAILABLE" | "UNAVAILABLE"
@@ -1684,6 +1695,12 @@ export type Database = {
         | "mobile_payment"
         | "easy_pay"
         | "virtual_account"
+      return_reason_type:
+        | "CHANGE_OF_MIND"
+        | "DEFECT"
+        | "WRONG_ITEM"
+        | "DAMAGED"
+        | "LOST"
       role: "customer" | "seller" | "administrator"
       sales_status:
         | "REGISTERED"
@@ -1693,6 +1710,7 @@ export type Database = {
         | "STOP"
         | "END"
       seller_status: "PENDING" | "APPROVED" | "REJECTED"
+      shipping_fee_bearer: "SELLER" | "PLATFORM"
       shipping_fee_type: "FREE" | "PAID" | "COD" | "CONDITIONAL"
       target_age_type: "BABY" | "KIDS"
       target_gender_type: "GIRL" | "BOY" | "UNISEX"
@@ -1859,6 +1877,7 @@ export const Constants = {
         "shipped",
         "in_transit",
         "delivered",
+        "returning",
       ],
       description_type: ["IMAGE", "HTML"],
       image_type: ["MAIN", "ADDITIONAL"],
@@ -1887,6 +1906,13 @@ export const Constants = {
         "easy_pay",
         "virtual_account",
       ],
+      return_reason_type: [
+        "CHANGE_OF_MIND",
+        "DEFECT",
+        "WRONG_ITEM",
+        "DAMAGED",
+        "LOST",
+      ],
       role: ["customer", "seller", "administrator"],
       sales_status: [
         "REGISTERED",
@@ -1897,6 +1923,7 @@ export const Constants = {
         "END",
       ],
       seller_status: ["PENDING", "APPROVED", "REJECTED"],
+      shipping_fee_bearer: ["SELLER", "PLATFORM"],
       shipping_fee_type: ["FREE", "PAID", "COD", "CONDITIONAL"],
       target_age_type: ["BABY", "KIDS"],
       target_gender_type: ["GIRL", "BOY", "UNISEX"],
