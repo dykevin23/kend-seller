@@ -1,6 +1,6 @@
 # KEND-SELLER 현재 상황 (Overview)
 
-> 최종 업데이트: 2026-08-04 (P2-4 착수 — 재고 배지·취소버그 반영)
+> 최종 업데이트: 2026-08-06 (Phase 2 종료, Phase 2.5 착수 준비)
 > KEND-SELLER의 현재 상태 단일 대시보드. 개발 진행마다 갱신한다.
 > 작성 표준 → [core/readme-structure-guide.md](./core/readme-structure-guide.md) §8 (방식 vs 내용)
 > 완료 상세 → [changelog-seller.md](./changelog-seller.md) / 큰 계획 → [kend-roadmap-to-launch.md](./kend-roadmap-to-launch.md)
@@ -17,9 +17,9 @@
 
 > ← _seller에서 작업 시 갱신_
 
-- **P2-4 착수**: 품절/재고부족 배지 완료, 취소 주문 노출 버그 수정 완료. 재고관리(`/products/stocks-keeping`) 화면은 다음 착수 대상
-- kend와 R&R 분담 합의됨(차감/복구 트랜잭션은 kend, 배지·화면은 seller) — 세부 진행상황은 아래 "진행 중/대기" 참고
-- 판매자취소 시 환불 스코프(그룹 전체가 아닌 판매자 몫만) + 취소사유 캡처/구매자 노출은 kend와 정의 협의 중
+- **Phase 2 종료 (kend-milestones 2026-08-04 갱신 확인)**: 재고차감/복원(P2-4) 포함 필수 항목 완료. 후속으로 **Phase 2.5(주문 라이프사이클 완결 — 구매확정/반품·교환·AS/문의/SLA/배송예외/플랫폼배송비)** 신설됨
+- **Phase 2.5 착수 준비 중**: `orders.confirmed_at` 기록(발송 SLA 기산점) 완료 반영. `product_returns.return_window_days`는 실니즈 없어 kend과 협의 후 스킵(법정기간 상수 하드코딩으로 대체)
+- **다음 착수 후보(병렬 가능)**: 플랫폼 조건부 배송비 admin 화면 / RTS·장기미수령 기간기반 플래깅(`sync-tracking` 수정)
 
 ---
 
@@ -27,8 +27,8 @@
 
 > ← _[changelog-seller.md](./changelog-seller.md)에서 핵심 항목 요약_
 
+- Phase 2.5 착수 준비 (2026-08-06): `orders.confirmed_at` 기록(발송 SLA 연동), kend Phase 2.5 스키마(반품사유·배송비부담주체·반송상태) 타입 반영
 - 재고 배지 + 취소주문 노출 버그 수정 (2026-08-04): 품절/재고부족 배지, 화이트리스트→블랙리스트 필터 전환으로 취소건도 계속 조회되도록 수정
-- 배송 처리(스마트택배 연동) (2026-07-24): 배송사/송장번호 입력 UI, Edge Function+pg_cron 폴링으로 배송완료 자동 갱신. 실제 CJ대한통운 송장 2건으로 종단 테스트 완료
 
 ---
 
@@ -36,18 +36,17 @@
 
 > ← _seller 작업 시 채울 것_ (현재 active/ 폴더 미생성 — 착수 시 structure-guide 규칙대로 생성)
 
-- **kend 답변 대기**: changelog-kend.md 갱신(`handle_order_cancelled` 트리거·`expire-pending-orders` cron 미기록 상태) / 환불 Edge Function 진행상황 / `decrement_stock`·`expire_pending_orders` 함수의 실제 연결 여부(연결되면 `product_stock_keepings.stock`이 실제로 움직이기 시작함)
-- **판매자취소 정의 협의 중** (kend와): 환불 스코프(그룹 전체 아닌 판매자 몫만 부분환불) + 취소사유 캡처·구매자 노출 방식
-- **보류 — 다음 스코프 끝나면 논의**: 환불신청/교환신청 기능 누락 가능성 검토 (P2-9 반품/환불 UI [선택]과 별개로 제기됨)
+- **Phase 2.5 병렬 작업 착수 예정**: 플랫폼 조건부 배송비 admin 화면, RTS/장기미수령 기간기반 플래깅(`sync-tracking` 수정) — 순서상 후자(1c)는 스마트택배 응답의 반송(RTS) 상태 표현 방식 확인이 선행 필요
+- Group 3(반품/교환 승인·검수 화면, 문의처리 화면)는 kend의 구매확정 로직(P2.5-2) + 양쪽 스키마 완료 후 착수 — 아직 대기
 
 ---
 
 ## 📋 다음 작업
 
 > ← _seller 작업 시 채울 것_
-- **재고관리 화면** (`/products/stocks-keeping`, P2-4 후속): SKU별 재고 조회+수정
-- 이후 P2-6 배송비 설정 → P3 정산
-- (후순위) 승인 flow UX 보완 3건 + 관리자 직접 판매자 등록 — [todo/seller-approval-ux-followups.md](./todo/seller-approval-ux-followups.md)
+- **플랫폼 조건부 배송비 admin 화면** (Phase 2.5-5)
+- **RTS/장기미수령 기간기반 플래깅** (Phase 2.5-6, `sync-tracking` 수정)
+- (후순위, Phase 3 관리보완) 재고관리 화면(`/products/stocks-keeping`), 상품 수정 기능, 승인 flow UX 보완 3건 + 관리자 직접 판매자 등록 — [todo/seller-approval-ux-followups.md](./todo/seller-approval-ux-followups.md)
 
 ---
 
@@ -82,9 +81,9 @@
 - [x] 판매자 기반 (로그인/인증, 업체 등록+승인 flow, 프로필/사업자 정보) — ✅ 완료 (2026-07-13)
 - [x] 주문 관리 화면 (목록/상세, 상태 변경, 신규 주문 알림) — ✅ 완료 (2026-07-22, 대량 일괄처리는 미검증)
 - [x] 배송 처리 (송장 입력, 스마트택배 추적 연동) — ✅ 완료 (2026-07-24)
-- [ ] 재고 차감 연동
-- [ ] 배송비 설정 (무료/유료/조건부)
-- [ ] 정산 (구매확정 → 정산 계산 → 내역 조회)
+- [x] 재고 차감 연동 — ✅ 완료 (2026-08-04, kend 차감/복원 트랜잭션 + seller 품절/재고부족 배지)
+- [x] 배송비 설정 (무료/유료/조건부) — ✅ 완료 (상품등록 화면 기존 구현, kend-milestones P2-6 교차확인)
+- [ ] 정산 (구매확정 → 정산 계산 → 내역 조회) — Phase 3.5로 이동, 선행 작업(Phase 2.5) 진행 중
 
 ---
 

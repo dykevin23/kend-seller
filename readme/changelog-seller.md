@@ -8,6 +8,17 @@ KEND-SELLER 판매자 관리자 웹의 주요 변경사항을 날짜별로 기�
 
 ---
 
+## 2026-08-06
+
+### [KEND-SELLER] Phase 2.5 착수 준비 — confirmed_at 기록 + return_window_days 스킵
+
+- **`orders.confirmed_at` 기록** (`updateOrderStatus`): 접수확인(`confirmed`) 전이 시에만 기록, 이후 상태전이에서는 건드리지 않음. kend의 발송 SLA cron(확인 후 3일 내 미발송 시 자동취소)이 이 값을 기산점으로 사용
+- **kend Phase 2.5 스키마 확장 반영** (`db:typegen`): `delivery_items.reason`(반품/교환 사유), `order_items.shipping_fee_bearer`(배송비 부담주체), `deliveries.status`에 `returning`(반송중) 추가 — 전부 kend 소유 스키마, seller는 타입만 반영
+- **`product_returns.return_window_days` 필드 추가 요청 철회**: 상품별/판매자별 반품기간 차등 니즈가 아직 없어 kend이 법정기간(단순변심 7일/하자·오배송 30일)을 상수로 하드코딩하는 것으로 정리. 착수 전 확인 과정에서 불필요한 스키마 변경을 미리 걸러냄
+- 다음: 플랫폼 조건부 배송비 admin 화면, RTS/장기미수령 기간기반 플래깅(`sync-tracking` 수정) — kend-seller 단독 진행 가능한 Phase 2.5 병렬 작업
+
+---
+
 ## 2026-08-04
 
 ### [KEND-SELLER] 재고 배지(품절/재고부족) 추가 + 취소 주문 노출 버그 수정 (P2-4 착수)
