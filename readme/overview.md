@@ -1,6 +1,6 @@
 # KEND-SELLER 현재 상황 (Overview)
 
-> 최종 업데이트: 2026-08-06 (Phase 2 종료, Phase 2.5 착수 준비)
+> 최종 업데이트: 2026-08-07 (플랫폼 무료배송 admin 화면 완료, 실사용 테스트 대기)
 > KEND-SELLER의 현재 상태 단일 대시보드. 개발 진행마다 갱신한다.
 > 작성 표준 → [core/readme-structure-guide.md](./core/readme-structure-guide.md) §8 (방식 vs 내용)
 > 완료 상세 → [changelog-seller.md](./changelog-seller.md) / 큰 계획 → [kend-roadmap-to-launch.md](./kend-roadmap-to-launch.md)
@@ -17,9 +17,8 @@
 
 > ← _seller에서 작업 시 갱신_
 
-- **Phase 2 종료 (kend-milestones 2026-08-04 갱신 확인)**: 재고차감/복원(P2-4) 포함 필수 항목 완료. 후속으로 **Phase 2.5(주문 라이프사이클 완결 — 구매확정/반품·교환·AS/문의/SLA/배송예외/플랫폼배송비)** 신설됨
-- **Phase 2.5 착수 준비 중**: `orders.confirmed_at` 기록(발송 SLA 기산점) 완료 반영. `product_returns.return_window_days`는 실니즈 없어 kend과 협의 후 스킵(법정기간 상수 하드코딩으로 대체)
-- **다음 착수 후보(병렬 가능)**: 플랫폼 조건부 배송비 admin 화면 / RTS·장기미수령 기간기반 플래깅(`sync-tracking` 수정)
+- **Phase 2.5 진행 중**: `orders.confirmed_at` 기록 완료, kend SLA 자동취소 cron(주문확인 3일/발송 3일) 연동 완료, **플랫폼 조건부 무료배송 admin 화면 + kend 판정로직 연동 완료**(실사용 종단테스트는 대기)
+- **다음 착수**: RTS·장기미수령 기간기반 플래깅(`sync-tracking` 수정) — 스마트택배 응답의 반송 상태 표현 방식 확인부터
 
 ---
 
@@ -27,8 +26,8 @@
 
 > ← _[changelog-seller.md](./changelog-seller.md)에서 핵심 항목 요약_
 
+- 플랫폼 조건부 무료배송 admin 화면 (2026-08-07): `platform_settings` 싱글턴 테이블 + 설정화면, kend 판정로직 연동(시뮬레이션 검증 완료, 실사용 테스트 대기)
 - Phase 2.5 착수 준비 (2026-08-06): `orders.confirmed_at` 기록(발송 SLA 연동), kend Phase 2.5 스키마(반품사유·배송비부담주체·반송상태) 타입 반영
-- 재고 배지 + 취소주문 노출 버그 수정 (2026-08-04): 품절/재고부족 배지, 화이트리스트→블랙리스트 필터 전환으로 취소건도 계속 조회되도록 수정
 
 ---
 
@@ -36,7 +35,8 @@
 
 > ← _seller 작업 시 채울 것_ (현재 active/ 폴더 미생성 — 착수 시 structure-guide 규칙대로 생성)
 
-- **Phase 2.5 병렬 작업 착수 예정**: 플랫폼 조건부 배송비 admin 화면, RTS/장기미수령 기간기반 플래깅(`sync-tracking` 수정) — 순서상 후자(1c)는 스마트택배 응답의 반송(RTS) 상태 표현 방식 확인이 선행 필요
+- **플랫폼 무료배송 실사용 종단테스트**: admin이 실제 임계값 설정 → 실주문 생성 → `shipping_fee_bearer=PLATFORM` 기록 확인 (현재 `platform_settings` row 없어 사실상 off 상태)
+- **RTS/장기미수령 기간기반 플래깅** 착수 예정 — 스마트택배 응답의 반송(RTS) 상태 표현 방식 확인이 선행 필요
 - Group 3(반품/교환 승인·검수 화면, 문의처리 화면)는 kend의 구매확정 로직(P2.5-2) + 양쪽 스키마 완료 후 착수 — 아직 대기
 
 ---
@@ -44,7 +44,6 @@
 ## 📋 다음 작업
 
 > ← _seller 작업 시 채울 것_
-- **플랫폼 조건부 배송비 admin 화면** (Phase 2.5-5)
 - **RTS/장기미수령 기간기반 플래깅** (Phase 2.5-6, `sync-tracking` 수정)
 - (후순위, Phase 3 관리보완) 재고관리 화면(`/products/stocks-keeping`), 상품 수정 기능, 승인 flow UX 보완 3건 + 관리자 직접 판매자 등록 — [todo/seller-approval-ux-followups.md](./todo/seller-approval-ux-followups.md)
 

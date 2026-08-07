@@ -8,6 +8,17 @@ KEND-SELLER 판매자 관리자 웹의 주요 변경사항을 날짜별로 기�
 
 ---
 
+## 2026-08-07
+
+### [KEND-SELLER] 플랫폼 조건부 무료배송 admin 설정 화면 (Phase 2.5-5)
+
+- **`platform_settings` 테이블 추가** (싱글턴): `free_shipping_threshold`(기본값 0=off) — 장바구니 총액이 이 값 이상이면 판매자 배송비 정책과 무관하게 플랫폼이 배송비 부담
+- **admin 설정 화면** (`/system/settings`, `administrator` 전용): 임계값 조회/수정 폼, 네비게이션 "System" 메뉴에 "Platform Settings" 추가
+- kend이 이어서 `createOrder`에 실제 판정 로직 연동 완료: 상품금액 합계가 임계값 이상이면 판매자 자체조건 충족 여부와 무관하게 배송비 면제하되, **판매자 자체조건은 미달인데 플랫폼이 대신 면제한 경우만** `order_items.shipping_fee_bearer = 'PLATFORM'`으로 기록(Phase 3.5 정산 계산 입력값). 판매자 자체조건으로 원래 무료였던 건은 `SELLER` 유지. kend 측 DB 시뮬레이션 3케이스로 검증 완료
+- 실사용 흐름 종단 테스트(admin이 실제 값 설정 → 실주문 생성 → PLATFORM 기록 확인)는 아직 진행 안 함 — 현재 `platform_settings`에 row가 없어 사실상 off 상태
+
+---
+
 ## 2026-08-06
 
 ### [KEND-SELLER] Phase 2.5 착수 준비 — confirmed_at 기록 + return_window_days 스킵
