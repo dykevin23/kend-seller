@@ -7,6 +7,19 @@ KEND 웹앱(React Router SSR + WebView)의 주요 변경사항을 날짜별로 �
 
 ---
 
+## 2026-08-06
+
+### [KEND] Phase 2.5 착수 — SLA 자동취소 cron + 스키마 확장
+
+- **스키마 확장**(`app/features/orders/schema.ts`): `delivery_items.reason`(반품/교환 사유: 단순변심/하자/오배송/파손/분실), `order_items.shipping_fee_bearer`(배송비 부담주체 SELLER/PLATFORM, Phase 3.5 정산 입력값), `deliveries.status`에 `returning`(반송중) 추가, `orders.confirmed_at`(판매자 주문확인 시각) 추가 — 전부 추가(additive) 변경
+- **`expire_unconfirmed_orders`**: 판매자가 3일 안에 주문확인(`pending`→`confirmed`)을 안 한 주문을 자동취소하는 cron(매시)
+- **`expire_unshipped_orders`**: 주문확인 후 3일 안에 발송(`shipped`)까지 못 간 주문을 자동취소하는 cron(매시). `confirmed_at`을 기산점으로 사용 — kend-seller의 `updateOrderStatus`가 `confirmed` 전이 시 이 값을 세팅
+  - 둘 다 기존 `handle_order_cancelled` 트리거를 그대로 타서 재고 복원/그룹 승격이 자동으로 이어짐
+- **설계 결정 2건** (상세 근거는 [order-lifecycle-master-plan.md](todo/order-lifecycle-master-plan.md) §5): `confirmed_at` 자동 세팅은 DB 트리거 대신 kend-seller 앱 코드에서 직접 처리(상태 전이 경로가 한 곳뿐이라 트리거는 과함), 반품기간(`return_window_days`)은 상품별 설정 필드 대신 코드 상수(단순변심 7일/그 외 사유 30일)로 하드코딩(실제 니즈 없이 미리 만드는 과설계 방지)
+- **로드맵 재구성**: Phase 2 종료, Phase 2.5(주문 라이프사이클 완결)·Phase 3(판매자 관리보완)·Phase 3.5(정산, 구 Phase 3) 신설. 구 P2-9(반품/환불, 선택→필수 승격)·P3-1(구매확정)을 Phase 2.5로 흡수, 구 P2-7/8/10은 주제별로 Phase 2.5/3에 재배치. 상세: [order-lifecycle-master-plan.md](todo/order-lifecycle-master-plan.md), [order-cancel-refund-exchange-flow.md](todo/order-cancel-refund-exchange-flow.md)
+
+---
+
 ## 2026-08-04
 
 ### [KEND] 재고 hold 유지시간 30분 → 15분 단축
