@@ -1641,6 +1641,7 @@ export type Database = {
       }
     }
     Functions: {
+      auto_confirm_purchase: { Args: never; Returns: number }
       decrement_stock: {
         Args: { p_quantity: number; p_sku_id: string }
         Returns: undefined

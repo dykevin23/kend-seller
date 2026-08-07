@@ -7,6 +7,19 @@ KEND 웹앱(React Router SSR + WebView)의 주요 변경사항을 날짜별로 �
 
 ---
 
+## 2026-08-07
+
+### [KEND] Phase 2.5 진행 — 구매확정 + 주문상세 타임라인 + 플랫폼 조건부 무료배송
+
+- **주문상세 타임라인 화면 신설** (`order-detail-page.tsx`, `/orders/:orderGroupId`): 죽어있던 `getOrderGroupDetail` 쿼리(쓰는 곳이 없던 코드)를 살려서 제작. 주문일시/결제일시/판매자확인일시/발송일시/배송완료일시 + 배송사·송장번호 표시. 주문목록의 "배송·주문 관리"/"배송 조회" 버튼(기존엔 동작 없는 껍데기)을 이 화면으로 연결
+- **`orders.purchase_confirmed_at` 컬럼 추가** + **`confirmPurchase` 뮤테이션**: 배송완료(`delivered`)된 주문만 구매확정 가능, 이미 확정된 건 재확정 차단
+- **`auto_confirm_purchase` cron**: 배송완료 후 **7일** 경과 시 자동 구매확정(매일 새벽 3시). 수동 확정 안 해도 자동으로 정리됨
+- **플랫폼 조건부 무료배송 연동** (`createOrder`): kend-seller가 만든 `platform_settings.free_shipping_threshold`를 장바구니 총액과 비교해, 판매자 자체 조건 미달이어도 플랫폼 조건 충족 시 배송비 면제. 이때 `order_items.shipping_fee_bearer`를 `PLATFORM`으로 기록(판매자 자체 조건으로 이미 무료인 경우는 `SELLER` 유지) — Phase 3.5 정산 계산의 입력값이 됨. 설정 row가 없으면 임계값 0(off)으로 안전하게 처리
+- **로드맵 반영**: P2.5-1(SLA)·P2.5-2(구매확정)·P2.5-5(플랫폼 배송비) 완료 처리
+- 배송조회 상세 이력(택배사 단계별 이력 표시)은 스마트택배 API가 데이터 자체는 제공하나, kend-seller `sync-tracking`이 지금 이 필드를 안 읽고 있어 별도 작업으로 백로그 등록(Phase 미배정)
+
+---
+
 ## 2026-08-06
 
 ### [KEND] Phase 2.5 착수 — SLA 자동취소 cron + 스키마 확장

@@ -196,26 +196,26 @@
 > 대비 갭 분석 결과 이 영역을 필수로 승격. 상세 정책/근거: [order-cancel-refund-exchange-flow.md](todo/order-cancel-refund-exchange-flow.md),
 > 작업순서: [order-lifecycle-master-plan.md](todo/order-lifecycle-master-plan.md)
 
-#### 🟡 P2.5-1. 판매자확인/발송 SLA + 자동취소
-- **포함**: 주문확인 미이행 3일 → 자동취소(스케줄러, `expire_pending_orders` 패턴 재사용), 발송 SLA(일수 미정) 초과 시 자동취소, 알림(구 P2-8 알림센터 흡수 — 없으면 이메일/SMS 대체)
-- **담당**: kend(cron) / kend-seller(알림 연동)
+#### ✅ P2.5-1. 판매자확인/발송 SLA + 자동취소 — 완료 (2026-08-06)
+- **완료**: 판매자확인 3일 초과(`expire_unconfirmed_orders`), 발송 3일 초과(`expire_unshipped_orders`, `orders.confirmed_at` 기준) 자동취소 cron. 기존 재고복원 트리거가 그대로 연쇄 처리
+- **미포함(보류)**: SLA 임박 알림(구 P2-8 알림센터 흡수분) — 알림센터 자체가 미착수라 대기
 
-#### 🟡 P2.5-2. 구매확정 로직 (구 P3-1 흡수)
-- **포함**: 수동 확정 버튼, 배송완료 후 N일 자동 확정(cron), 확정 후 반품/교환 채널 잠금(→ AS/문의로 유도)
-- **담당**: kend
+#### ✅ P2.5-2. 구매확정 로직 (구 P3-1 흡수) — 완료 (2026-08-07)
+- **완료**: 주문상세 타임라인 화면(죽어있던 `getOrderGroupDetail` 활용), 수동 구매확정 버튼, 배송완료 후 7일 자동 확정(`auto_confirm_purchase`)
+- **잠금 로직은 P2.5-3에서 실제 적용**: 반품/교환 신청 UI가 `purchase_confirmed_at` 유무로 노출 여부를 판단하는 형태로 구현 예정
 
 #### 🟡 P2.5-3. 반품/교환/AS 처리 시스템 (구 P2-9 흡수, 필수 승격)
-- **포함**: 반품/교환은 **주문 상태 액션**(기존 `delivery_items.status`의 `return_requested`→`returned`, `exchange_requested`→`exchanged` 재사용, 신규 테이블 불필요) — 주문목록에서 신청, 단계별 처리는 상세화면. 사유 enum 확장(단순변심/하자/오배송/파손/분실), 반품기간 필드(법정최소 7일/30일 + 판매자 확장 가능), Toss 부분환불 연동(→ 판매자 취소 시 환불 자동화 안 되던 기존 버그도 함께 해결)
-- **선행**: P2.5-2 (구매확정 시점이 반품채널 마감 기준)
+- **포함**: 반품/교환은 **주문 상태 액션**(기존 `delivery_items.status`의 `return_requested`→`returned`, `exchange_requested`→`exchanged` 재사용, 신규 테이블 불필요) — 주문목록에서 신청, 단계별 처리는 상세화면. 사유 enum 확장(단순변심/하자/오배송/파손/분실, `delivery_items.reason`, 완료). ~~반품기간 필드~~ → 법정기간을 코드 상수로 하드코딩(7일/30일)하기로 결정, 필드 미도입. Toss 부분환불 연동(→ 판매자 취소 시 환불 자동화 안 되던 기존 버그도 함께 해결)
+- **선행**: P2.5-2 ✅ 완료 (구매확정 시점이 반품채널 마감 기준)
 - **담당**: kend(스키마+Toss연동), kend-seller(승인/검수 화면)
 
 #### 🟡 P2.5-4. 문의하기 (Q&A) 코어 시스템 (신규)
 - **포함**: 카테고리별 문의(배송/상품/기타 등), `order_id` 선택적 연결. 구매확정 후 AS 문의도 여기로. 반품/교환처럼 상태전이 액션이 아니라 순수 메시지형 — **CS관리 운영기능(Phase 3)의 기반**
 - **담당**: kend(접수 UI) + kend-seller(처리 화면, seller/admin 권한 둘 다)
 
-#### 🟡 P2.5-5. 플랫폼 조건부 무료배송 (신규)
-- **포함**: 판매자별 조건과 별개로 장바구니 총액 기준 플랫폼 임계값(admin 설정, 초기 0=off), `shipping_fee_bearer`(SELLER/PLATFORM) 필드 — Phase 3.5 정산 계산의 입력값
-- **담당**: kend-seller(admin 전용 화면, 이미 있는 `administrator` role 메뉴에 추가)
+#### ✅ P2.5-5. 플랫폼 조건부 무료배송 (신규) — 완료 (2026-08-07)
+- **완료**: kend-seller `platform_settings` 테이블 + admin 설정화면, kend `createOrder`에서 임계값 비교 후 `order_items.shipping_fee_bearer`(SELLER/PLATFORM) 반영 — Phase 3.5 정산 계산 입력값으로 사용 예정
+- **담당**: kend-seller(admin 화면) + kend(주문 생성 로직) 양쪽 완료
 
 #### 🟡 P2.5-6. 배송 예외 처리 (신규)
 - **포함**: 오배송/파손/분실(반품 사유코드로 흡수, 책임소재 안 따지고 구매자 우선 처리 원칙) / 장기미수령·수취거절 반송(RTS) — 스마트택배 sync-tracking에 기간기반 플래깅 추가(`in_transit` N일 정체 시 수동확인 알림), `deliveries.status`에 반송 상태 추가
