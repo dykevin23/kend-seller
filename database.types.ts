@@ -758,6 +758,7 @@ export type Database = {
           order_group_id: string
           order_number: string
           product_amount: number
+          purchase_confirmed_at: string | null
           seller_code: string
           seller_id: string
           seller_name: string
@@ -773,6 +774,7 @@ export type Database = {
           order_group_id: string
           order_number: string
           product_amount: number
+          purchase_confirmed_at?: string | null
           seller_code: string
           seller_id: string
           seller_name: string
@@ -788,6 +790,7 @@ export type Database = {
           order_group_id?: string
           order_number?: string
           product_amount?: number
+          purchase_confirmed_at?: string | null
           seller_code?: string
           seller_id?: string
           seller_name?: string
@@ -902,6 +905,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      platform_settings: {
+        Row: {
+          free_shipping_threshold: number
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          free_shipping_threshold?: number
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          free_shipping_threshold?: number
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       product_deliveries: {
         Row: {
@@ -1626,6 +1647,7 @@ export type Database = {
       }
       expire_pending_orders: { Args: never; Returns: number }
       expire_unconfirmed_orders: { Args: never; Returns: number }
+      expire_unshipped_orders: { Args: never; Returns: number }
       get_growth_percentile_history: {
         Args: { p_child_id: string; p_type: string }
         Returns: {

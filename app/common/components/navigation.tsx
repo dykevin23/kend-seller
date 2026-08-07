@@ -118,6 +118,11 @@ const menus: Menu[] = [
         description: "판매자 승인 관리",
         to: "/system/sellers",
       },
+      {
+        name: "Platform Settings",
+        description: "플랫폼 전역 설정 (무료배송 기준금액 등)",
+        to: "/system/settings",
+      },
     ],
   },
 ];

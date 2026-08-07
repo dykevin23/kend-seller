@@ -1,6 +1,23 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "~/supa-client";
 
+// 플랫폼 전역 설정(싱글턴) 조회. row가 아직 없으면 기본값(0=off)으로 취급
+export const getPlatformSettings = async (
+  client: SupabaseClient<Database>
+) => {
+  const { data, error } = await client
+    .from("platform_settings")
+    .select("id, free_shipping_threshold, updated_at")
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return (
+    data ?? { id: null, free_shipping_threshold: 0, updated_at: null }
+  );
+};
+
 export const searchHashtags = async (
   client: SupabaseClient<Database>,
   query: string

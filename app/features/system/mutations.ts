@@ -1,6 +1,38 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "~/supa-client";
 
+// 플랫폼 전역 설정(싱글턴) 갱신 — row가 없으면 생성, 있으면 갱신
+export const updatePlatformSettings = async (
+  client: SupabaseClient<Database>,
+  { freeShippingThreshold }: { freeShippingThreshold: number }
+) => {
+  const { data: existing, error: fetchError } = await client
+    .from("platform_settings")
+    .select("id")
+    .limit(1)
+    .maybeSingle();
+
+  if (fetchError) throw fetchError;
+
+  if (!existing) {
+    const { error } = await client.from("platform_settings").insert({
+      free_shipping_threshold: freeShippingThreshold,
+    });
+    if (error) throw error;
+    return;
+  }
+
+  const { error } = await client
+    .from("platform_settings")
+    .update({
+      free_shipping_threshold: freeShippingThreshold,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", existing.id);
+
+  if (error) throw error;
+};
+
 export const createHashtag = async (
   client: SupabaseClient<Database>,
   name: string

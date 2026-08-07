@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 /**
  * 도메인 테이블(domains)
@@ -66,6 +66,17 @@ export const common_codes = pgTable("common_codes", {
   name: text().notNull(),
   use_yn: text().notNull().default("Y"),
   created_at: timestamp().notNull().defaultNow(),
+  updated_at: timestamp().notNull().defaultNow(),
+});
+
+/**
+ * 플랫폼 전역 설정 (싱글턴 — 항상 한 row만 존재)
+ * free_shipping_threshold: 장바구니 총액이 이 값 이상이면 플랫폼이 배송비 부담
+ *   (판매자별 무료배송 조건과 별개). 0이면 기능 off
+ */
+export const platform_settings = pgTable("platform_settings", {
+  id: uuid().primaryKey().defaultRandom(),
+  free_shipping_threshold: integer().notNull().default(0),
   updated_at: timestamp().notNull().defaultNow(),
 });
 

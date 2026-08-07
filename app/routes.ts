@@ -94,6 +94,8 @@ export default [
         index("features/seller/pages/seller-approval-list-page.tsx"),
         route("/post", "features/seller/pages/post-seller-approval-page.tsx"),
       ]),
+      // 플랫폼 설정
+      route("/settings", "features/system/pages/platform-settings-page.tsx"),
     ]),
   ]),
 
