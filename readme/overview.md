@@ -1,6 +1,6 @@
 # KEND-SELLER 현재 상황 (Overview)
 
-> 최종 업데이트: 2026-08-07 (플랫폼 무료배송 admin 화면 완료, 실사용 테스트 대기)
+> 최종 업데이트: 2026-08-14 (반품 신청 처리 화면 4단계 승인 플로우 구현 완료, 실사용 테스트 대기)
 > KEND-SELLER의 현재 상태 단일 대시보드. 개발 진행마다 갱신한다.
 > 작성 표준 → [core/readme-structure-guide.md](./core/readme-structure-guide.md) §8 (방식 vs 내용)
 > 완료 상세 → [changelog-seller.md](./changelog-seller.md) / 큰 계획 → [kend-roadmap-to-launch.md](./kend-roadmap-to-launch.md)
@@ -17,8 +17,8 @@
 
 > ← _seller에서 작업 시 갱신_
 
-- **Phase 2.5 진행 중**: `orders.confirmed_at` 기록 완료, kend SLA 자동취소 cron(주문확인 3일/발송 3일) 연동 완료, **플랫폼 조건부 무료배송 admin 화면 + kend 판정로직 연동 완료**(실사용 종단테스트는 대기)
-- **다음 착수**: RTS·장기미수령 기간기반 플래깅(`sync-tracking` 수정) — 스마트택배 응답의 반송 상태 표현 방식 확인부터
+- **Phase 2.5 진행 중**: `orders.confirmed_at` 기록·SLA 자동취소 cron·플랫폼 조건부 무료배송(admin+kend 연동) 완료. **반품 신청 처리 화면(P2.5-3, `/orders/returns`) 4단계 승인 플로우 구현 완료** — kend의 `entity_status_history` 이력 테이블 + `return_approved_at`/`return_received_at`/`reject_reason` 스펙 기반, typecheck·라우팅만 확인, 실사용 클릭 테스트는 아직
+- **다음 착수(최우선)**: 반품 신청 처리 화면 실사용 테스트 — 실제 판매자 계정으로 1차승인→회수확인→최종승인, 거절→재진행 경로 전체 클릭 검증. 통과 후 RTS·장기미수령 기간기반 플래깅(`sync-tracking` 수정) 착수
 
 ---
 
@@ -35,15 +35,17 @@
 
 > ← _seller 작업 시 채울 것_ (현재 active/ 폴더 미생성 — 착수 시 structure-guide 규칙대로 생성)
 
+- **반품 신청 처리 화면(P2.5-3) 실사용 테스트**: 구현됨(테스트 대기) — 4단계(1차승인/거절/회수확인/최종승인) 전체 클릭 검증 필요, 최종승인 시점에 kend 환불 크론이 정확히 트리거되는지가 핵심 확인 포인트
 - **플랫폼 무료배송 실사용 종단테스트**: admin이 실제 임계값 설정 → 실주문 생성 → `shipping_fee_bearer=PLATFORM` 기록 확인 (현재 `platform_settings` row 없어 사실상 off 상태)
 - **RTS/장기미수령 기간기반 플래깅** 착수 예정 — 스마트택배 응답의 반송(RTS) 상태 표현 방식 확인이 선행 필요
-- Group 3(반품/교환 승인·검수 화면, 문의처리 화면)는 kend의 구매확정 로직(P2.5-2) + 양쪽 스키마 완료 후 착수 — 아직 대기
+- 문의처리 화면(P2.5-4)은 kend 접수 UI 완료 후 착수 — 아직 대기
 
 ---
 
 ## 📋 다음 작업
 
 > ← _seller 작업 시 채울 것_
+- **반품 신청 처리 화면(P2.5-3) 실사용 테스트** (최우선) — 4단계 플로우 클릭 검증
 - **RTS/장기미수령 기간기반 플래깅** (Phase 2.5-6, `sync-tracking` 수정)
 - (후순위, Phase 3 관리보완) 재고관리 화면(`/products/stocks-keeping`), 상품 수정 기능, 승인 flow UX 보완 3건 + 관리자 직접 판매자 등록 — [todo/seller-approval-ux-followups.md](./todo/seller-approval-ux-followups.md)
 
