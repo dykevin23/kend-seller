@@ -63,6 +63,120 @@ export const updateOrderStatus = async (
   };
 };
 
+export interface ReturnActionResult {
+  success: boolean;
+  error?: string;
+}
+
+// 판매자 소유 + status='return_requested' 확인 (반품 4단계 액션 공통 가드).
+// return_received_at도 함께 가져와 최종승인의 선행조건 체크에 재사용한다.
+const verifyOwnedReturnRequest = async (
+  client: SupabaseClient,
+  { deliveryItemId, sellerId }: { deliveryItemId: string; sellerId: string }
+): Promise<{ id: string; return_received_at: string | null } | null> => {
+  const { data, error } = await client
+    .from("delivery_items")
+    .select(
+      `
+      id, status, return_received_at,
+      order_items!inner ( orders!inner ( seller_id ) )
+    `
+    )
+    .eq("id", deliveryItemId)
+    .eq("order_items.orders.seller_id", sellerId)
+    .eq("status", "return_requested")
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return null;
+
+  return { id: data.id, return_received_at: data.return_received_at };
+};
+
+// 액션1: 1차 승인 (거절 후 재승인도 겸함 — reject_reason 초기화)
+export const approveReturnStage1 = async (
+  client: SupabaseClient,
+  { deliveryItemId, sellerId }: { deliveryItemId: string; sellerId: string }
+): Promise<ReturnActionResult> => {
+  const owned = await verifyOwnedReturnRequest(client, { deliveryItemId, sellerId });
+  if (!owned) {
+    return { success: false, error: "처리할 수 없는 요청입니다." };
+  }
+
+  const { error } = await client
+    .from("delivery_items")
+    .update({ return_approved_at: new Date().toISOString(), reject_reason: null })
+    .eq("id", deliveryItemId);
+
+  if (error) throw error;
+  return { success: true };
+};
+
+// 액션2: 거절 (1차 거절/검수 후 거절 동일 연산, status는 건드리지 않음)
+export const rejectReturn = async (
+  client: SupabaseClient,
+  {
+    deliveryItemId,
+    sellerId,
+    reason,
+  }: { deliveryItemId: string; sellerId: string; reason: string }
+): Promise<ReturnActionResult> => {
+  const owned = await verifyOwnedReturnRequest(client, { deliveryItemId, sellerId });
+  if (!owned) {
+    return { success: false, error: "처리할 수 없는 요청입니다." };
+  }
+
+  const { error } = await client
+    .from("delivery_items")
+    .update({ reject_reason: reason })
+    .eq("id", deliveryItemId);
+
+  if (error) throw error;
+  return { success: true };
+};
+
+// 액션3: 회수 확인
+export const confirmReturnReceived = async (
+  client: SupabaseClient,
+  { deliveryItemId, sellerId }: { deliveryItemId: string; sellerId: string }
+): Promise<ReturnActionResult> => {
+  const owned = await verifyOwnedReturnRequest(client, { deliveryItemId, sellerId });
+  if (!owned) {
+    return { success: false, error: "처리할 수 없는 요청입니다." };
+  }
+
+  const { error } = await client
+    .from("delivery_items")
+    .update({ return_received_at: new Date().toISOString() })
+    .eq("id", deliveryItemId);
+
+  if (error) throw error;
+  return { success: true };
+};
+
+// 액션4: 최종 승인 — status를 'returned'로 바꾸는 유일한 지점 (kend 환불 크론 트리거).
+// DB가 순서를 강제하지 않으므로 회수확인(return_received_at) 여부를 여기서 직접 가드한다.
+export const finalizeReturnApproval = async (
+  client: SupabaseClient,
+  { deliveryItemId, sellerId }: { deliveryItemId: string; sellerId: string }
+): Promise<ReturnActionResult> => {
+  const owned = await verifyOwnedReturnRequest(client, { deliveryItemId, sellerId });
+  if (!owned) {
+    return { success: false, error: "처리할 수 없는 요청입니다." };
+  }
+  if (!owned.return_received_at) {
+    return { success: false, error: "회수 확인 후 최종 승인이 가능합니다." };
+  }
+
+  const { error } = await client
+    .from("delivery_items")
+    .update({ status: "returned", reject_reason: null })
+    .eq("id", deliveryItemId);
+
+  if (error) throw error;
+  return { success: true };
+};
+
 export interface MarkOrderShippedResult {
   success: boolean;
   error?: string;

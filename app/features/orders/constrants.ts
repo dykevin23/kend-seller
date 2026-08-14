@@ -24,6 +24,15 @@ export const DELIVERY_STATUS_LABELS: Record<string, string> = {
   delivered: "배송완료",
 };
 
+// return_reason_type 라벨 (delivery_items.reason — 구매자 반품 신청 사유)
+export const RETURN_REASON_LABELS: Record<string, string> = {
+  CHANGE_OF_MIND: "단순변심",
+  DEFECT: "상품하자",
+  WRONG_ITEM: "오배송",
+  DAMAGED: "파손",
+  LOST: "분실",
+};
+
 // courier_company enum → 스마트택배(SweetTracker) t_code 매핑
 // 출처: GET https://info.sweettracker.co.kr/api/v1/companylist (2026-07 확인)
 export const COURIER_TO_SWEETTRACKER_CODE: Record<string, string> = {

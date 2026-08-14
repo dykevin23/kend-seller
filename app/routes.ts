@@ -21,6 +21,7 @@ export default [
   /* 주문 관리 */
   ...prefix("orders", [
     route("/list", "features/orders/pages/order-list-page.tsx"),
+    route("/returns", "features/orders/pages/return-list-page.tsx"),
     route("/:orderNumber", "features/orders/pages/order-detail-page.tsx"),
   ]),
 

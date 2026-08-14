@@ -382,6 +382,10 @@ export type Database = {
           order_item_id: string
           quantity: number
           reason: Database["public"]["Enums"]["return_reason_type"] | null
+          refunded_at: string | null
+          reject_reason: string | null
+          return_approved_at: string | null
+          return_received_at: string | null
           status: Database["public"]["Enums"]["delivery_item_status"]
           updated_at: string
         }
@@ -392,6 +396,10 @@ export type Database = {
           order_item_id: string
           quantity: number
           reason?: Database["public"]["Enums"]["return_reason_type"] | null
+          refunded_at?: string | null
+          reject_reason?: string | null
+          return_approved_at?: string | null
+          return_received_at?: string | null
           status?: Database["public"]["Enums"]["delivery_item_status"]
           updated_at?: string
         }
@@ -402,6 +410,10 @@ export type Database = {
           order_item_id?: string
           quantity?: number
           reason?: Database["public"]["Enums"]["return_reason_type"] | null
+          refunded_at?: string | null
+          reject_reason?: string | null
+          return_approved_at?: string | null
+          return_received_at?: string | null
           status?: Database["public"]["Enums"]["delivery_item_status"]
           updated_at?: string
         }
@@ -446,6 +458,33 @@ export type Database = {
           name?: string
           updated_at?: string
           use_yn?: string
+        }
+        Relationships: []
+      }
+      entity_status_history: {
+        Row: {
+          entity_id: string
+          entity_type: string
+          id: string
+          occurred_at: string
+          snapshot: Json | null
+          status: string
+        }
+        Insert: {
+          entity_id: string
+          entity_type: string
+          id?: string
+          occurred_at?: string
+          snapshot?: Json | null
+          status: string
+        }
+        Update: {
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          occurred_at?: string
+          snapshot?: Json | null
+          status?: string
         }
         Relationships: []
       }
@@ -1657,6 +1696,10 @@ export type Database = {
           percentile: number
           value: number
         }[]
+      }
+      increment_stock: {
+        Args: { p_quantity: number; p_sku_id: string }
+        Returns: undefined
       }
     }
     Enums: {

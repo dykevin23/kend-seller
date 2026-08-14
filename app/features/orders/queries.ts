@@ -228,6 +228,70 @@ export const getSellerOrderDetail = async (
   };
 };
 
+export interface ReturnRequestItem {
+  id: string;
+  order_number: string;
+  product_name: string;
+  sku_code: string;
+  quantity: number;
+  reason: string | null;
+  reject_reason: string | null;
+  return_approved_at: string | null;
+  return_received_at: string | null;
+  updated_at: string;
+  recipient_name: string;
+  recipient_phone: string;
+}
+
+// 반품 신청 목록 조회 (판매자별, status='return_requested'인 건만)
+// 4단계 승인 플로우(1차승인/거절/회수확인/최종승인) 어디에 있든 status는 그대로
+// return_requested라 계속 이 목록에 남는다 — 최종승인으로 'returned'가 될 때만 빠진다.
+export const getSellerReturnRequests = async (
+  client: SupabaseClient,
+  sellerId: string
+): Promise<ReturnRequestItem[]> => {
+  const { data, error } = await client
+    .from("delivery_items")
+    .select(
+      `
+      id, reason, reject_reason, return_approved_at, return_received_at, updated_at,
+      order_items!inner (
+        product_name, sku_code, quantity,
+        orders!inner (
+          order_number,
+          order_groups!inner ( recipient_name, recipient_phone )
+        )
+      )
+    `
+    )
+    .eq("status", "return_requested")
+    .eq("order_items.orders.seller_id", sellerId)
+    .order("updated_at", { ascending: false });
+
+  if (error) throw error;
+
+  return (data || []).map((item: any) => {
+    const orderItem = item.order_items;
+    const order = orderItem.orders;
+    const group = order.order_groups;
+
+    return {
+      id: item.id,
+      order_number: order.order_number,
+      product_name: orderItem.product_name,
+      sku_code: orderItem.sku_code,
+      quantity: orderItem.quantity,
+      reason: item.reason,
+      reject_reason: item.reject_reason,
+      return_approved_at: item.return_approved_at,
+      return_received_at: item.return_received_at,
+      updated_at: item.updated_at,
+      recipient_name: group.recipient_name,
+      recipient_phone: group.recipient_phone,
+    };
+  });
+};
+
 // 신규(접수대기) 주문 카운트 — 목록 페이지 상단 배지용
 export const getNewOrderCount = async (
   client: SupabaseClient,
