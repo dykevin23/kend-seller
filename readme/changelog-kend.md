@@ -7,6 +7,39 @@ KEND 웹앱(React Router SSR + WebView)의 주요 변경사항을 날짜별로 �
 
 ---
 
+## 2026-08-21
+
+### [KEND] 반품(P2.5-3) 실사용 E2E 테스트 완료 + 주문/배송 화면 UI·탭 재정의
+
+- **E2E 검증**: 8/14 구현한 반품 신청→승인→환불 전 흐름을 실제 데이터로 검증 — 주문생성→배송완료→반품신청→1차승인→회수확인→최종승인→환불크론까지 정상 플로우 14단계, 예외 케이스(기한초과, 1차거절→재진행, 회수확인 없이 최종승인 시도 차단, 구매확정 후 반품 차단, 타인 주문 반품 차단, 크론 인증 가드, 발송전 취소, 한 주문 상품 2개 중 1개만 반품) 8종 전부 통과
+- **테스트 중 발견한 UI/로직 버그 6건 수정**:
+  - 반품신청 화면 — `Dialog`(`fixed inset-0`)라 모바일에서 항상 풀스크린으로 뜨던 것을 `BottomSheet`로 전환(상품 옵션선택 시트와 동일 패턴)
+  - 반품/교환 진행중(`return_requested`/`exchange_requested`)인 상품이 있으면 주문상세의 구매확정 버튼을 숨기도록 수정 — 기존엔 `order.status`만 보고 `delivery_item` 상태를 안 봐서 반품 진행 중에도 구매확정이 가능했음
+  - 회수확인(`return_received_at`) 이후에도 "반송 택배를 보내주세요"(1차승인 단계 문구)가 계속 뜨던 버그 — `getOrderGroupDetail` 쿼리가 이 컬럼 자체를 select 안 하고 있었음
+  - 주문내역 상품 클릭 시 상품페이지로 안 가던 버그 — `order_items.product_id`(UUID)로 링크를 만들어 404 나던 것을, 앱 전체 컨벤션대로 `product_code` 기반으로 수정
+  - 반품/교환 상태 라벨을 주문 상태 배지와 같은 스타일로 통일(`getItemStatusLabel` 신설, `app/features/orders/utils.ts`) — 상품(delivery_item) 단위로 판단해서 한 주문 안에서도 상품별로 다른 배지가 뜨도록 개선
+  - 반품 진행중인 상품이 취소/환불 탭에 안 보이던 문제 — 아래 탭 재정의로 해결
+- **주문/배송 탭 재정의**: 상품(delivery_item) 단위로 탭을 다시 나눔 — **전체 / 주문접수 / 배송중 / 배송완료 / 취소·환불**. 기존 "결제대기" 탭은 없애고 "주문접수"에 흡수(결제완료~발송 전 구간 전체를 포괄, 결제대기 주문도 `orders.status`가 이미 `pending`이라 별도 처리 없이 자연스럽게 포함됨). "배송중"은 실제 발송(`shipped`/`in_transit`) 이후로 좁힘. 발송전 취소는 부분취소가 불가능해 탭으로 뺄 실익이 없다고 판단해 전체 탭에서만 노출. `deliveries.status='returning'`(RTS·장기미수령, kend-seller 미도입)도 취소/환불 탭에 미리 반영해둠 — 나중에 kend-seller가 구현하면 kend 쪽 추가 작업 없이 바로 노출됨
+- **`getUserOrderGroups` 쿼리 재작성**: 필터별로 다른 shape 반환(전체/결제대기=`order_group` 중첩, 나머지=상품 단위 카드로 평탄화) — 같은 판매자 주문 안에서도 상품마다 배송/반품 상태가 다를 수 있어, `order_group`·`orders` 단위로 탭을 나누면 다른 상품 상태가 섞여 보이는 문제였음. 주문취소 트리거(`handle_order_cancelled`)가 `deliveries`/`delivery_items` 상태를 안 건드리는 걸 재확인해, 취소된 주문이 배송중 탭에 남는 회귀를 막는 가드를 추가
+- **후속 발견(정책/법률)**: 반품 사유가 구매자 자가신고이고 증빙 요구가 없음(판매자 검수 단계가 유일한 사후 검증, "전체승인/전체거절"만 가능) + §7.2에서 결정한 "사유별 반품배송비 부담주체" 정책이 코드에 전혀 구현 안 됨(상품가만 환불) + 판매자귀책 사유 반품기간(30일 고정)이 전자상거래법 법정기준(안 날로부터 30일 또는 수령일로부터 3개월 중 나중, 으로 알려짐)보다 짧을 가능성 — `order-cancel-refund-exchange-flow.md` §5-4에 기록, **Toss 실키 전환 전 법률 검토 권장**
+- **다음 작업**: 구매확정을 `orders` 단위가 아니라 `delivery_item` 단위로 개별화하는 작업이 남음 — 지금은 한 주문에 정상 상품과 반품 상품이 섞이면 정상 상품까지 구매확정이 막히는 걸 이번 테스트로 확인함(스키마 변경 필요, 별도 라운드로 진행 예정)
+
+## 2026-08-14
+
+### [KEND] 반품 신청 + 환불 처리 도입 (P2.5-3, kend 부분) — 구현됨, 테스트 대기
+
+- **반품 신청**: 배송완료~구매확정 전, `delivery_item` 단위로 반품 신청 가능(`requestReturn`). 사유별 신청기한(단순변심 7일/그 외 30일) 검증, 신청 시 `delivery_items.status: normal → return_requested` + `reason` 세팅. 주문상세 화면에 반품 신청 다이얼로그(`return-request-dialog.tsx`) 추가
+- **반품 승인 플로우 재설계**: 최초엔 "승인=즉시 최종확정"으로 단순화했으나, 실제로는 1차승인(반송 택배 진행 동의) → 회수확인 → 검수 후 최종승인/거절의 다단계 프로세스가 필요함을 kend-seller 작업 중 확인. `delivery_items.status` enum은 그대로 두고 `return_approved_at`/`return_received_at`/`reject_reason` 컬럼을 추가해 중간 단계를 표현 — `status`가 `'returned'`로 바뀌는 시점(검수 후 최종승인)에만 환불이 트리거되도록 설계. 거절은 상태를 되돌리지 않고 `reject_reason`만 채워 판매자가 재고려 가능하게 함
+- **환불 처리 크론**: `processApprovedReturns`(`orders/mutations.server.ts`) — `status='returned' AND refunded_at IS NULL`인 건을 찾아 Toss 부분환불 + 재고복원(`increment_stock` RPC 신설) + `order_groups` 상태 집계(`partially_refunded`/`refunded`)까지 처리. `/api/cron/process-returns` 라우트로 노출(`CRON_SECRET` 헤더 인증). kend-seller는 TOSS_SECRET_KEY가 없어 상태 컬럼만 갱신하고, 실제 환불은 이 크론이 폴링 방식으로 처리 — 판매자 취소가 결제취소를 안 부르던 기존 버그(2026-07-27 항목 참고)와 같은 유형의 실수를 피하기 위한 설계
+- **pg_cron 등록 SQL은 준비만 해둠**: `schedule_process_returns.sql`은 프로덕션 도메인이 아직 없어 플레이스홀더 상태로 미적용 — 도메인 확정 후 실행 필요
+- **상태 이력 테이블 신설**: `entity_status_history`(entity_type 기반 범용 구조 — orders/order_groups/deliveries/payments로도 같은 틀로 확장 가능하게 설계, 이번엔 delivery_items에만 연결) + `delivery_items` 대상 DB 트리거(`on_delivery_item_status_changed.sql`) — status/reason/승인/거절/환불 관련 컬럼이 바뀔 때마다 자동으로 스냅샷 기록. 앱 코드가 로깅을 기억할 필요 없이 트리거가 캡처
+- **kend-seller에 반품 승인 스펙 전달**: 1차승인/1차거절/회수확인/최종승인·거절 4단계가 어떤 컬럼을 어떻게 바꾸는지, `status='returned'`가 정확히 언제 되는지 문서화해 전달
+- **테스트용 주문 데이터 정리**: `order_groups`(+cascade) 11건, `carts` 2건 삭제 (전부 테스트 데이터, 재고 수치는 손대지 않음 — 어차피 더미)
+- **P2.5-4(문의하기) 착수했다가 홀딩**: `inquiries` 스키마 초안까지 갔다가, 반품 승인 설계 이슈 확인 우선순위로 밀려 롤백. 재개 예정
+- ⚠️ **테스트 대기**: 코드/트리거/스키마는 적용됐으나 실제 반품 신청→승인→환불 E2E는 아직 미검증 (kend-seller 승인화면이 별도 저장소에서 진행 중이라 여기서 단독 테스트 불가)
+
+---
+
 ## 2026-08-07
 
 ### [KEND] Phase 2.5 진행 — 구매확정 + 주문상세 타임라인 + 플랫폼 조건부 무료배송
