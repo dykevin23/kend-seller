@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useFetcher } from "react-router";
+import { useFetcher, useSearchParams } from "react-router";
 import Content from "~/common/components/content";
 import Title from "~/common/components/title";
 import Card from "~/common/components/card";
@@ -67,13 +67,18 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client } = makeSSRClient(request);
+  const url = new URL(request.url);
+  const tab = url.searchParams.get("tab") === "completed" ? "completed" : "pending";
+
   const seller = await getSellerInfo(client);
   if (!seller) {
-    return { returns: [] };
+    return { returns: [], tab };
   }
 
-  const returns = await getSellerReturnRequests(client, seller.id);
-  return { returns };
+  const returns = await getSellerReturnRequests(client, seller.id, {
+    completed: tab === "completed",
+  });
+  return { returns, tab };
 };
 
 type Stage = {
@@ -107,9 +112,14 @@ const getStage = (item: ReturnRequestItem): Stage => {
 };
 
 export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
-  const { returns } = loaderData;
+  const { returns, tab } = loaderData;
   const { confirm } = useAlert();
   const fetcher = useFetcher();
+  const [, setSearchParams] = useSearchParams();
+
+  const handleTabChange = (nextTab: "pending" | "completed") => {
+    setSearchParams(nextTab === "pending" ? {} : { tab: nextTab });
+  };
 
   const submitAction = (intent: string, deliveryItemId: string) => {
     fetcher.submit({ intent, deliveryItemId }, { method: "post" });
@@ -136,6 +146,25 @@ export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
     <Content>
       <Title title="반품 관리" />
 
+      <div className="mb-3 flex gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant={tab === "pending" ? "default" : "outline"}
+          onClick={() => handleTabChange("pending")}
+        >
+          승인 대기
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant={tab === "completed" ? "default" : "outline"}
+          onClick={() => handleTabChange("completed")}
+        >
+          완료 내역
+        </Button>
+      </div>
+
       <Card>
         <Table>
           <TableHeader>
@@ -146,7 +175,9 @@ export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
               <TableHead>사유</TableHead>
               <TableHead>수령인</TableHead>
               <TableHead className="text-center">진행상태</TableHead>
-              <TableHead className="text-center">액션</TableHead>
+              <TableHead className="text-center">
+                {tab === "completed" ? "환불" : "액션"}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -154,6 +185,41 @@ export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
               returns.map((item) => {
                 const stage = getStage(item);
                 const canResumeToFinal = !!item.return_received_at;
+
+                if (tab === "completed") {
+                  return (
+                    <TableRow key={item.id}>
+                      <TableCell>{item.updated_at.slice(0, 10)}</TableCell>
+                      <TableCell>{item.order_number}</TableCell>
+                      <TableCell>
+                        {item.product_name} ({item.sku_code}) x {item.quantity}
+                      </TableCell>
+                      <TableCell>
+                        {item.reason ? RETURN_REASON_LABELS[item.reason] ?? item.reason : "-"}
+                      </TableCell>
+                      <TableCell>
+                        <div>{item.recipient_name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {item.recipient_phone}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span className="inline-block rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-400">
+                          반품 완료
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {item.refunded_at ? (
+                          <span className="text-xs text-muted-foreground">
+                            환불 완료 ({item.refunded_at.slice(0, 10)})
+                          </span>
+                        ) : (
+                          <span className="text-xs text-amber-600">환불 처리 중</span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                }
 
                 return (
                   <TableRow key={item.id}>
@@ -187,7 +253,8 @@ export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
                       )}
                     </TableCell>
                     <TableCell>
-                      <div className="flex flex-wrap justify-center gap-2">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="flex flex-wrap gap-2">
                         {item.reject_reason ? (
                           canResumeToFinal ? (
                             <Button
@@ -267,16 +334,19 @@ export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
                             1차 승인
                           </Button>
                         )}
-                        <RejectDialog
-                          deliveryItemId={item.id}
-                          isEditing={!!item.reject_reason}
-                          onReject={(deliveryItemId, reason) => {
-                            fetcher.submit(
-                              { intent: "reject", deliveryItemId, reason },
-                              { method: "post" }
-                            );
-                          }}
-                        />
+                        </div>
+                        <div className="border-l pl-2">
+                          <RejectDialog
+                            deliveryItemId={item.id}
+                            isEditing={!!item.reject_reason}
+                            onReject={(deliveryItemId, reason) => {
+                              fetcher.submit(
+                                { intent: "reject", deliveryItemId, reason },
+                                { method: "post" }
+                              );
+                            }}
+                          />
+                        </div>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -285,7 +355,9 @@ export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
             ) : (
               <TableRow>
                 <TableCell colSpan={7} className="h-24 text-center">
-                  대기 중인 반품 신청이 없습니다.
+                  {tab === "completed"
+                    ? "완료된 반품 내역이 없습니다."
+                    : "대기 중인 반품 신청이 없습니다."}
                 </TableCell>
               </TableRow>
             )}
@@ -322,7 +394,12 @@ function RejectDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="button" size="sm" variant="outline">
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          className="text-muted-foreground hover:text-destructive"
+        >
           {isEditing ? "거절 사유 수정" : "거절"}
         </Button>
       </DialogTrigger>

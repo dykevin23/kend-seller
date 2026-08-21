@@ -20,6 +20,8 @@ import {
   ORDER_STATUS,
   ORDER_STATUS_ACTIONS,
   DELIVERY_STATUS_LABELS,
+  isValidTrackingNumber,
+  normalizeTrackingNumber,
 } from "../constrants";
 import { COURIER_COMPANIES } from "~/features/products/constrants";
 import type { Route } from "./+types/order-detail-page";
@@ -59,12 +61,18 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
     if (!courier || !trackingNumber) {
       return { success: false, error: "배송사와 송장번호를 모두 입력해주세요." };
     }
+    if (!isValidTrackingNumber(trackingNumber)) {
+      return {
+        success: false,
+        error: "송장번호 형식이 올바르지 않습니다. 숫자 8~20자리로 입력해주세요.",
+      };
+    }
 
     return await markOrderShipped(client, {
       orderId: order.id,
       sellerId: seller.id,
       courier,
-      trackingNumber,
+      trackingNumber: normalizeTrackingNumber(trackingNumber),
     });
   }
 
@@ -107,6 +115,7 @@ export default function OrderDetailPage({
   const shipFetcher = useFetcher();
   const [courier, setCourier] = useState("");
   const [trackingNumber, setTrackingNumber] = useState("");
+  const [trackingError, setTrackingError] = useState("");
 
   if (!order) {
     return (
@@ -131,8 +140,23 @@ export default function OrderDetailPage({
     ALLOWED_TRANSITIONS[order.status]?.includes(action.value)
   );
 
+  // 스마트택배 sync-tracking 크론은 조회 실패(104/106) 시 tracking_synced_at을 갱신하지 않고
+  // 넘어가므로, 발송 후 일정 시간이 지나도 이 값이 비어있으면 송장번호 오입력 가능성이 있다
+  const TRACKING_SYNC_ALERT_HOURS = 24;
+  const showTrackingSyncAlert =
+    order.delivery?.status === "shipped" &&
+    !order.delivery.tracking_synced_at &&
+    !!order.delivery.shipped_at &&
+    Date.now() - new Date(order.delivery.shipped_at).getTime() >
+      TRACKING_SYNC_ALERT_HOURS * 60 * 60 * 1000;
+
   const handleShip = () => {
     if (!courier || !trackingNumber) return;
+    if (!isValidTrackingNumber(trackingNumber)) {
+      setTrackingError("송장번호는 숫자 8~20자리로 입력해주세요.");
+      return;
+    }
+    setTrackingError("");
     confirm({
       title: "배송 처리",
       message: `배송사 "${COURIER_COMPANIES.find((c) => c.value === courier)?.label}", 송장번호 "${trackingNumber}"로 배송 처리하시겠습니까?`,
@@ -214,8 +238,11 @@ export default function OrderDetailPage({
               <Label className="text-xs text-muted-foreground">송장번호</Label>
               <Input
                 value={trackingNumber}
-                onChange={(e) => setTrackingNumber(e.target.value)}
-                placeholder="송장번호 입력"
+                onChange={(e) => {
+                  setTrackingNumber(e.target.value);
+                  if (trackingError) setTrackingError("");
+                }}
+                placeholder="송장번호 입력 (숫자 8~20자리)"
               />
             </div>
             <Button
@@ -225,6 +252,9 @@ export default function OrderDetailPage({
               배송 처리
             </Button>
           </div>
+          {trackingError && (
+            <p className="text-sm text-red-500 mt-2">{trackingError}</p>
+          )}
           {shipFetcher.data?.error && (
             <p className="text-sm text-red-500 mt-2">
               {shipFetcher.data.error}
@@ -236,6 +266,12 @@ export default function OrderDetailPage({
       {order.delivery && (
         <Card>
           <h2 className="text-xl font-bold">배송 정보</h2>
+          {showTrackingSyncAlert && (
+            <p className="mb-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+              발송 후 {TRACKING_SYNC_ALERT_HOURS}시간이 지나도 배송 조회가 확인되지
+              않고 있습니다. 송장번호를 다시 확인해주세요.
+            </p>
+          )}
           <InfoRow
             label="배송사"
             value={

@@ -148,6 +148,7 @@ export interface OrderDetail {
     courier: string | null;
     tracking_number: string | null;
     status: string;
+    shipped_at: string | null;
     tracking_synced_at: string | null;
   } | null;
 }
@@ -176,7 +177,7 @@ export const getSellerOrderDetail = async (
         delivery_message, payment_method, status, paid_at,
         payments ( method, status, receipt_url )
       ),
-      deliveries ( courier, tracking_number, status, tracking_synced_at )
+      deliveries ( courier, tracking_number, status, shipped_at, tracking_synced_at )
     `
     )
     .eq("seller_id", sellerId)
@@ -222,6 +223,7 @@ export const getSellerOrderDetail = async (
           courier: delivery.courier,
           tracking_number: delivery.tracking_number,
           status: delivery.status,
+          shipped_at: delivery.shipped_at,
           tracking_synced_at: delivery.tracking_synced_at,
         }
       : null,
@@ -238,23 +240,27 @@ export interface ReturnRequestItem {
   reject_reason: string | null;
   return_approved_at: string | null;
   return_received_at: string | null;
+  refunded_at: string | null;
   updated_at: string;
   recipient_name: string;
   recipient_phone: string;
 }
 
-// 반품 신청 목록 조회 (판매자별, status='return_requested'인 건만)
-// 4단계 승인 플로우(1차승인/거절/회수확인/최종승인) 어디에 있든 status는 그대로
-// return_requested라 계속 이 목록에 남는다 — 최종승인으로 'returned'가 될 때만 빠진다.
+// 반품 목록 조회 (판매자별). completed=false(기본)면 진행 중인 건(status='return_requested'),
+// completed=true면 최종승인까지 끝난 건(status='returned')만 조회한다.
+// 4단계 승인 플로우 중 어디에 있든 status는 return_requested로 유지되다가
+// 최종승인 순간에만 returned로 바뀌므로, 완료 내역은 별도 조회가 필요하다.
+// refunded_at은 kend 환불 크론 전용 컬럼 — 여기선 표시용으로 읽기만 하고 절대 쓰지 않는다.
 export const getSellerReturnRequests = async (
   client: SupabaseClient,
-  sellerId: string
+  sellerId: string,
+  { completed = false }: { completed?: boolean } = {}
 ): Promise<ReturnRequestItem[]> => {
   const { data, error } = await client
     .from("delivery_items")
     .select(
       `
-      id, reason, reject_reason, return_approved_at, return_received_at, updated_at,
+      id, reason, reject_reason, return_approved_at, return_received_at, refunded_at, updated_at,
       order_items!inner (
         product_name, sku_code, quantity,
         orders!inner (
@@ -264,7 +270,7 @@ export const getSellerReturnRequests = async (
       )
     `
     )
-    .eq("status", "return_requested")
+    .eq("status", completed ? "returned" : "return_requested")
     .eq("order_items.orders.seller_id", sellerId)
     .order("updated_at", { ascending: false });
 
@@ -285,6 +291,7 @@ export const getSellerReturnRequests = async (
       reject_reason: item.reject_reason,
       return_approved_at: item.return_approved_at,
       return_received_at: item.return_received_at,
+      refunded_at: item.refunded_at,
       updated_at: item.updated_at,
       recipient_name: group.recipient_name,
       recipient_phone: group.recipient_phone,

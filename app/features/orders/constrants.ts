@@ -33,6 +33,15 @@ export const RETURN_REASON_LABELS: Record<string, string> = {
   LOST: "분실",
 };
 
+// 송장번호 형식 sanity check — 택배사별 정확한 자릿수 규격까진 확보 못해
+// 하이픈/공백 제거 후 숫자 8~20자리인지 정도만 확인해 명백한 오입력(문자 섞임, 너무 짧음)만 거른다
+const TRACKING_NUMBER_PATTERN = /^\d{8,20}$/;
+
+export const normalizeTrackingNumber = (value: string) => value.replace(/[\s-]/g, "");
+
+export const isValidTrackingNumber = (value: string) =>
+  TRACKING_NUMBER_PATTERN.test(normalizeTrackingNumber(value));
+
 // courier_company enum → 스마트택배(SweetTracker) t_code 매핑
 // 출처: GET https://info.sweettracker.co.kr/api/v1/companylist (2026-07 확인)
 export const COURIER_TO_SWEETTRACKER_CODE: Record<string, string> = {
