@@ -380,6 +380,7 @@ export type Database = {
           delivery_id: string
           id: string
           order_item_id: string
+          purchase_confirmed_at: string | null
           quantity: number
           reason: Database["public"]["Enums"]["return_reason_type"] | null
           refunded_at: string | null
@@ -394,6 +395,7 @@ export type Database = {
           delivery_id: string
           id?: string
           order_item_id: string
+          purchase_confirmed_at?: string | null
           quantity: number
           reason?: Database["public"]["Enums"]["return_reason_type"] | null
           refunded_at?: string | null
@@ -408,6 +410,7 @@ export type Database = {
           delivery_id?: string
           id?: string
           order_item_id?: string
+          purchase_confirmed_at?: string | null
           quantity?: number
           reason?: Database["public"]["Enums"]["return_reason_type"] | null
           refunded_at?: string | null
@@ -797,7 +800,6 @@ export type Database = {
           order_group_id: string
           order_number: string
           product_amount: number
-          purchase_confirmed_at: string | null
           seller_code: string
           seller_id: string
           seller_name: string
@@ -813,7 +815,6 @@ export type Database = {
           order_group_id: string
           order_number: string
           product_amount: number
-          purchase_confirmed_at?: string | null
           seller_code: string
           seller_id: string
           seller_name: string
@@ -829,7 +830,6 @@ export type Database = {
           order_group_id?: string
           order_number?: string
           product_amount?: number
-          purchase_confirmed_at?: string | null
           seller_code?: string
           seller_id?: string
           seller_name?: string
