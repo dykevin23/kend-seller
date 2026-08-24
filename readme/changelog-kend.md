@@ -24,6 +24,15 @@ KEND 웹앱(React Router SSR + WebView)의 주요 변경사항을 날짜별로 �
 - **후속 발견(정책/법률)**: 반품 사유가 구매자 자가신고이고 증빙 요구가 없음(판매자 검수 단계가 유일한 사후 검증, "전체승인/전체거절"만 가능) + §7.2에서 결정한 "사유별 반품배송비 부담주체" 정책이 코드에 전혀 구현 안 됨(상품가만 환불) + 판매자귀책 사유 반품기간(30일 고정)이 전자상거래법 법정기준(안 날로부터 30일 또는 수령일로부터 3개월 중 나중, 으로 알려짐)보다 짧을 가능성 — `order-cancel-refund-exchange-flow.md` §5-4에 기록, **Toss 실키 전환 전 법률 검토 권장**
 - **다음 작업**: 구매확정을 `orders` 단위가 아니라 `delivery_item` 단위로 개별화하는 작업이 남음 — 지금은 한 주문에 정상 상품과 반품 상품이 섞이면 정상 상품까지 구매확정이 막히는 걸 이번 테스트로 확인함(스키마 변경 필요, 별도 라운드로 진행 예정)
 
+### [KEND] 구매확정을 상품(delivery_item) 단위로 개별화 (P2.5-3 후속) — 완료
+
+- 위에서 발견한 문제 해결: `orders.purchase_confirmed_at`(주문 단위) 컬럼을 없애고 `delivery_items.purchase_confirmed_at`(상품 단위)로 완전히 이전 — pre-launch라 하위호환 없이 교체. 마이그레이션 적용 + `database.types.ts` 갱신까지 실제 공유 Supabase DB에 반영 완료
+- `confirmPurchase` 뮤테이션을 `orderId` → `deliveryItemId` 기준으로 재작성(본인주문/배송완료/`status==='normal'`/미확정 가드), `requestReturn`의 구매확정 체크도 상위 조인 대신 delivery_item 자기 컬럼으로 단순화
+- `auto_confirm_purchase` cron(배송완료 7일 후 자동확정)도 `delivery_items` 기준으로 재작성하고 **실제 DB에 함수 재등록까지 완료** — 스키마 변경만 하고 이 함수를 안 고쳤으면 존재하지 않는 컬럼을 참조해서 크론이 깨질 뻔했음
+- `order-detail-page.tsx`: 구매확정 버튼/완료문구를 상품 단위로 이동해 반품신청 버튼과 나란히 노출, `OrderTimeline`에서 주문단위였던 "구매확정" 행 제거
+- kend-seller는 이 컬럼을 참조하는 코드가 없어 기능 영향 없음(검증 완료) — 다만 seller의 `database.types.ts`가 옛 스키마(orders 쪽)를 보고 있어 stale함, `db:typegen` 갱신 필요하다고 `kend-milestones.md` P3.5-2에 기록
+- 반품중 상품 + 정상 상품이 섞인 주문에서 정상 상품만 구매확정되고 반품중 상품엔 버튼이 안 뜨는지 실사용 테스트로 확인 완료
+
 ## 2026-08-14
 
 ### [KEND] 반품 신청 + 환불 처리 도입 (P2.5-3, kend 부분) — 구현됨, 테스트 대기
