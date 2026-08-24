@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { isStalledInTransit } from "./constrants";
 
 // 판매자에게 숨겨야 하는 order_group 상태 — 결제 자체가 안 된 "유령 주문"만 제외.
 // paid 이후 상태(취소/환불 포함)는 판매자가 계속 볼 수 있어야 하므로 화이트리스트가 아닌
@@ -15,6 +16,7 @@ export interface OrderListItem {
   created_at: string;
   recipient_name: string;
   item_summary: string;
+  stalled_delivery: boolean;
 }
 
 interface GetSellerOrdersParams {
@@ -42,7 +44,8 @@ export const getSellerOrders = async (
       total_amount,
       created_at,
       order_groups!inner ( status, recipient_name ),
-      order_items ( product_name, quantity )
+      order_items ( product_name, quantity ),
+      deliveries ( status, shipped_at )
     `,
       { count: "exact" }
     )
@@ -95,6 +98,11 @@ export const getSellerOrders = async (
           ? items[0].product_name
           : `${items[0].product_name} 외 ${items.length - 1}건`;
 
+    const deliveryRaw = order.deliveries;
+    const delivery = Array.isArray(deliveryRaw)
+      ? (deliveryRaw[0] ?? null)
+      : (deliveryRaw ?? null);
+
     return {
       id: order.id,
       order_number: order.order_number,
@@ -105,6 +113,7 @@ export const getSellerOrders = async (
       created_at: order.created_at,
       recipient_name: order.order_groups?.recipient_name ?? "-",
       item_summary: itemSummary,
+      stalled_delivery: isStalledInTransit(delivery?.status, delivery?.shipped_at),
     };
   });
 

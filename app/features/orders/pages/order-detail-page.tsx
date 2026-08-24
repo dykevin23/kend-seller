@@ -22,6 +22,8 @@ import {
   DELIVERY_STATUS_LABELS,
   isValidTrackingNumber,
   normalizeTrackingNumber,
+  STALLED_IN_TRANSIT_DAYS,
+  isStalledInTransit,
 } from "../constrants";
 import { COURIER_COMPANIES } from "~/features/products/constrants";
 import type { Route } from "./+types/order-detail-page";
@@ -150,6 +152,11 @@ export default function OrderDetailPage({
     Date.now() - new Date(order.delivery.shipped_at).getTime() >
       TRACKING_SYNC_ALERT_HOURS * 60 * 60 * 1000;
 
+  const showStalledDeliveryAlert = isStalledInTransit(
+    order.delivery?.status,
+    order.delivery?.shipped_at
+  );
+
   const handleShip = () => {
     if (!courier || !trackingNumber) return;
     if (!isValidTrackingNumber(trackingNumber)) {
@@ -270,6 +277,13 @@ export default function OrderDetailPage({
             <p className="mb-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700 dark:bg-amber-950 dark:text-amber-400">
               발송 후 {TRACKING_SYNC_ALERT_HOURS}시간이 지나도 배송 조회가 확인되지
               않고 있습니다. 송장번호를 다시 확인해주세요.
+            </p>
+          )}
+          {showStalledDeliveryAlert && (
+            <p className="mb-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+              발송 후 {STALLED_IN_TRANSIT_DAYS}일이 지나도 배송이 완료되지 않고
+              있습니다. 장기미수령·수취거절 반송 가능성이 있으니 택배사에 직접
+              확인해주세요.
             </p>
           )}
           <InfoRow

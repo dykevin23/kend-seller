@@ -303,7 +303,14 @@ export default function OrderListPage({ loaderData }: Route.ComponentProps) {
                     {formatNumber(order.total_amount)}원
                   </TableCell>
                   <TableCell className="text-center">
-                    {getStatusLabel(order.status)}
+                    <div className="flex items-center justify-center gap-1.5">
+                      {getStatusLabel(order.status)}
+                      {order.stalled_delivery && (
+                        <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+                          정체
+                        </span>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="text-center">
                     {order.created_at.slice(0, 10)}

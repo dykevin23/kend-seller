@@ -33,6 +33,19 @@ export const RETURN_REASON_LABELS: Record<string, string> = {
   LOST: "분실",
 };
 
+// SweetTracker API에 반송(RTS)·장기미수령 전용 상태 코드가 없어(level은 1~6 순방향 진행단계뿐),
+// 배송중 상태가 이 기간을 넘겨도 안 끝나면 판매자 수동확인이 필요하다고 본다
+export const STALLED_IN_TRANSIT_DAYS = 7;
+
+export const isStalledInTransit = (
+  deliveryStatus: string | null | undefined,
+  shippedAt: string | null | undefined
+) =>
+  deliveryStatus === "in_transit" &&
+  !!shippedAt &&
+  Date.now() - new Date(shippedAt).getTime() >
+    STALLED_IN_TRANSIT_DAYS * 24 * 60 * 60 * 1000;
+
 // 송장번호 형식 sanity check — 택배사별 정확한 자릿수 규격까진 확보 못해
 // 하이픈/공백 제거 후 숫자 8~20자리인지 정도만 확인해 명백한 오입력(문자 섞임, 너무 짧음)만 거른다
 const TRACKING_NUMBER_PATTERN = /^\d{8,20}$/;
