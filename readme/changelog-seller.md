@@ -8,6 +8,25 @@ KEND-SELLER 판매자 관리자 웹의 주요 변경사항을 날짜별로 기�
 
 ---
 
+## 2026-08-24
+
+### [KEND-SELLER] RTS·장기미수령 기간기반 플래깅 (Phase 2.5-6)
+
+- **SweetTracker API 조사 결과 반송(RTS) 전용 상태 코드 없음 확인**: 공식 API 문서(v1.6)를 직접 확인한 결과 `level`은 1~6 순방향 진행단계(배송준비→집화→배송중→지점도착→배송출발→완료)만 표현하고, 반송/수취인부재/미배달 같은 예외 상태는 정의돼 있지 않음 — `trackingDetails[].kind` 자유 텍스트에 담길 수는 있으나 정확한 문자열이 공식 문서에 없어 텍스트 매칭은 오탐 위험(8/21 송장번호 검증 때의 SweetTracker 에러코드 104/106 케이스와 동일한 이유로 기각)
+- **순수 기간기반 플래깅으로 결정**: `deliveries.status`를 자동으로 `returning`으로 전환하지 않고, `in_transit` 상태가 `shipped_at` 기준 7일을 넘기면 판매자에게 수동확인만 유도. 오탐 시 되돌리기 어려운 상태 전환 리스크를 피함
+- **주문 상세 화면**: 기존 송장번호 사후알림 배너(24시간 미조회)와 동일한 패턴으로 "장기미수령·수취거절 반송 가능성" 경고 배너 추가
+- **주문 목록 화면**: 상세를 열어보지 않아도 발견 가능하도록 상태 옆에 "정체" 배지 추가 — `getSellerOrders` 쿼리에 `deliveries(status, shipped_at)` 조인 추가 필요했음 (기존엔 목록에서 delivery 정보를 아예 안 봤음)
+- **`sync-tracking` Edge Function**: 정체 건을 결과 로그에 `in_transit:stalled_7d+`로 표시(운영 가시성용, DB 상태는 안 건드림), `--use-api` 플래그로 Docker 없이 배포 완료
+- 임계값(7일)·처리방식(상태유지+알림만)은 사용자 확인 거쳐 결정
+- 실사용 테스트: 더미 주문의 `deliveries.status`/`shipped_at`을 DB에서 직접 조작해 상세 배너·목록 배지 노출 확인 완료(사용자 확인), 테스트 데이터는 원복함. sync-tracking 로그 마킹 자체는 실사용 조회로 검증하지 않음(로그 표시용 부가 기능이라 낮은 우선순위로 판단)
+- 이 작업으로 kend-seller 쪽 Phase 2.5 담당 항목 완료 (kend 쪽은 구매확정 상품단위 개별화 완료, 문의하기(P2.5-4)는 kend 접수 UI 착수 전이라 대기)
+
+### [KEND-SELLER] database.types.ts 갱신 — delivery_items.purchase_confirmed_at 반영
+
+- kend가 구매확정 컬럼을 `orders.purchase_confirmed_at`(주문 단위)에서 `delivery_items.purchase_confirmed_at`(상품 단위)로 이전한 스키마 변경을 `db:typegen`으로 반영. kend-seller 앱 코드는 이 컬럼을 참조하는 곳이 없어 영향 없음(grep 확인)
+
+---
+
 ## 2026-08-21
 
 ### [KEND-SELLER] 반품 처리 화면 UX 개선 + 송장번호 검증 (P2.5-3 후속)
