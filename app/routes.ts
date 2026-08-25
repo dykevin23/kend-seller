@@ -22,6 +22,11 @@ export default [
   ...prefix("orders", [
     route("/list", "features/orders/pages/order-list-page.tsx"),
     route("/returns", "features/orders/pages/return-list-page.tsx"),
+    route("/inquiries", "features/inquiries/pages/inquiry-list-page.tsx"),
+    route(
+      "/inquiries/:inquiryId",
+      "features/inquiries/pages/inquiry-detail-page.tsx"
+    ),
     route("/:orderNumber", "features/orders/pages/order-detail-page.tsx"),
   ]),
 
@@ -97,6 +102,14 @@ export default [
       ]),
       // 플랫폼 설정
       route("/settings", "features/system/pages/platform-settings-page.tsx"),
+      // 일반 문의 (판매자/상품과 무관한 문의)
+      ...prefix("inquiries", [
+        index("features/inquiries/pages/admin-inquiry-list-page.tsx"),
+        route(
+          "/:inquiryId",
+          "features/inquiries/pages/admin-inquiry-detail-page.tsx"
+        ),
+      ]),
     ]),
   ]),
 

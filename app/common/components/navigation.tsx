@@ -64,6 +64,11 @@ const menus: Menu[] = [
         description: "See the top categories in your community",
         to: "/orders/returns",
       },
+      {
+        name: "Inquiries",
+        description: "고객 문의 조회/답변",
+        to: "/orders/inquiries",
+      },
     ],
   },
   {
@@ -122,6 +127,11 @@ const menus: Menu[] = [
         name: "Platform Settings",
         description: "플랫폼 전역 설정 (무료배송 기준금액 등)",
         to: "/system/settings",
+      },
+      {
+        name: "General Inquiries",
+        description: "판매자/상품과 무관한 일반 문의 처리",
+        to: "/system/inquiries",
       },
     ],
   },
