@@ -78,14 +78,23 @@
 
 ### Phase 0 — 잔여 마무리 (2026-04-27 ~ 2026-05-01)
 
-#### 🚨 P0-1. iOS 심사 — **3달+ 정체 (블로커, 진행 중)**
-- **Due**: 2026-05-01 → **미해결**
-- **우선순위**: 🔴 블로커
-- **상황**: 결제 "서비스 준비 중" 처리 후 재제출했으나 **3개월 넘게 심사 정체**. 문의에도 "곧 처리" 답변만 받고 진척 없음
-- **대응 트랙**:
-  - [ ] App Store Connect 상태 확인 — 진짜 "심사 중"인지 / Resolution Center에 미확인 메시지(우리 회신 대기) 있는지
-  - [ ] Apple Developer Support **전화 콜백 예약** + 기존 케이스 escalate (expedite 약속 미이행 명시)
-  - [ ] 막판 카드: 제출 취소 후 **새 빌드 재제출**로 큐 리셋 (단, 위 회신 대기 여부 먼저 확인)
+#### 🚨 P0-1. iOS 심사 — **Guideline 5.6 재제출 정지 → appeal 승인, 재제출은 개발 완성도 확보 후로 의도적 보류**
+- **Due**: 2026-05-01 → **미해결 (전략적 보류)**
+- **우선순위**: 🔴 블로커 (단, 지금 당장 급한 액션은 없음 — 아래 참고)
+- **전체 타임라인**:
+  - 2026-04-14: 최초 리젝 4건 (4.8 로그인 / 2.1(a) 카메라 크래시 / 4 iPad UI / 2.1(a) 결제·버튼 미완성)
+  - 2026-04-15: 카메라 크래시 수정(`NSCameraUsageDescription` 등), Vision Pro 해제 → 재제출
+  - (이후) 결제 "서비스 준비 중" placeholder UI로 교체 → 재제출
+  - **2026-06-23**: Apple이 **Guideline 5.6 Developer Code of Conduct — Review Suspended**로 거절. "품질 기준 미달", "이 앱은 재제출 자격 없음, 답변/재제출 검토 안 하고 자동 거절 처리". placeholder content/unfinished 요소를 콕 집어 지적 → 반복 위반 시 Developer Program 제명 경고까지 포함된 심각한 등급
+  - 2026-07-22: 부당하다고 판단해 App Review Board에 appeal 제출
+  - **2026-07-29**: Apple 답변(Appeal Ticket APL512440) — "Guideline 5.6.4 이슈는 해소된 것으로 판단, 검토를 진행하려면 **새 binary를 재제출**하라." (새 App ID/앱 레코드가 아니라 **같은 앱에 새 빌드**를 의미)
+  - 증빙(로컬 전용, gitignore): [ios-review-evidence/](active/ios-review-evidence/) — 06-23 suspension, 07-22 appeal 접수, 07-29 appeal 승인 스크린샷
+- **현재 판단 (2026-08-25)**: 07-29 이후 아직 재제출 안 함 — **의도적 보류**. 06-23 거절 사유가 "placeholder content/unfinished"였던 만큼, `PAYMENT_COMING_SOON`으로 막힌 현재 상태에서 무리하게 재제출하면 같은 사유로 다시 걸릴 위험이 높다고 판단. Phase 2.5 개발 완성도를 더 끌어올린 뒤 재제출하는 쪽으로 전략 확정
+- **TestFlight ≠ 심사 제출**: Internal Testing은 App Review를 거치지 않으므로, TestFlight 테스트 빌드는 재제출 자격과 무관하게 자유롭게 만들어도 됨. "Submit for Review" 버튼을 누르는 순간만 실제 심사 제출(suspension 관련)이 발동
+- **재제출 전 필수 체크리스트** (Apple 06-23 Next Steps 기준):
+  - [ ] placeholder/미완성 UI 전부 제거 (결제 "준비 중" 화면 재검토 — 가능하면 Toss 실키 적용 후 실제 동작 상태로)
+  - [ ] 04-14 지적 4건 iPhone 실기기 재검증 (Apple Sign In, 카메라, iPad only 제외, 마이페이지 버튼)
+  - [ ] 전 화면 안정성/일관성 재점검 후 새 build number로 제출
 - **참고**: [ios-review-rejection-apr14.md](active/ios-review-rejection-apr14.md)
 - **note**: 심사 정체는 **출시(release)만 막고 개발은 막지 않음** → 개발 병렬 진행
 
@@ -189,7 +198,7 @@
 
 ---
 
-### Phase 2.5 — 주문 라이프사이클 완결 (신설, 2026-08-04 계획)
+### Phase 2.5 — 주문 라이프사이클 완결 ✅ 종료 (신설 2026-08-04 ~ 종료 2026-08-25)
 
 > **왜 필요한가**: P2-4 작업 중 "판매자 취소가 결제취소로 안 이어짐" 등 버그 3건을 발견하면서,
 > 취소 이후의 흐름(반품/교환/AS/구매확정)이 통째로 미정의 상태였음이 드러났다. 업계표준
@@ -209,10 +218,12 @@
 - **미포함(별도 이연)**: 교환(exchange, 정책 미정 다수), 구매확정 상품단위 개별화(다음 착수 예정), 반품 정책 법률 검토(전자상거래법 대조 — [상세](todo/order-cancel-refund-exchange-flow.md#5-알려진-미해결-이슈))
 - **담당**: kend(스키마+Toss연동+탭), kend-seller(승인/검수 화면+UX개선+송장검증) — 양쪽 완료
 
-#### 🟡 P2.5-4. 문의하기 (Q&A) 코어 시스템 (신규) — kend 부분 완료 (2026-08-21)
+#### ✅ P2.5-4. 문의하기 (Q&A) 코어 시스템 (신규) — 완료 (2026-08-25)
 - **완료(kend)**: `inquiries` 테이블 신규, 카테고리별(배송/상품/결제/기타) 문의 작성/목록/상세. 반품/교환처럼 상태전이 액션이 아니라 단일질문+단일답변 순수 Q&A(스레드 아님) — **CS관리 운영기능(Phase 3)의 기반**. 연결 대상은 `order_group_id`가 아니라 **`order_item_id`**(판매자를 항상 유일하게 특정하기 위함, `order_items.order_id → orders.seller_id`)
-- **남음(kend-seller)**: 처리 화면(답변 작성, seller/admin 권한 둘 다) — 이게 완료돼야 문의가 실제로 `status='answered'`로 바뀜. 필터링 시 위 체인으로 담당 판매자 특정 가능, `order_item_id`가 null인 일반 문의는 admin 전용으로 처리 권장
-- **담당**: kend(접수 UI) ✅ + kend-seller(처리 화면) 대기
+- **완료(kend-seller, seller 권한)**: 담당 상품에 달린 문의 목록/답변 화면(`/orders/inquiries`) — `order_item_id → orders.seller_id` 체인으로 본인 상품 문의만 필터링(inner join이라 일반 문의는 자연히 제외)
+- **완료(kend-seller, admin 권한)**: `order_item_id`가 null인 일반 문의 전용 화면(`/system/inquiries`, admin-layout 가드) — 애초 스펙("seller/admin 권한 둘 다")대로 양쪽 다 구현 완료
+- 실사용 E2E 확인 완료: 구매자 작성 → 판매자/admin 답변 등록 → kend 상세화면에 답변 노출까지
+- **담당**: kend(접수 UI) ✅ + kend-seller(seller 처리화면 ✅ + admin 처리화면 ✅)
 
 #### ✅ P2.5-5. 플랫폼 조건부 무료배송 (신규) — 완료 (2026-08-07)
 - **완료**: kend-seller `platform_settings` 테이블 + admin 설정화면, kend `createOrder`에서 임계값 비교 후 `order_items.shipping_fee_bearer`(SELLER/PLATFORM) 반영 — Phase 3.5 정산 계산 입력값으로 사용 예정
