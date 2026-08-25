@@ -8,6 +8,18 @@ KEND-SELLER 판매자 관리자 웹의 주요 변경사항을 날짜별로 기�
 
 ---
 
+## 2026-08-25
+
+### [KEND-SELLER] 문의하기 처리 화면 (Phase 2.5-4)
+
+- kend가 만든 `inquiries` 테이블(카테고리별 단일질문+단일답변 Q&A) + 구매자 접수 UI 위에, 답변 처리 화면 2종 구현
+- **판매자용** (`/orders/inquiries`, `/orders/inquiries/:id`): `order_item_id → order_items.order_id → orders.seller_id` 체인으로 본인 상품에 달린 문의만 필터링(inner join이라 `order_item_id`가 null인 일반 문의는 자연히 목록에서 제외됨). 카테고리·상태(답변대기/답변완료) 필터, 답변 등록 시 `status='answered'`+`answer`+`answered_at` 갱신
+- **admin용** (`/system/inquiries`, `admin-layout` 가드): `order_item_id`가 null인 일반 문의 전용 — 판매자 화면과 상호 배타적으로 나뉨. milestones에 명시된 "seller/admin 권한 둘 다" 요구사항 충족
+- **버그 발견 — 공용 `Card` 컴포넌트 테두리 미표시**: `border-1`/`border-1-muted`가 실재하지 않는 Tailwind 클래스라 Card가 테두리 없이 렌더링되고 있었음. 텍스트만 있는 카드(문의 상세 상단 정보 카드 등)에서 경계가 아예 안 보이는 것으로 발견 → `border`/`border-muted`로 수정, 앱 전체 Card 사용처에 영향
+- **UX 수정 사항 3건** (테스트 중 발견): 답변 등록 후 확인 안내 없이 페이지에 머무르던 것 → 성공 시 확인 알림 후 목록 이동(fetcher submitting→idle 전환 감지로 구현, 초기엔 `fetcher.data` 참조 변경만 감지해 안 뜨는 버그 있었음). 목록 테이블에 `Card` 래핑 — 기존 반품목록(`return-list-page`) 패턴을 그대로 따라갔다가, 실제로는 주문목록 등 다수 화면이 bare `<Table>`을 쓰는 게 우세 패턴임을 확인해 제거. 상세페이지 정보행 줄간격이 붙어있던 것 `py-2.5` 추가로 개선
+- 실사용 테스트 완료(사용자 확인) — 판매자 답변 등록 → kend 구매자 화면에서 답변 노출까지 확인
+- **kend-seller 쪽 Phase 2.5 담당 항목 전부 완료** — kend도 문의하기 접수 UI + 구매확정 개별화 완료로, Phase 2.5는 사실상 양쪽 다 종료
+
 ## 2026-08-24
 
 ### [KEND-SELLER] RTS·장기미수령 기간기반 플래깅 (Phase 2.5-6)
