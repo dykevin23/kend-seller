@@ -209,9 +209,10 @@
 - **미포함(별도 이연)**: 교환(exchange, 정책 미정 다수), 구매확정 상품단위 개별화(다음 착수 예정), 반품 정책 법률 검토(전자상거래법 대조 — [상세](todo/order-cancel-refund-exchange-flow.md#5-알려진-미해결-이슈))
 - **담당**: kend(스키마+Toss연동+탭), kend-seller(승인/검수 화면+UX개선+송장검증) — 양쪽 완료
 
-#### 🟡 P2.5-4. 문의하기 (Q&A) 코어 시스템 (신규)
-- **포함**: 카테고리별 문의(배송/상품/기타 등), `order_id` 선택적 연결. 구매확정 후 AS 문의도 여기로. 반품/교환처럼 상태전이 액션이 아니라 순수 메시지형 — **CS관리 운영기능(Phase 3)의 기반**
-- **담당**: kend(접수 UI) + kend-seller(처리 화면, seller/admin 권한 둘 다)
+#### 🟡 P2.5-4. 문의하기 (Q&A) 코어 시스템 (신규) — kend 부분 완료 (2026-08-21)
+- **완료(kend)**: `inquiries` 테이블 신규, 카테고리별(배송/상품/결제/기타) 문의 작성/목록/상세. 반품/교환처럼 상태전이 액션이 아니라 단일질문+단일답변 순수 Q&A(스레드 아님) — **CS관리 운영기능(Phase 3)의 기반**. 연결 대상은 `order_group_id`가 아니라 **`order_item_id`**(판매자를 항상 유일하게 특정하기 위함, `order_items.order_id → orders.seller_id`)
+- **남음(kend-seller)**: 처리 화면(답변 작성, seller/admin 권한 둘 다) — 이게 완료돼야 문의가 실제로 `status='answered'`로 바뀜. 필터링 시 위 체인으로 담당 판매자 특정 가능, `order_item_id`가 null인 일반 문의는 admin 전용으로 처리 권장
+- **담당**: kend(접수 UI) ✅ + kend-seller(처리 화면) 대기
 
 #### ✅ P2.5-5. 플랫폼 조건부 무료배송 (신규) — 완료 (2026-08-07)
 - **완료**: kend-seller `platform_settings` 테이블 + admin 설정화면, kend `createOrder`에서 임계값 비교 후 `order_items.shipping_fee_bearer`(SELLER/PLATFORM) 반영 — Phase 3.5 정산 계산 입력값으로 사용 예정
