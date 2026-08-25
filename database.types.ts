@@ -589,6 +589,63 @@ export type Database = {
         }
         Relationships: []
       }
+      inquiries: {
+        Row: {
+          answer: string | null
+          answered_at: string | null
+          category: Database["public"]["Enums"]["inquiry_category"]
+          content: string
+          created_at: string
+          id: string
+          order_item_id: string | null
+          status: Database["public"]["Enums"]["inquiry_status"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer?: string | null
+          answered_at?: string | null
+          category: Database["public"]["Enums"]["inquiry_category"]
+          content: string
+          created_at?: string
+          id?: string
+          order_item_id?: string | null
+          status?: Database["public"]["Enums"]["inquiry_status"]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answer?: string | null
+          answered_at?: string | null
+          category?: Database["public"]["Enums"]["inquiry_category"]
+          content?: string
+          created_at?: string
+          id?: string
+          order_item_id?: string | null
+          status?: Database["public"]["Enums"]["inquiry_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inquiries_order_item_id_order_items_id_fk"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inquiries_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
       main_categories: {
         Row: {
           code: string
@@ -1739,6 +1796,8 @@ export type Database = {
         | "returning"
       description_type: "IMAGE" | "HTML"
       image_type: "MAIN" | "ADDITIONAL"
+      inquiry_category: "DELIVERY" | "PRODUCT" | "PAYMENT" | "ETC"
+      inquiry_status: "pending" | "answered"
       island_delivery_type: "AVAILABLE" | "UNAVAILABLE"
       order_group_status:
         | "payment_in_progress"
@@ -1947,6 +2006,8 @@ export const Constants = {
       ],
       description_type: ["IMAGE", "HTML"],
       image_type: ["MAIN", "ADDITIONAL"],
+      inquiry_category: ["DELIVERY", "PRODUCT", "PAYMENT", "ETC"],
+      inquiry_status: ["pending", "answered"],
       island_delivery_type: ["AVAILABLE", "UNAVAILABLE"],
       order_group_status: [
         "payment_in_progress",
