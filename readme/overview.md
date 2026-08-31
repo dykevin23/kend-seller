@@ -1,6 +1,6 @@
 # KEND-SELLER 현재 상황 (Overview)
 
-> 최종 업데이트: 2026-08-25 (문의하기 처리 화면 완료로 Phase 2.5 전체 종료 — kend/kend-seller 양쪽 다)
+> 최종 업데이트: 2026-08-31 (정산 시스템 계산 배치+조회 화면 구현 — Phase 3.5 착수, UI 테스트 대기)
 > KEND-SELLER의 현재 상태 단일 대시보드. 개발 진행마다 갱신한다.
 > 작성 표준 → [core/readme-structure-guide.md](./core/readme-structure-guide.md) §8 (방식 vs 내용)
 > 완료 상세 → [changelog-seller.md](./changelog-seller.md) / 큰 계획 → [kend-roadmap-to-launch.md](./kend-roadmap-to-launch.md)
@@ -17,9 +17,10 @@
 
 > ← _seller에서 작업 시 갱신_
 
-- **Phase 2.5 전체 완료** ✅: 구매확정·SLA 자동취소·반품(P2.5-3)·플랫폼 무료배송·RTS 플래깅(P2.5-6)에 이어 **문의하기(P2.5-4) 처리 화면까지 완료** — kend(접수 UI)·kend-seller(판매자/admin 답변 화면) 양쪽 다 끝나 Phase 2.5가 완전히 종료됨. 실사용 테스트(판매자 답변 → kend 구매자 화면 노출) 확인 완료
-- **부수 발견**: 앱 전체가 공유하는 `Card` 컴포넌트의 테두리 클래스가 깨져 있던 버그(`border-1`/`border-1-muted` → 존재하지 않는 클래스) 발견·수정 — 모든 화면의 카드 시각에 영향
-- **다음 착수(최우선)**: Phase 2.5가 끝나 이제 Phase 3(관리보완) 순번 — 재고관리 화면(`/products/stocks-keeping`), 상품 수정 기능 등 [todo/seller-approval-ux-followups.md](./todo/seller-approval-ux-followups.md) 참고
+- **Phase 2.5 전체 완료** ✅ (2026-08-25): 구매확정·SLA·반품·플랫폼 무료배송·RTS 플래깅·문의하기까지 kend/kend-seller 양쪽 다 종료
+- **Phase 3.5 정산 시스템 착수** (2026-08-31, kend-seller 단독 소유): `settlement_items` 테이블, `calculate_monthly_settlements()` SQL 함수+pg_cron(매월 1일), 조회 화면(`/system/settlements`, admin 전용, 기간/상태 필터+주문별 명세+지급완료 처리) 구현. **SQL 배치 로직은 실데이터로 검증 완료**(8월 실주문 2건으로 집계값 정확함 확인), **화면 실사용 테스트는 아직 대기**
+- **다음 확인(최우선)**: 정산 조회 화면(목록/상세/지급완료 액션) 클릭 테스트
+- **스코프 밖으로 명시적으로 뺀 것**: Toss 지급대행 연동(EXT-7 대기), 엑셀 다운로드(의존성 필요, 백로그), 계좌 미등록 판매자 표시(`admin_sellers`에 계좌 컬럼 자체가 없음)
 
 ---
 
@@ -28,7 +29,6 @@
 > ← _[changelog-seller.md](./changelog-seller.md)에서 핵심 항목 요약_
 
 - 문의하기 처리 화면(P2.5-4) (2026-08-25): 판매자용(`/orders/inquiries`, seller_id 체인 필터)·admin용(`/system/inquiries`, order_item_id null 전용) 2종 완료. 실사용 테스트 완료(kend 구매자 화면까지 확인). 공용 Card 컴포넌트 테두리 버그도 함께 발견·수정
-- RTS·장기미수령 기간기반 플래깅(P2.5-6) (2026-08-24): SweetTracker API에 반송 전용 코드 없음을 문서로 확인, 상태 자동전환 대신 기간기반 알림(배송중 7일 초과 시 상세 배너+목록 배지) 채택. 사용자 확인으로 테스트 완료, sync-tracking 배포까지 완료
 
 ---
 
@@ -37,12 +37,15 @@
 > ← _seller 작업 시 채울 것_ (현재 active/ 폴더 미생성 — 착수 시 structure-guide 규칙대로 생성)
 
 - **플랫폼 무료배송 실사용 종단테스트**: admin이 실제 임계값 설정 → 실주문 생성 → `shipping_fee_bearer=PLATFORM` 기록 확인 (현재 `platform_settings` row 없어 사실상 off 상태)
+- **정산 조회 화면 UI 테스트**: `/system/settlements` 목록/상세/지급완료 처리 액션 클릭 테스트 — SQL 배치 로직은 검증됨, 화면만 남음. 실제 첫 배치는 2026-09-01 새벽 자동 실행(8월분 대상)
 
 ---
 
 ## 📋 다음 작업
 
 > ← _seller 작업 시 채울 것_
+- 정산 조회 화면(`/system/settlements`) 실사용 테스트 — 최우선
+- P3.5-3 잔여: 엑셀 다운로드(라이브러리 선정 필요), 계좌 미등록 판매자 표시(스키마 설계부터 필요)
 - (Phase 3 관리보완) 재고관리 화면(`/products/stocks-keeping`), 상품 수정 기능, 승인 flow UX 보완 3건 + 관리자 직접 판매자 등록 — [todo/seller-approval-ux-followups.md](./todo/seller-approval-ux-followups.md)
 
 ---
@@ -80,7 +83,7 @@
 - [x] 배송 처리 (송장 입력, 스마트택배 추적 연동) — ✅ 완료 (2026-07-24)
 - [x] 재고 차감 연동 — ✅ 완료 (2026-08-04, kend 차감/복원 트랜잭션 + seller 품절/재고부족 배지)
 - [x] 배송비 설정 (무료/유료/조건부) — ✅ 완료 (상품등록 화면 기존 구현, kend-milestones P2-6 교차확인)
-- [ ] 정산 (구매확정 → 정산 계산 → 내역 조회) — Phase 3.5로 이동, 선행 작업(Phase 2.5) 진행 중
+- [ ] 정산 (구매확정 → 정산 계산 → 내역 조회) — Phase 3.5 진행 중, 계산 배치 구현·검증 완료, 조회 화면 UI 테스트 대기
 
 ---
 

@@ -8,6 +8,18 @@ KEND-SELLER 판매자 관리자 웹의 주요 변경사항을 날짜별로 기�
 
 ---
 
+## 2026-08-31
+
+### [KEND-SELLER] 정산 시스템 — 계산 배치 + 조회 화면 (Phase 3.5, 구현됨·UI 테스트 대기)
+
+- kend가 전달한 설계 스펙(2026-08-31) 그대로 구현. Toss 지급대행(EXT-7)이 아직 신청도 못 한 단계라 이번 라운드는 계산+조회까지만, 지급은 수동 송금 유지
+- **`settlement_items` 테이블 신설**: `(seller_id, period_start)` unique로 재실행 안전. 주문별 명세는 별도 테이블 없이 `delivery_items`를 같은 기간·판매자 조건으로 재조회해서 구성(정규화)
+- **`platform_settings.commission_rate` 컬럼 추가**: 임시 10%, `free_shipping_threshold`와 동일한 admin 설정 패턴. 계산 시점 값을 `settlement_items.commission_rate`에 스냅샷으로 남겨 이후 요율 변경이 과거 정산에 영향 안 주도록 함
+- **`calculate_monthly_settlements()` SQL 함수 + pg_cron**(매월 1일 새벽 1시): `delivery_items.status='normal' AND purchase_confirmed_at`가 지난달 범위인 건을 `order_items → orders`로 크로스 스키마 조회해 판매자별 집계. `shipping_fee_bearer='PLATFORM'` 건은 `base_shipping_fee`만큼 배송비 보전 가산. **실제 DB에 배포 완료 + 검증 완료** — 8월 실데이터(2건, 19,000원×2)로 집계 로직 드라이런해 정확함 확인, 함수 자체도 직접 호출해 정상 동작(7월분 없어 0건 처리) 확인함
+- **조회 화면** (`/system/settlements`, admin 전용): 기간·상태 필터 목록, 상세에 주문별 명세 + pending→paid 지급완료 처리 액션. 전환 로직을 `markSettlementPaid` 함수로 분리해둬서 나중에 Toss 지급대행 붙으면 이 함수만 API 콜백에서 호출하도록 교체 가능하게 설계(호출부는 안 바뀜)
+- **이번 라운드 스코프 밖**: Toss 지급대행 API 연동, 세금/원천징수, 최소 정산액 임계치, 엑셀 다운로드(새 의존성 필요해 백로그 이관), "계좌 미등록 판매자" 표시(`admin_sellers`에 계좌 관련 컬럼 자체가 없어 이번엔 미구현 — 계산 대상 제외는 안 함)
+- typecheck 통과 확인. **화면(목록/상세/지급완료 액션) 실사용 클릭 테스트는 아직 안 함** — 다음 세션 우선 확인 필요
+
 ## 2026-08-25
 
 ### [KEND-SELLER] 문의하기 처리 화면 (Phase 2.5-4)
