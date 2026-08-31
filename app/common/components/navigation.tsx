@@ -133,6 +133,11 @@ const menus: Menu[] = [
         description: "판매자/상품과 무관한 일반 문의 처리",
         to: "/system/inquiries",
       },
+      {
+        name: "Settlements",
+        description: "판매자 정산 내역 조회/지급 처리",
+        to: "/system/settlements",
+      },
     ],
   },
 ];

@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -1004,16 +1004,19 @@ export type Database = {
       }
       platform_settings: {
         Row: {
+          commission_rate: number
           free_shipping_threshold: number
           id: string
           updated_at: string
         }
         Insert: {
+          commission_rate?: number
           free_shipping_threshold?: number
           id?: string
           updated_at?: string
         }
         Update: {
+          commission_rate?: number
           free_shipping_threshold?: number
           id?: string
           updated_at?: string
@@ -1585,6 +1588,66 @@ export type Database = {
           },
         ]
       }
+      settlement_items: {
+        Row: {
+          commission_amount: number
+          commission_rate: number
+          created_at: string
+          id: string
+          paid_at: string | null
+          period_end: string
+          period_start: string
+          seller_id: string
+          settlement_amount: number
+          shipping_reimbursement: number
+          status: Database["public"]["Enums"]["settlement_status"]
+          total_sales_amount: number
+        }
+        Insert: {
+          commission_amount: number
+          commission_rate: number
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          period_end: string
+          period_start: string
+          seller_id: string
+          settlement_amount: number
+          shipping_reimbursement?: number
+          status?: Database["public"]["Enums"]["settlement_status"]
+          total_sales_amount: number
+        }
+        Update: {
+          commission_amount?: number
+          commission_rate?: number
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          period_end?: string
+          period_start?: string
+          seller_id?: string
+          settlement_amount?: number
+          shipping_reimbursement?: number
+          status?: Database["public"]["Enums"]["settlement_status"]
+          total_sales_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "settlement_items_seller_id_admin_sellers_id_fk"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "admin_sellers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "settlement_items_seller_id_admin_sellers_id_fk"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "seller_information_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sub_categories: {
         Row: {
           code: string
@@ -1835,6 +1898,7 @@ export type Database = {
         | "STOP"
         | "END"
       seller_status: "PENDING" | "APPROVED" | "REJECTED"
+      settlement_status: "pending" | "paid"
       shipping_fee_bearer: "SELLER" | "PLATFORM"
       shipping_fee_type: "FREE" | "PAID" | "COD" | "CONDITIONAL"
       target_age_type: "BABY" | "KIDS"
@@ -2050,6 +2114,7 @@ export const Constants = {
         "END",
       ],
       seller_status: ["PENDING", "APPROVED", "REJECTED"],
+      settlement_status: ["pending", "paid"],
       shipping_fee_bearer: ["SELLER", "PLATFORM"],
       shipping_fee_type: ["FREE", "PAID", "COD", "CONDITIONAL"],
       target_age_type: ["BABY", "KIDS"],

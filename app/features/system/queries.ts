@@ -7,14 +7,19 @@ export const getPlatformSettings = async (
 ) => {
   const { data, error } = await client
     .from("platform_settings")
-    .select("id, free_shipping_threshold, updated_at")
+    .select("id, free_shipping_threshold, commission_rate, updated_at")
     .limit(1)
     .maybeSingle();
 
   if (error) throw error;
 
   return (
-    data ?? { id: null, free_shipping_threshold: 0, updated_at: null }
+    data ?? {
+      id: null,
+      free_shipping_threshold: 0,
+      commission_rate: 10,
+      updated_at: null,
+    }
   );
 };
 

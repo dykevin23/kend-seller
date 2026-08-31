@@ -4,7 +4,10 @@ import type { Database } from "~/supa-client";
 // 플랫폼 전역 설정(싱글턴) 갱신 — row가 없으면 생성, 있으면 갱신
 export const updatePlatformSettings = async (
   client: SupabaseClient<Database>,
-  { freeShippingThreshold }: { freeShippingThreshold: number }
+  {
+    freeShippingThreshold,
+    commissionRate,
+  }: { freeShippingThreshold: number; commissionRate: number }
 ) => {
   const { data: existing, error: fetchError } = await client
     .from("platform_settings")
@@ -17,6 +20,7 @@ export const updatePlatformSettings = async (
   if (!existing) {
     const { error } = await client.from("platform_settings").insert({
       free_shipping_threshold: freeShippingThreshold,
+      commission_rate: commissionRate,
     });
     if (error) throw error;
     return;
@@ -26,6 +30,7 @@ export const updatePlatformSettings = async (
     .from("platform_settings")
     .update({
       free_shipping_threshold: freeShippingThreshold,
+      commission_rate: commissionRate,
       updated_at: new Date().toISOString(),
     })
     .eq("id", existing.id);

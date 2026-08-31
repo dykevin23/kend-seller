@@ -21,6 +21,11 @@ const formSchema = z.object({
     .number()
     .int("정수만 입력 가능합니다")
     .min(0, "0 이상의 값을 입력해주세요"),
+  commissionRate: z.coerce
+    .number()
+    .int("정수만 입력 가능합니다")
+    .min(0, "0 이상의 값을 입력해주세요")
+    .max(100, "100 이하의 값을 입력해주세요"),
 });
 
 export const action = async ({ request }: Route.ActionArgs) => {
@@ -36,6 +41,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
   const { client } = makeSSRClient(request);
   await updatePlatformSettings(client, {
     freeShippingThreshold: data.freeShippingThreshold,
+    commissionRate: data.commissionRate,
   });
 
   return { success: true };
@@ -73,6 +79,31 @@ export default function PlatformSettingsPage({
           {actionData?.formErrors?.freeShippingThreshold && (
             <p className="px-4 text-sm text-red-500">
               {actionData.formErrors.freeShippingThreshold[0]}
+            </p>
+          )}
+        </Card>
+        <Card>
+          <TextField
+            id="commissionRate"
+            name="commissionRate"
+            type="number"
+            min={0}
+            max={100}
+            step={1}
+            label="정산 수수료율"
+            direction="row"
+            className="w-1/2"
+            defaultValue={settings.commission_rate}
+            outsideAdornment={<span className="text-sm text-muted-foreground">%</span>}
+          />
+          <p className="px-4 text-xs text-muted-foreground">
+            정산 계산 배치가 판매자 매출에서 이 비율만큼 수수료로 차감합니다.
+            매월 계산 시점의 값이 각 정산 내역에 스냅샷으로 기록되므로, 변경해도
+            과거 정산 내역에는 영향을 주지 않습니다.
+          </p>
+          {actionData?.formErrors?.commissionRate && (
+            <p className="px-4 text-sm text-red-500">
+              {actionData.formErrors.commissionRate[0]}
             </p>
           )}
         </Card>

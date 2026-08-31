@@ -110,6 +110,14 @@ export default [
           "features/inquiries/pages/admin-inquiry-detail-page.tsx"
         ),
       ]),
+      // 정산 관리
+      ...prefix("settlements", [
+        index("features/settlements/pages/settlement-list-page.tsx"),
+        route(
+          "/:settlementId",
+          "features/settlements/pages/settlement-detail-page.tsx"
+        ),
+      ]),
     ]),
   ]),
 
