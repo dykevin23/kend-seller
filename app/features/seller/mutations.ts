@@ -100,6 +100,9 @@ export const createSellerInformation = async (
     addressDetail,
     business,
     domain,
+    bankName,
+    accountNumber,
+    accountHolderName,
     userId,
   }: {
     bizrNo: string;
@@ -110,6 +113,9 @@ export const createSellerInformation = async (
     addressDetail: string;
     business: string;
     domain: string;
+    bankName: string;
+    accountNumber: string;
+    accountHolderName: string;
     userId: string;
   }
 ) => {
@@ -124,6 +130,9 @@ export const createSellerInformation = async (
       address_detail: addressDetail,
       business: business,
       domain_id: domain,
+      bank_name: bankName,
+      account_number: accountNumber,
+      account_holder_name: accountHolderName,
     })
     .select("id, seller_code")
     .single();
@@ -152,6 +161,9 @@ export const updateSellerInformation = async (
     addressDetail,
     business,
     domain,
+    bankName,
+    accountNumber,
+    accountHolderName,
   }: {
     bizrNo: string;
     companyName: string;
@@ -161,6 +173,9 @@ export const updateSellerInformation = async (
     addressDetail: string;
     business: string;
     domain: string;
+    bankName: string;
+    accountNumber: string;
+    accountHolderName: string;
   }
 ) => {
   const { error } = await client
@@ -174,6 +189,9 @@ export const updateSellerInformation = async (
       address_detail: addressDetail,
       business: business,
       domain_id: domain,
+      bank_name: bankName,
+      account_number: accountNumber,
+      account_holder_name: accountHolderName,
       status: "PENDING",
       rejection_reason: null,
     })

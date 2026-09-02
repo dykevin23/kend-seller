@@ -113,8 +113,11 @@ export type Database = {
       }
       admin_sellers: {
         Row: {
+          account_holder_name: string | null
+          account_number: string | null
           address: string
           address_detail: string
+          bank_name: string | null
           bizr_no: string
           business: string
           created_at: string
@@ -129,8 +132,11 @@ export type Database = {
           zone_code: string
         }
         Insert: {
+          account_holder_name?: string | null
+          account_number?: string | null
           address: string
           address_detail: string
+          bank_name?: string | null
           bizr_no: string
           business: string
           created_at?: string
@@ -145,8 +151,11 @@ export type Database = {
           zone_code: string
         }
         Update: {
+          account_holder_name?: string | null
+          account_number?: string | null
           address?: string
           address_detail?: string
+          bank_name?: string | null
           bizr_no?: string
           business?: string
           created_at?: string
@@ -1772,8 +1781,11 @@ export type Database = {
     Views: {
       seller_information_view: {
         Row: {
+          account_holder_name: string | null
+          account_number: string | null
           address: string | null
           address_detail: string | null
+          bank_name: string | null
           bizr_no: string | null
           business: string | null
           created_at: string | null
@@ -1801,6 +1813,7 @@ export type Database = {
     }
     Functions: {
       auto_confirm_purchase: { Args: never; Returns: number }
+      calculate_monthly_settlements: { Args: never; Returns: undefined }
       decrement_stock: {
         Args: { p_quantity: number; p_sku_id: string }
         Returns: undefined

@@ -24,7 +24,7 @@ import {
 } from "../mutations";
 import { getSellerInfo, getSellerHashtags } from "../queries";
 import { getSellerLogoUrl } from "../storage";
-import { BUSINESS_TYPES } from "../constrants";
+import { BUSINESS_TYPES, BANK_LIST } from "../constrants";
 import SellerLogoUpload from "../components/seller-logo-upload";
 import SellerHashtagInput from "../components/seller-hashtag-input";
 
@@ -37,6 +37,11 @@ const formSchema = z.object({
   addressDetail: z.string(),
   business: z.string(),
   domain: z.string(),
+  bankName: z.string().nonempty("정산 계좌 은행을 선택해주세요"),
+  accountNumber: z
+    .string()
+    .regex(/^\d{8,20}$/, "계좌번호는 '-' 없이 숫자 8~20자리로 입력해주세요"),
+  accountHolderName: z.string().nonempty("예금주명을 입력해주세요"),
 });
 
 export const action = async ({ request }: Route.ActionArgs) => {
@@ -177,6 +182,16 @@ export default function SubmitSellerInformationPage({
           <InfoRow label="대표 서비스" value={seller.domain_name ?? "-"} />
         </Card>
 
+        {/* 정산 계좌 (읽기 전용) */}
+        <Card>
+          <h2 className="text-xl font-bold">정산 계좌</h2>
+          <InfoRow label="은행" value={seller.bank_name ?? "-"} />
+          <Separator />
+          <InfoRow label="계좌번호" value={seller.account_number ?? "-"} />
+          <Separator />
+          <InfoRow label="예금주명" value={seller.account_holder_name ?? "-"} />
+        </Card>
+
         {/* 해시태그 */}
         <Card>
           <h2 className="text-xl font-bold">해시태그</h2>
@@ -227,6 +242,10 @@ function SellerPendingNotice({
         />
         <Separator />
         <InfoRow label="비즈니스 형태" value={seller.business} />
+        <Separator />
+        <InfoRow label="정산 계좌" value={seller.bank_name ?? "-"} />
+        <InfoRow label="계좌번호" value={seller.account_number ?? "-"} />
+        <InfoRow label="예금주명" value={seller.account_holder_name ?? "-"} />
       </Card>
     </Content>
   );
@@ -354,6 +373,42 @@ function SellerRegistrationForm({
             direction="row"
             className="w-1/4"
             defaultValue={seller?.domain_id ?? undefined}
+          />
+        </Card>
+        <Card>
+          <h2 className="text-xl font-bold">정산 계좌</h2>
+          <p className="px-4 text-xs text-muted-foreground">
+            매출 정산금을 지급받을 계좌입니다. 아직 계좌 실명 확인(1원 인증)은
+            지원하지 않아 입력하신 정보 그대로 저장되니, 정확히 입력해주세요.
+          </p>
+          <Select
+            id="bankName"
+            name="bankName"
+            label="은행"
+            options={BANK_LIST.map((bank) => ({
+              label: bank.label,
+              value: bank.value,
+            }))}
+            direction="row"
+            className="w-1/4"
+            defaultValue={seller?.bank_name ?? undefined}
+          />
+          <TextField
+            id="accountNumber"
+            name="accountNumber"
+            label="계좌번호"
+            direction="row"
+            className="w-1/3"
+            placeholder="'-' 없이 숫자만 입력"
+            defaultValue={seller?.account_number ?? undefined}
+          />
+          <TextField
+            id="accountHolderName"
+            name="accountHolderName"
+            label="예금주명"
+            direction="row"
+            className="w-1/4"
+            defaultValue={seller?.account_holder_name ?? undefined}
           />
         </Card>
         <div className="flex justify-end">

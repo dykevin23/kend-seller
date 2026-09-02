@@ -30,6 +30,10 @@ export const SellerStatus = pgEnum(
  * domain_id: 대표 도메인
  * status: 승인 상태(PENDING/APPROVED/REJECTED)
  * rejection_reason: 반려 사유(REJECTED일 때만 사용)
+ * bank_name/account_number/account_holder_name: 정산 계좌 정보(P3.5-1) — 신규 등록부터
+ *   필수지만 기존 판매자는 값이 없을 수 있어 컬럼은 nullable. 1원 인증(계좌 실명확인)은
+ *   아직 미구현 — Toss 지급대행(EXT-7) 붙을 때 그쪽 KYC로 한 번에 처리 예정이라 지금은
+ *   검증 없이 입력값만 저장한다(2026-09-02 결정)
  */
 export const sellers = pgTable("admin_sellers", {
   id: uuid().primaryKey().defaultRandom(),
@@ -42,6 +46,9 @@ export const sellers = pgTable("admin_sellers", {
   address_detail: text().notNull(),
   business: text().notNull(),
   domain_id: uuid().references(() => domains.id),
+  bank_name: text(),
+  account_number: text(),
+  account_holder_name: text(),
   status: SellerStatus().notNull().default("PENDING"),
   rejection_reason: text(),
   created_at: timestamp().notNull().defaultNow(),
