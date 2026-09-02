@@ -60,6 +60,9 @@ export interface SettlementDetail {
   seller_id: string;
   seller_code: string;
   seller_name: string;
+  bank_name: string | null;
+  account_number: string | null;
+  account_holder_name: string | null;
   period_start: string;
   period_end: string;
   total_sales_amount: number;
@@ -83,7 +86,7 @@ export const getSettlementDetail = async (
       id, seller_id, period_start, period_end, total_sales_amount,
       shipping_reimbursement, commission_rate, commission_amount,
       settlement_amount, status, paid_at, created_at,
-      admin_sellers ( seller_code, name )
+      admin_sellers ( seller_code, name, bank_name, account_number, account_holder_name )
     `
     )
     .eq("id", settlementId)
@@ -99,6 +102,9 @@ export const getSettlementDetail = async (
     seller_id: data.seller_id,
     seller_code: seller?.seller_code ?? "-",
     seller_name: seller?.name ?? "-",
+    bank_name: seller?.bank_name ?? null,
+    account_number: seller?.account_number ?? null,
+    account_holder_name: seller?.account_holder_name ?? null,
     period_start: data.period_start,
     period_end: data.period_end,
     total_sales_amount: data.total_sales_amount,

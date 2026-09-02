@@ -20,7 +20,6 @@ import { getLoggedInUserId } from "~/features/users/queries";
 import {
   createSellerInformation,
   updateSellerInformation,
-  updateSellerBankAccount,
   setSellerHashtags,
 } from "../mutations";
 import { getSellerInfo, getSellerHashtags } from "../queries";
@@ -45,33 +44,10 @@ const formSchema = z.object({
   accountHolderName: z.string().nonempty("예금주명을 입력해주세요"),
 });
 
-const bankAccountFormSchema = formSchema.pick({
-  bankName: true,
-  accountNumber: true,
-  accountHolderName: true,
-});
-
 export const action = async ({ request }: Route.ActionArgs) => {
   const formData = await request.formData();
   const intent = formData.get("intent");
   const { client } = makeSSRClient(request);
-
-  // 승인 완료 후 정산 계좌 수정 (재승인 불필요 — 사업 정보와 달리 계좌만 바뀌는 것)
-  if (intent === "updateBankAccount") {
-    const { success, data, error } = bankAccountFormSchema.safeParse(
-      Object.fromEntries(formData)
-    );
-
-    if (!success) {
-      return { formErrors: error.flatten().fieldErrors };
-    }
-
-    const seller = await getSellerInfo(client);
-    if (!seller) return { ok: false };
-
-    await updateSellerBankAccount(client, seller.id, data);
-    return { ok: true };
-  }
 
   // Step 2: 해시태그 저장
   if (intent === "saveHashtags") {
@@ -206,6 +182,16 @@ export default function SubmitSellerInformationPage({
           <InfoRow label="대표 서비스" value={seller.domain_name ?? "-"} />
         </Card>
 
+        {/* 정산 계좌 (읽기 전용 — 최초 등록/재제출 시에만 입력 가능) */}
+        <Card>
+          <h2 className="text-xl font-bold">정산 계좌</h2>
+          <InfoRow label="은행" value={seller.bank_name ?? "-"} />
+          <Separator />
+          <InfoRow label="계좌번호" value={seller.account_number ?? "-"} />
+          <Separator />
+          <InfoRow label="예금주명" value={seller.account_holder_name ?? "-"} />
+        </Card>
+
         {/* 해시태그 */}
         <Card>
           <h2 className="text-xl font-bold">해시태그</h2>
@@ -220,61 +206,6 @@ export default function SubmitSellerInformationPage({
           <Button type="submit" disabled={!hasChanges}>
             저장
           </Button>
-        </div>
-      </Form>
-
-      {/* 정산 계좌 — 사업 정보와 달리 재승인 없이 바로 수정 가능 */}
-      <Form method="post" className="space-y-5">
-        <input type="hidden" name="intent" value="updateBankAccount" />
-        <Card>
-          <h2 className="text-xl font-bold">정산 계좌</h2>
-          <Select
-            id="bankName"
-            name="bankName"
-            label="은행"
-            options={BANK_LIST.map((bank) => ({
-              label: bank.label,
-              value: bank.value,
-            }))}
-            direction="row"
-            className="w-1/4"
-            defaultValue={seller.bank_name ?? undefined}
-          />
-          {actionData?.formErrors?.bankName && (
-            <p className="px-4 text-sm text-red-500">
-              {actionData.formErrors.bankName[0]}
-            </p>
-          )}
-          <TextField
-            id="accountNumber"
-            name="accountNumber"
-            label="계좌번호"
-            direction="row"
-            className="w-1/3"
-            placeholder="'-' 없이 숫자만 입력"
-            defaultValue={seller.account_number ?? undefined}
-          />
-          {actionData?.formErrors?.accountNumber && (
-            <p className="px-4 text-sm text-red-500">
-              {actionData.formErrors.accountNumber[0]}
-            </p>
-          )}
-          <TextField
-            id="accountHolderName"
-            name="accountHolderName"
-            label="예금주명"
-            direction="row"
-            className="w-1/4"
-            defaultValue={seller.account_holder_name ?? undefined}
-          />
-          {actionData?.formErrors?.accountHolderName && (
-            <p className="px-4 text-sm text-red-500">
-              {actionData.formErrors.accountHolderName[0]}
-            </p>
-          )}
-        </Card>
-        <div className="flex justify-end">
-          <Button type="submit">저장</Button>
         </div>
       </Form>
     </Content>

@@ -67,6 +67,7 @@ export default function SettlementDetailPage({
   }
 
   const isPaid = settlement.status === "paid";
+  const hasAccount = !!(settlement.bank_name && settlement.account_number);
 
   const handleMarkPaid = () => {
     confirm({
@@ -145,6 +146,26 @@ export default function SettlementDetailPage({
       </Card>
 
       <Card>
+        <h2 className="text-xl font-bold">지급 계좌</h2>
+        {settlement.bank_name && settlement.account_number ? (
+          <div className="mt-3">
+            <InfoRow label="은행" value={settlement.bank_name} />
+            <Separator />
+            <InfoRow label="계좌번호" value={settlement.account_number} />
+            <Separator />
+            <InfoRow
+              label="예금주명"
+              value={settlement.account_holder_name ?? "-"}
+            />
+          </div>
+        ) : (
+          <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-400">
+            등록된 계좌가 없습니다. 판매자에게 정산 계좌 등록을 요청해주세요.
+          </p>
+        )}
+      </Card>
+
+      <Card>
         <h2 className="text-xl font-bold">주문별 명세</h2>
         <Table>
           <TableHeader>
@@ -208,7 +229,9 @@ export default function SettlementDetailPage({
           목록으로
         </Button>
         {!isPaid && (
-          <Button onClick={handleMarkPaid}>지급 완료 처리</Button>
+          <Button onClick={handleMarkPaid} disabled={!hasAccount}>
+            지급 완료 처리
+          </Button>
         )}
       </div>
     </Content>
