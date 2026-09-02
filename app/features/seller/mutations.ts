@@ -200,6 +200,33 @@ export const updateSellerInformation = async (
   if (error) throw error;
 };
 
+// 승인 완료된 판매자의 정산 계좌만 수정 — 사업 정보(재승인 필요)와 달리
+// 계좌 변경은 승인 상태에 영향 없음
+export const updateSellerBankAccount = async (
+  client: SupabaseClient<Database>,
+  sellerId: string,
+  {
+    bankName,
+    accountNumber,
+    accountHolderName,
+  }: {
+    bankName: string;
+    accountNumber: string;
+    accountHolderName: string;
+  }
+) => {
+  const { error } = await client
+    .from("admin_sellers")
+    .update({
+      bank_name: bankName,
+      account_number: accountNumber,
+      account_holder_name: accountHolderName,
+    })
+    .eq("id", sellerId);
+
+  if (error) throw error;
+};
+
 export const approveSeller = async (
   client: SupabaseClient<Database>,
   sellerId: string
