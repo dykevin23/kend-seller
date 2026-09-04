@@ -51,13 +51,29 @@ export const action = async ({ request }: Route.ActionArgs) => {
   return { success: false, error: "알 수 없는 요청입니다." };
 };
 
+const toDateInputValue = (date: Date) => date.toISOString().slice(0, 10);
+
+// 기본 기간: 오늘 ~ 한 달 전. 쿼리스트링에 값이 있으면 그걸 우선한다
+const getDefaultPeriod = () => {
+  const today = new Date();
+  const oneMonthAgo = new Date(today);
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+  return {
+    periodStart: toDateInputValue(oneMonthAgo),
+    periodEnd: toDateInputValue(today),
+  };
+};
+
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client } = makeSSRClient(request);
   const url = new URL(request.url);
+  const defaultPeriod = getDefaultPeriod();
   const rating = url.searchParams.get("rating") ?? "ALL";
   const answered = url.searchParams.get("answered") ?? "ALL";
-  const periodStart = url.searchParams.get("periodStart") ?? "";
-  const periodEnd = url.searchParams.get("periodEnd") ?? "";
+  const periodStart =
+    url.searchParams.get("periodStart") ?? defaultPeriod.periodStart;
+  const periodEnd =
+    url.searchParams.get("periodEnd") ?? defaultPeriod.periodEnd;
 
   const seller = await getSellerInfo(client);
   if (!seller) {
