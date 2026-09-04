@@ -1503,6 +1503,35 @@ export type Database = {
         }
         Relationships: []
       }
+      review_images: {
+        Row: {
+          created_at: string
+          id: string
+          review_id: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          review_id: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          review_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_images_review_id_reviews_id_fk"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           content: string
@@ -1511,6 +1540,8 @@ export type Database = {
           id: string
           product_id: string
           rating: number
+          seller_replied_at: string | null
+          seller_reply: string | null
           user_id: string
         }
         Insert: {
@@ -1520,6 +1551,8 @@ export type Database = {
           id?: string
           product_id: string
           rating: number
+          seller_replied_at?: string | null
+          seller_reply?: string | null
           user_id: string
         }
         Update: {
@@ -1529,6 +1562,8 @@ export type Database = {
           id?: string
           product_id?: string
           rating?: number
+          seller_replied_at?: string | null
+          seller_reply?: string | null
           user_id?: string
         }
         Relationships: [
