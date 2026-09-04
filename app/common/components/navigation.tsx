@@ -48,6 +48,11 @@ const menus: Menu[] = [
         description: "Promote a product to our community",
         to: "/products/submit",
       },
+      {
+        name: "Reviews",
+        description: "내 상품에 달린 리뷰 조회",
+        to: "/products/reviews",
+      },
     ],
   },
   {
