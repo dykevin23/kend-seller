@@ -8,6 +8,7 @@ import { Label } from "~/common/components/ui/label";
 import { type ColumnDef } from "@tanstack/react-table";
 import DataGrid from "~/common/components/data-grid";
 import type { SystemOption } from "~/types/system";
+import { formatNumber, parseNumber } from "~/common/utils/format";
 
 interface ProductOptionProps {
   optionKey: string;
@@ -29,6 +30,12 @@ interface ProductOptionCardProps {
   systemOptions: SystemOption[];
 }
 
+const BULK_FIELDS = [
+  { key: "regularPrice", label: "정상가" },
+  { key: "salePrice", label: "판매가" },
+  { key: "stocks", label: "재고" },
+] as const;
+
 export default function ProductOptionCard({
   data,
   setData,
@@ -37,6 +44,25 @@ export default function ProductOptionCard({
   const [productOptions, setProductOptions] = useState<ProductOptionProps[]>([
     { optionKey: "", optionName: "", values: [] },
   ]);
+
+  // SKU가 많으면 한 칸씩 입력하기 번거로워서, 값 하나를 전체 행에 한 번에 적용하는 용도
+  const [bulkValues, setBulkValues] = useState<Record<string, string>>({
+    regularPrice: "",
+    salePrice: "",
+    stocks: "",
+  });
+
+  const handleBulkValueChange =
+    (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      const cleaned = event.target.value.replace(/[^\d]/g, "");
+      setBulkValues((prev) => ({ ...prev, [field]: formatNumber(cleaned) }));
+    };
+
+  const handleApplyBulkValue = (field: string) => {
+    const value = Number(parseNumber(bulkValues[field] ?? ""));
+    if (!bulkValues[field] || Number.isNaN(value)) return;
+    setData((prev) => prev.map((row) => ({ ...row, [field]: value })));
+  };
 
   const handleChangeOptionKey = (i: number) => (v: string) => {
     setProductOptions((prev) => {
@@ -206,6 +232,30 @@ export default function ProductOptionCard({
           <Button type="button" onClick={handleAddOption}>옵션 추가하기</Button>
         </div>
       </div>
+
+      {data.length > 0 && (
+        <div className="flex flex-wrap items-end gap-3 rounded-md border bg-muted/30 p-3">
+          {BULK_FIELDS.map((field) => (
+            <div key={field.key} className="flex items-end gap-1.5">
+              <TextField
+                label={`${field.label} 일괄`}
+                value={bulkValues[field.key]}
+                onChange={handleBulkValueChange(field.key)}
+                placeholder="0"
+                className="w-28 text-right"
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => handleApplyBulkValue(field.key)}
+              >
+                전체 적용
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <DataGrid columns={columns} data={data} onChange={(v) => setData(v)} />
     </Card>
