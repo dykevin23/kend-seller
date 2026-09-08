@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useRevalidator } from "react-router";
 import Card from "~/common/components/card";
 import { Button } from "~/common/components/ui/button";
 import SubmitAddressModal from "~/features/seller/components/submit-address-modal";
+import SelectAddressModal from "~/features/seller/components/select-address-modal";
 import RadioGroup from "~/common/components/radio-group";
 import Select from "~/common/components/select";
 import TextField from "~/common/components/text-field";
@@ -43,6 +45,9 @@ export default function ProductDeliveryCard({
 }: ProductDeliveryCardProps) {
   const [submitAddressModalOpen, setSubmitAddressModalOpen] =
     useState<boolean>(false);
+  const [selectAddressModalOpen, setSelectAddressModalOpen] =
+    useState<boolean>(false);
+  const revalidator = useRevalidator();
 
   // SHIPPING 타입 주소만 필터링
   const shippingAddresses = addressList.filter(
@@ -67,8 +72,20 @@ export default function ProductDeliveryCard({
   // 첫 번째 주소를 기본으로 선택 (있는 경우)
   const currentAddress = selectedAddress || shippingAddresses[0] || null;
 
-  const handleOpenModal = () => {
+  const handleOpenRegisterModal = () => {
+    setSelectAddressModalOpen(false);
     setSubmitAddressModalOpen(true);
+  };
+
+  const handleOpenSelectModal = () => {
+    setSelectAddressModalOpen(true);
+  };
+
+  const handleCloseSubmitModal = () => {
+    setSubmitAddressModalOpen(false);
+    // 새 주소가 등록됐을 수 있으니 목록을 다시 불러온다(안 하면 방금 등록한
+    // 주소가 화면에 반영 안 돼 "등록된 출고지가 없습니다"로 계속 보이는 문제 있었음)
+    revalidator.revalidate();
   };
 
   const handleShippingFeeTypeChange = (value: string) => {
@@ -85,12 +102,9 @@ export default function ProductDeliveryCard({
             {shippingAddresses.length === 0 ? (
               <div className="flex items-center justify-between py-4 px-4 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="text-gray-600">등록된 출고지가 없습니다.</p>
-                <Button type="button" onClick={handleOpenModal}>등록</Button>
-              </div>
-            ) : shippingAddresses.length > 1 ? (
-              <div className="flex items-center justify-between py-4 px-4 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-gray-600">출고지를 선택해주세요.</p>
-                <Button type="button" onClick={handleOpenModal}>조회</Button>
+                <Button type="button" onClick={handleOpenRegisterModal}>
+                  등록
+                </Button>
               </div>
             ) : (
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -98,7 +112,16 @@ export default function ProductDeliveryCard({
                   <h3 className="font-semibold text-lg">
                     {currentAddress.address_name}
                   </h3>
-                  <Button type="button" variant="outline" size="sm" onClick={handleOpenModal}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={
+                      shippingAddresses.length > 1
+                        ? handleOpenSelectModal
+                        : handleOpenRegisterModal
+                    }
+                  >
                     변경
                   </Button>
                 </div>
@@ -227,10 +250,19 @@ export default function ProductDeliveryCard({
         </div>
       </Card>
 
+      <SelectAddressModal
+        open={selectAddressModalOpen}
+        addresses={shippingAddresses}
+        selectedId={currentAddress?.id}
+        onSelect={(address) => setSelectedAddress(address)}
+        onRegisterNew={handleOpenRegisterModal}
+        onClose={() => setSelectAddressModalOpen(false)}
+      />
+
       <SubmitAddressModal
         open={submitAddressModalOpen}
         addressType="SHIPPING"
-        onClose={() => setSubmitAddressModalOpen(false)}
+        onClose={handleCloseSubmitModal}
       />
     </>
   );

@@ -127,7 +127,13 @@ export default function SubmitAddressModal({
             >
               취소
             </Button>
-            <Button type="submit" size="sm" className="px-5" onClick={handleSubmit}>
+            <Button
+              type="submit"
+              size="sm"
+              className="px-5"
+              onClick={handleSubmit}
+              disabled={fetcher.state !== "idle"}
+            >
               등록
             </Button>
           </div>

@@ -55,7 +55,8 @@ export const getSellerAddresses = async (
   const { data, error } = await client
     .from("admin_seller_address")
     .select("*")
-    .eq("seller_id", sellerId);
+    .eq("seller_id", sellerId)
+    .order("created_at", { ascending: true });
   if (error) throw error;
   return data || [];
 };
