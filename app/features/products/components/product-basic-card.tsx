@@ -44,6 +44,10 @@ export default function ProductBasicCard({
     });
   };
 
+  const handleSubCategory = (value: string) => {
+    setSelectedCategory((prev) => ({ ...prev, sub: value }));
+  };
+
   return (
     <Card>
       <h2 className="text-xl font-bold">상품 기본정보</h2>
@@ -129,6 +133,7 @@ export default function ProductBasicCard({
                 : []
             }
             value={selectedCategory.sub}
+            onChange={handleSubCategory}
           />
         </div>
       </div>
