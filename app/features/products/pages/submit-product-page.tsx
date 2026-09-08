@@ -201,6 +201,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
       // SKU 재고정보 저장 (sku_code는 DB Trigger에서 자동 생성)
       const stockKeepings = data.productOptions.map((sku) => ({
         product_id: productId,
+        options: sku.options,
         stock: sku.stocks,
         regular_price: sku.regularPrice,
         sale_price: sku.salePrice,

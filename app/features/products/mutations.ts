@@ -59,6 +59,7 @@ export const createProductStockKeepings = async (
   client: SupabaseClient,
   stockKeepings: Array<{
     product_id: string;
+    options: Record<string, string>;
     stock: number;
     regular_price: number;
     sale_price: number;

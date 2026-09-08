@@ -162,12 +162,22 @@ export default function ProductOptionCard({
     });
   };
 
+  // 옵션 키가 하나도 없으면(레거시 데이터 결함 등) "옵션" 그룹 컬럼 자체를
+  // 뺀다 — 빈 columns 배열을 그대로 두면 tanstack-table이 leaf 컬럼으로
+  // 취급해 옵션 객체를 그대로 렌더링하려다 "Objects are not valid as a
+  // React child" 에러로 화면이 죽는다
+  const optionColumns = getColumnsFromData();
+
   const columns: ColumnDef<ProductOptionArrayProps>[] = [
-    {
-      accessorKey: "options",
-      header: () => <span>옵션</span>,
-      columns: getColumnsFromData(),
-    },
+    ...(optionColumns.length > 0
+      ? [
+          {
+            accessorKey: "options",
+            header: () => <span>옵션</span>,
+            columns: optionColumns,
+          },
+        ]
+      : []),
     {
       accessorKey: "regularPrice",
       header: () => <span>정상가</span>,
