@@ -1,6 +1,6 @@
 # KEND-SELLER 현재 상황 (Overview)
 
-> 최종 업데이트: 2026-09-07 (Phase 3.5 최종 완료 확인 + 리뷰 관리 화면 테스트 통과로 Phase 3 착수)
+> 최종 업데이트: 2026-09-14 (상품 수정 화면(B-1) 테스트 통과)
 > KEND-SELLER의 현재 상태 단일 대시보드. 개발 진행마다 갱신한다.
 > 작성 표준 → [core/readme-structure-guide.md](./core/readme-structure-guide.md) §8 (방식 vs 내용)
 > 완료 상세 → [changelog-seller.md](./changelog-seller.md) / 큰 계획 → [kend-roadmap-to-launch.md](./kend-roadmap-to-launch.md)
@@ -19,7 +19,8 @@
 
 - **Phase 2.5 전체 완료** ✅ (2026-08-25): 구매확정·SLA·반품·플랫폼 무료배송·RTS 플래깅·문의하기까지 kend/kend-seller 양쪽 다 종료
 - **Phase 3.5 정산 시스템 전체 완료** ✅ (2026-09-07 최종 확인): 계산 배치·조회 화면·계좌 등록(P3.5-1/2/3)에 이어 정산 상세의 지급 계좌 노출+미등록 경고 배너/버튼 비활성화까지 양쪽 케이스 실사용 테스트 통과
-- **Phase 3 착수 — 리뷰 관리 완료** ✅ (2026-09-07): 답변 등록/수정/삭제, 미답변·별점·기간 필터, 통계 카드까지 구현+테스트 통과. 나머지 Phase 3 항목(상품 일괄관리/재고조정/상품수정/Seller대시보드/CS관리)은 미착수
+- **Phase 3 진행 중 — 리뷰 관리 완료** ✅ (2026-09-07): 답변 등록/수정/삭제, 미답변·별점·기간 필터, 통계 카드까지 구현+테스트 통과
+- **Phase 3 — 상품 수정 화면(B-1) 완료** ✅ (2026-09-14): 기본정보/이미지/배송지/반품지 수정 + 옵션은 추가만 허용(기존값 수정·삭제 잠금). 등록 시 `products.status` 레벨 불일치 버그(REGISTERED로 생성돼 kend 목록 누락)도 함께 수정. 나머지 Phase 3 항목(재고관리/Seller대시보드/CS관리/공지사항/교환처리)은 미착수 — kend 인계문서(`readme/todo/phase3-kend-seller-handoff.md`) 기준 B-2~B-7
 - **스코프 밖으로 명시적으로 뺀 것**: Toss 지급대행 연동(EXT-7 대기, 계좌 1원 인증도 이때 통합), 엑셀 다운로드(의존성 필요, 백로그)
 
 ---
@@ -28,9 +29,10 @@
 
 > ← _[changelog-seller.md](./changelog-seller.md)에서 핵심 항목 요약_
 
+- 상품 수정 화면(Phase 3, B-1) (2026-09-14): 기본정보/이미지/배송지/반품지 수정 + 옵션 추가전용, 등록 시 status 레벨 불일치 버그 수정, 실사용 테스트 통과
+- SKU 등록 옵션 저장 버그 + 카테고리 선택 버그 수정 (2026-09-08): 두 버그 모두 재현·수정 확인 완료
 - 리뷰 관리 화면(Phase 3) (2026-09-07): 답변/필터/통계 카드까지 실사용 테스트 통과
 - Phase 3.5 정산 시스템 최종 완료 확인 (2026-09-07): 정산 상세 계좌 노출+미등록 경고 양쪽 케이스 테스트 통과
-- 정산 계좌 등록(P3.5-1) (2026-09-03): 신규 가입 플로우로 계좌 입력·저장 실사용 테스트 통과
 
 ---
 
@@ -46,7 +48,8 @@
 
 > ← _seller 작업 시 채울 것_
 - P3.5-3 잔여: 엑셀 다운로드(라이브러리 선정 필요)
-- (Phase 3 관리보완, 리뷰 관리는 완료) 상품 일괄관리, 재고관리 화면(`/products/stocks-keeping`), 상품 수정 기능, Seller 대시보드, CS관리 운영기능, 승인 flow UX 보완 3건 + 관리자 직접 판매자 등록 — [todo/seller-approval-ux-followups.md](./todo/seller-approval-ux-followups.md)
+- (Phase 3 관리보완, 리뷰 관리·상품수정은 완료) 재고관리 화면(`/products/stocks-keeping`, B-2), Seller 대시보드(B-3), CS관리 운영기능(B-4), 공지사항 스키마+admin CRUD(B-5, kend 블로킹 중), 교환 처리 화면(B-6, 정책 미정으로 착수 불가) — 상세는 `readme/todo/phase3-kend-seller-handoff.md`
+- 승인 flow UX 보완 3건 + 관리자 직접 판매자 등록 — [todo/seller-approval-ux-followups.md](./todo/seller-approval-ux-followups.md)
 
 ---
 
