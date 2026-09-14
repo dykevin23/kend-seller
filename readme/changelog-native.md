@@ -7,6 +7,52 @@ KEND-NATIVE React Native WebView 앱의 주요 변경사항을 날짜별로 기�
 
 ---
 
+## 2026-09-11
+
+### [KEND-NATIVE] iOS 카드앱(페이북/ISP) 결제 딥링크·팝업 핸드오프 수정
+
+- **증상**: BC카드/페이북 결제 테스트 중, 페이북 웹 결제창에서 "결제하기"를 눌러도 카드사 인증(ISP) 화면으로 못 넘어가고 "결제 후 결제완료를 눌러주세요" 대기 화면에서 멈춤. 페이북 앱이 설치돼 있어도 열리지 않음
+- **원인 1 — 앱스킴 미핸드오프**: `onShouldStartLoadWithRequest`가 `paybooc://` 같은 비-http(s) 요청을 로딩 오버레이 로직에서 제외만 시키고 `return true`로 끝나, iOS WKWebView가 커스텀 스킴을 OS로 위임하지 않아 네비게이션이 조용히 무시됨
+- **원인 2 — `LSApplicationQueriesSchemes` 미등록**: 등록이 없으면 `Linking.canOpenURL()`이 앱 설치 여부와 무관하게 항상 `false` 반환
+- **원인 3 — 팝업 미지원**: BC카드/페이북 ISP 인증창은 `window.open()`으로 팝업을 띄우는데, `react-native-webview`는 멀티윈도우를 지원하지 않아 호출 자체가 무시됨(팝업이 아예 뜨지 않음)
+- **수정** (`app/index.tsx`):
+  - `handleShouldStartLoad`: http(s)가 아닌 요청은 `Linking.canOpenURL()` 확인 후 `Linking.openURL()`로 OS에 위임, WebView 자체 네비게이션은 `return false`로 차단
+  - `injectedJavaScriptBeforeContentLoaded`(`POPUP_REDIRECT_SCRIPT`)로 `window.open`을 `window.location.href` 이동으로 치환 → 위 앱스킴 핸드오프로 자연스럽게 이어짐
+- **수정** (`app.json`): `ios.infoPlist.LSApplicationQueriesSchemes`에 국내 PG/카드사 앱 스킴 등록 (`supertoss`, `kakaotalk`, `ispmobile`, `kb-acp`, `paybooc`, `kftc-bankpay`, `lotteappcard`, `mpocket.online.ansimclick`, `samsungpay` 등)
+- Android는 `intent://` 스킴을 `react-native-webview`가 자체 처리하는 경우가 많아 기존에도 동작했을 가능성 있음 — iOS 수정 후 동일 시나리오로 재테스트 필요
+
+### [KEND-NATIVE] iOS buildNumber 22 / Android versionCode 20 빌드·배포
+
+- 위 결제 딥링크·팝업 수정 포함해 EAS production 빌드(iOS·Android 둘 다 `autoIncrement`로 각각 22/20 부여)
+- iOS: App Store Connect 업로드 성공(TestFlight, Apple 처리 대기)
+- Android: AAB를 Play Console에 수동 업로드해 배포 확인
+- **미확인**: 실기기에서 BC카드/페이북 결제 흐름 재테스트는 아직 수행 안 함
+
+---
+
+## 2026-09-10
+
+### [KEND-NATIVE] 결제 리다이렉트 구간 뒤로가기 차단 — 소진된 Toss 세션 복귀 방지
+
+- **증상**: 앱 결제 테스트 중 발견 — Toss 결제창(전체 페이지 이동)에서 취소 후 뒤로가기를 누르면 이미 소진된 Toss 세션 URL로 돌아가 "이미 종료된 세션입니다" 에러 페이지가 뜸. 기존 차단(`BACK_BLOCKED_REGEX`)은 kend 경로(`/payments/*`)만 커버, 외부 도메인(pay.toss.im 등)과 결제 종료 랜딩 URL은 미커버
+- **뒤로가기 차단을 2종류로 분리** (`app/index.tsx`):
+  - `isPaymentFlowUrl` — kend 아닌 모든 외부 도메인 + `/payments/*` + `payment_success`/`payment_error`/`payment_cancelled` 쿼리 랜딩. Android 하드웨어 back도 확인 Alert 없이 조용히 무시 (외부 페이지엔 자체 취소 UI 존재)
+  - `isFormFlowUrl` — `/auth/*`, `/children/(submit|:id/edit|:id/growth)`. 기존대로 확인 Alert
+- **결제 직후 복귀 화면 가드** (`justReturnedFromPaymentRef`): kend가 URL 쿼리를 클라이언트에서 제거한 뒤에도 "외부→kend 복귀 직후"임을 추적해 뒤로가기 계속 차단, 다른 pathname 이동 시 해제
+- **iOS back/forward 원천 차단**: `onShouldStartLoadWithRequest`에서 `navigationType === "backforward"`이고 현재 kend에 있는데 대상이 결제 리다이렉트 URL이면 `return false`
+- **흰 화면 깜빡임 완화**: kend↔외부(결제창) http(s) 최상위 전환 시 debounce 없이 즉시 로딩 오버레이 + 8초 안전 타임아웃
+- 상세: [active/native-swipe-blacklist.md](./active/native-swipe-blacklist.md), 배포/테스트 체크리스트: [todo/native-payment-webview-handoff.md](./todo/native-payment-webview-handoff.md)
+
+### [KEND-NATIVE] iOS·Android 재빌드 및 테스트 트랙 배포
+
+- iOS buildNumber 20 — EAS 빌드 성공, App Store Connect 업로드 완료 (TestFlight)
+- Android versionCode 18 — EAS 빌드(AAB) 성공, Play Console 수동 업로드 후 **내부 테스트 트랙 출시**
+- 둘 다 SDK 57 + 위 결제 뒤로가기 수정 포함. Android는 SDK 57로 targetSdkVersion 36(Android 16) 충족 — Google Play의 2026-08-31 대상 API 정책은 프로덕션 승격 시 해제됨
+- **Android 개발자 인증**(2026-09-30 기한): 패키지 이름·서명 키가 Play Console에서 자동 등록되어 요구사항 충족 완료
+- **미확인**: 결제 취소→복귀, 소셜 로그인 회귀 등 실기기 테스트 체크리스트(위 handoff 문서)는 아직 수행 안 함
+
+---
+
 ## 2026-08-25
 
 ### [KEND-NATIVE] Expo SDK 53→57 업그레이드 — Apple iOS 26 SDK(Xcode 26) 필수 정책 대응
