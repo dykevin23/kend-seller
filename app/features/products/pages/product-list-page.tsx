@@ -23,7 +23,11 @@ import {
   SelectValue,
 } from "~/common/components/ui/select";
 import Pagination from "~/common/components/pagination";
-import { SALES_STATUS, LOW_STOCK_THRESHOLD } from "../constrants";
+import {
+  SALES_STATUS,
+  PRODUCT_STATUS_OPTIONS,
+  LOW_STOCK_THRESHOLD,
+} from "../constrants";
 import { formatNumber } from "~/common/utils/format";
 import type { Route } from "./+types/product-list-page";
 import { makeSSRClient } from "~/supa-client";
@@ -207,7 +211,7 @@ export default function ProductListPage({ loaderData }: Route.ComponentProps) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ALL">전체</SelectItem>
-                  {SALES_STATUS.map((status) => (
+                  {PRODUCT_STATUS_OPTIONS.map((status) => (
                     <SelectItem key={status.value} value={status.value}>
                       {status.label}
                     </SelectItem>
@@ -249,7 +253,7 @@ export default function ProductListPage({ loaderData }: Route.ComponentProps) {
                 <SelectValue placeholder="상태 변경" />
               </SelectTrigger>
               <SelectContent>
-                {SALES_STATUS.map((status) => (
+                {PRODUCT_STATUS_OPTIONS.map((status) => (
                   <SelectItem key={status.value} value={status.value}>
                     {status.label}
                   </SelectItem>

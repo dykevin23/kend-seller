@@ -12,6 +12,9 @@ export const TARGET_AGE_TYPES = [
   { label: "키즈(4~7세)", value: "KIDS" },
 ] as const;
 
+// 전체 상태값 — products/product_stock_keepings가 같은 DB enum(sales_status)을
+// 공유해서 정의는 하나로 두되, 실제 선택 가능한 범위는 레벨별로 아래 두
+// 목록으로 제한한다(2026-09 상품/SKU 상태 모델 정리)
 export const SALES_STATUS = [
   { label: "등록", value: "REGISTERED" },
   { label: "준비중", value: "PREPARE" },
@@ -20,6 +23,20 @@ export const SALES_STATUS = [
   { label: "판매중지", value: "STOP" },
   { label: "판매종료", value: "END" },
 ] as const;
+
+// 상품(product) 상태 변경 시 판매자가 고를 수 있는 값 — REGISTERED는 등록
+// 완료 전(임시저장) 상태로만 쓰기로 해서, 이미 존재하는 상품을 다시 이
+// 상태로 되돌리는 선택지는 제공하지 않는다
+export const PRODUCT_STATUS_OPTIONS = SALES_STATUS.filter(
+  (status) => status.value !== "REGISTERED"
+);
+
+// SKU(옵션) 상태로 쓸 수 있는 값 — REGISTERED/END는 상품 생명주기 개념이라
+// 옵션 단위에는 의미가 없어서 제외
+const SKU_STATUS_VALUES = new Set(["SALE", "PREPARE", "SOLD_OUT", "STOP"]);
+export const SKU_STATUS_OPTIONS = SALES_STATUS.filter((status) =>
+  SKU_STATUS_VALUES.has(status.value)
+);
 
 export const IMAGE_TYPES = [
   { label: "대표이미지", value: "MAIN" },
