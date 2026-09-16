@@ -8,6 +8,25 @@ KEND-SELLER 판매자 관리자 웹의 주요 변경사항을 날짜별로 기�
 
 ---
 
+## 2026-09-16
+
+### [KEND-SELLER] 재고관리 화면 추가 (Phase 3, B-2)
+
+- **`/products/stocks-keeping` 신설**: 판매자 소유 전체 상품의 SKU를 한 화면에서 조회. 상품코드 → SKU 순으로 정렬(상품별로 묶여 보임), 검색(상품명/SKU코드) + 판매상태 필터, 재고 수량·판매상태(SALE/PREPARE/SOLD_OUT/STOP) 인라인 수정 후 행별 저장. 검색창 Enter 키로도 검색 가능(기존 주문목록과 동일 패턴)
+- **상품수정 화면(B-1)에서 "재고관리 화면에서 처리 예정"으로 미뤄뒀던 부분**을 이어서 완성 — SKU_STATUS_OPTIONS·updateSKUStatus 등 미리 준비돼있던 기반을 그대로 활용
+- **재고 0 → 판매중(SALE) 전환 차단**: 재고를 0으로 바꾸면 상태가 자동으로 품절(SOLD_OUT)로 전환되고, 재고 0인 동안은 "판매중" 선택지 자체가 비활성화됨. 화면뿐 아니라 `updateStockKeeping` 뮤테이션 레벨에서도 같은 규칙을 강제해 다른 호출 경로가 생겨도 깨지지 않게 함
+- **정렬 관련 버그 2건을 순차 발견·수정**: (1) 처음엔 sku_code 텍스트 정렬이라 "sku-129"가 "sku-13"보다 앞에 오는 문제 → 상품코드 기준 정렬로 변경했으나, PostgREST/Supabase가 조인된 테이블 컬럼으로 상위 쿼리 행을 정렬하는 걸 지원하지 않아(`.order(col, {referencedTable})`는 중첩 컬렉션 내부에만 적용됨, 실측으로 확인) 여전히 안 먹힘 → 전량 조회 후 JS에서 정렬해 페이지 슬라이스하는 방식으로 전환. (2) 같은 상품 내에서도 sku_code가 zero-padding 없는 전역 증가값이라 "sku-10"이 "sku-2"보다 앞에 오는 문제 → 끝자리 숫자를 뽑아 숫자로 비교하도록 보정(코드 형식 자체는 안 바꿈)
+- **키워드 검색**: SKU코드는 자체 컬럼이라 바로 검색되지만 상품명은 조인 테이블 컬럼이라 하나의 `.or()`에 못 섞는 PostgREST 제약이 있어(2026-07-22 주문목록 500에러와 동일 함정), 상품명으로 먼저 product_id 목록을 구해 우회
+- **공용 `Input` 컴포넌트 변경(seller 전체 적용)**: `type="number"`의 브라우저 기본 위아래 화살표(스피너) UI를 없애고 text+숫자필터로 렌더링하도록 수정. 호출부 코드 변경 없이 재고관리·배송비·반품비·정산 수수료율 등 숫자 입력이 있는 화면 전체에 한번에 적용됨
+- 실사용 테스트 완료(사용자 확인) — 목록조회/검색/필터/재고수정/상태전환/품절방지/Enter검색 전부 확인
+
+### [KEND-SELLER] 상품명 한글 자모분해(NFD) 저장 버그 수정
+
+- 재고관리 검색 테스트 중 "하"로 검색해도 결과가 안 나오는 문제 발견 → 원인은 쿼리가 아니라 데이터: 일부 상품명이 완성형(NFC)이 아닌 분해형(NFD, 한글 자모 단위)으로 저장돼 있어 화면 표시는 정상이지만(브라우저가 자동 조합) `ILIKE` 매칭이 안 됐던 것. 직접 DB 조회로 실측 확인(전체 상품 18개 중 한 판매자의 5개가 NFD, macOS 환경에서 복사/붙여넣기 시 흔한 증상)
+- product_details.brand/maker, product_options.option, product_stock_keepings.options는 이미 전부 정상(NFC)이었음을 확인 — products.name만 백필 필요
+- **백필 마이그레이션**(`0012_normalize_product_name_nfc.sql`) 실제 DB에 적용 완료, 적용 후 재검증까지 0건 확인
+- **재발 방지**: `createProduct`/`updateProduct`/`createProductDetail`/`updateProductDetail`/`createProductOptions`/`createProductStockKeepings`에서 상품명·브랜드·제조사·옵션값·SKU옵션을 저장 시점에 항상 NFC로 정규화하도록 수정
+
 ## 2026-09-14
 
 ### [KEND-SELLER] 상품 수정 화면 추가 (Phase 3, B-1)
