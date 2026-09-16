@@ -14,6 +14,11 @@ export default [
     index("features/products/pages/product-list-page.tsx"),
     // 상품등록 화면
     route("/submit", "features/products/pages/submit-product-page.tsx"),
+    // 재고 관리
+    route(
+      "/stocks-keeping",
+      "features/products/pages/stocks-keeping-page.tsx"
+    ),
     // 리뷰 관리
     route("/reviews", "features/reviews/pages/review-list-page.tsx"),
     // 상품상세 화면

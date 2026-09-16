@@ -40,7 +40,7 @@ const menus: Menu[] = [
       },
       {
         name: "Stocks Keeping",
-        description: "See the top categories in your community",
+        description: "SKU별 재고 조회 및 수정",
         to: "/products/stocks-keeping",
       },
       {

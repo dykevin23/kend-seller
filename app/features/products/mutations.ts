@@ -1,5 +1,16 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+// 한글 등 조합형 문자가 완성형(NFC)이 아닌 분해형(NFD, 자모 단위)으로 입력되면
+// (주로 macOS에서 복사/붙여넣기 시 발생) 화면엔 똑같이 보여도 ILIKE 키워드
+// 검색이 매칭되지 않는 문제가 있었다(2026-09, products.name 5건 실측 확인,
+// app/sql/migrations/0012_normalize_product_name_nfc.sql로 백필함) — 검색
+// 대상이 되는 텍스트는 저장 시점에 항상 NFC로 정규화해 재발을 막는다
+const nfc = (value: string) => value.normalize("NFC");
+const nfcOptions = (options: Record<string, string>): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(options).map(([key, value]) => [key, nfc(value)])
+  );
+
 // 상품 기본정보 생성
 export const createProduct = async (
   client: SupabaseClient,
@@ -20,7 +31,7 @@ export const createProduct = async (
   // 여기서 고정으로 명시한다(호출부에서 깜빡해도 안전하도록)
   const { data: product, error } = await client
     .from("products")
-    .insert({ ...data, status: "PREPARE" })
+    .insert({ ...data, name: nfc(data.name), status: "PREPARE" })
     .select("id, product_code")
     .single();
 
@@ -37,7 +48,11 @@ export const createProductDetail = async (
     maker: string;
   }
 ) => {
-  const { error } = await client.from("product_details").insert(data);
+  const { error } = await client.from("product_details").insert({
+    ...data,
+    brand: data.brand ? nfc(data.brand) : null,
+    maker: nfc(data.maker),
+  });
   if (error) throw error;
 };
 
@@ -52,7 +67,9 @@ export const createProductOptions = async (
 ) => {
   if (options.length === 0) return;
 
-  const { error } = await client.from("product_options").insert(options);
+  const { error } = await client
+    .from("product_options")
+    .insert(options.map((opt) => ({ ...opt, option: nfc(opt.option) })));
   if (error) throw error;
 };
 
@@ -73,7 +90,9 @@ export const createProductStockKeepings = async (
 
   const { data, error } = await client
     .from("product_stock_keepings")
-    .insert(stockKeepings)
+    .insert(
+      stockKeepings.map((sku) => ({ ...sku, options: nfcOptions(sku.options) }))
+    )
     .select("id, sku_code");
 
   if (error) throw error;
@@ -158,7 +177,10 @@ export const updateProduct = async (
     sub_category: string;
   }
 ) => {
-  const { error } = await client.from("products").update(data).eq("id", productId);
+  const { error } = await client
+    .from("products")
+    .update({ ...data, name: nfc(data.name) })
+    .eq("id", productId);
   if (error) throw error;
 };
 
@@ -170,7 +192,10 @@ export const updateProductDetail = async (
 ) => {
   const { error } = await client
     .from("product_details")
-    .update(data)
+    .update({
+      brand: data.brand ? nfc(data.brand) : null,
+      maker: nfc(data.maker),
+    })
     .eq("product_id", productId);
   if (error) throw error;
 };
@@ -288,6 +313,25 @@ export const updateProductsStatus = async (
     .update({ status })
     .in("id", productIds)
     .eq("seller_id", sellerId);
+
+  if (error) throw error;
+};
+
+// SKU 재고 + 판매상태 동시 수정 (재고관리 화면 전용)
+export const updateStockKeeping = async (
+  client: SupabaseClient,
+  skuId: string,
+  data: { stock: number; status: string }
+) => {
+  // 재고 0인 SKU가 판매중(SALE) 상태로 저장되는 걸 여기서 막는다 — 화면
+  // 쪽에서도 막지만, 이 함수를 거치는 모든 호출에 대해 최종적으로 보장
+  // 되어야 하는 불변조건이라 뮤테이션 레벨에서 한번 더 강제한다
+  const status = data.stock === 0 && data.status === "SALE" ? "SOLD_OUT" : data.status;
+
+  const { error } = await client
+    .from("product_stock_keepings")
+    .update({ stock: data.stock, status })
+    .eq("id", skuId);
 
   if (error) throw error;
 };
