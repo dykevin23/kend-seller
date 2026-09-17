@@ -76,13 +76,13 @@ export default function SellerLogoUpload({
       <div className="flex gap-2">
         {!hasImage ? (
           <div
-            className="flex justify-center items-center w-30 h-30 bg-gray-100 border border-dashed border-gray-300 rounded cursor-pointer hover:bg-gray-200 transition-colors"
+            className="flex justify-center items-center w-30 h-30 bg-muted border border-dashed border-border rounded cursor-pointer hover:bg-accent transition-colors"
             onClick={handleClick}
           >
             {isUploading ? (
-              <Loader className="w-6 h-6 text-gray-400 animate-spin" />
+              <Loader className="w-6 h-6 text-muted-foreground animate-spin" />
             ) : (
-              <Plus className="w-6 h-6 text-gray-400" />
+              <Plus className="w-6 h-6 text-muted-foreground" />
             )}
           </div>
         ) : (
@@ -90,17 +90,17 @@ export default function SellerLogoUpload({
             <img
               src={displayUrl}
               alt="판매자 로고"
-              className="w-full h-full object-contain rounded border border-gray-200"
+              className="w-full h-full object-contain rounded border border-border"
               onError={handleImageError}
               onLoad={handleImageLoad}
             />
             <Button
               type="button"
               size="icon"
-              className="absolute top-1 right-1 w-6 h-6 rounded-full bg-white/90 hover:bg-white border border-gray-300 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              className="absolute top-1 right-1 w-6 h-6 rounded-full bg-card/90 hover:bg-card border border-border opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
               onClick={handleRemove}
             >
-              <X className="w-4 h-4 text-black" />
+              <X className="w-4 h-4 text-foreground" />
             </Button>
           </div>
         )}

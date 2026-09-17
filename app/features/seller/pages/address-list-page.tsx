@@ -1,5 +1,6 @@
 import Content from "~/common/components/content";
 import Title from "~/common/components/title";
+import Card from "~/common/components/card";
 import type { Route } from "./+types/address-list-page";
 import DataGrid from "~/common/components/data-grid";
 import { Button } from "~/common/components/ui/button";
@@ -82,11 +83,13 @@ export default function AddressListPage({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <Content className="space-y-4">
-        <Title title="배송지/주소지 관리" />
+        <Title title="배송지·반품지 관리" />
         <Button size="sm" onClick={() => setSubmitAddressModalOpen(true)}>
           새 주소지 등록
         </Button>
-        <DataGrid data={loaderData.addressList} columns={columns} />
+        <Card>
+          <DataGrid data={loaderData.addressList} columns={columns} />
+        </Card>
       </Content>
 
       <SubmitAddressModal

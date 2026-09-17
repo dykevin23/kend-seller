@@ -135,6 +135,201 @@ export const getSettlementPeriods = async (
   return periods;
 };
 
+export interface SellerSettlementSummary {
+  pendingAmount: number;
+  lastPaidAmount: number | null;
+  lastPaidAt: string | null;
+}
+
+// 대시보드 "정산" 카드용 — 판매자 본인 정산 내역 요약(지급대기 합계 + 최근 지급건)
+export const getSellerSettlementSummary = async (
+  client: SupabaseClient<Database>,
+  sellerId: string
+): Promise<SellerSettlementSummary> => {
+  const { data, error } = await client
+    .from("settlement_items")
+    .select("status, settlement_amount, paid_at, period_end")
+    .eq("seller_id", sellerId)
+    .order("period_end", { ascending: false });
+
+  if (error) throw error;
+
+  const rows = data || [];
+  const pendingAmount = rows
+    .filter((row) => row.status === "pending")
+    .reduce((sum, row) => sum + row.settlement_amount, 0);
+  const lastPaid = rows.find((row) => row.status === "paid");
+
+  return {
+    pendingAmount,
+    lastPaidAmount: lastPaid?.settlement_amount ?? null,
+    lastPaidAt: lastPaid?.paid_at ?? null,
+  };
+};
+
+// 사이드바 배지용 — 매 페이지 로드마다 호출되므로 가벼운 count 쿼리로 분리
+export const getPendingSettlementCount = async (
+  client: SupabaseClient<Database>
+): Promise<number> => {
+  const { count, error } = await client
+    .from("settlement_items")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "pending");
+  if (error) throw error;
+  return count || 0;
+};
+
+export interface AdminSettlementSummary {
+  pendingCount: number;
+  pendingAmount: number;
+  paidThisMonthCount: number;
+}
+
+// 관리자 대시보드 "정산 현황" 카드용 — 전체 판매자 합산
+export const getAdminSettlementSummary = async (
+  client: SupabaseClient<Database>
+): Promise<AdminSettlementSummary> => {
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  const [pendingRes, paidRes] = await Promise.all([
+    client.from("settlement_items").select("settlement_amount").eq("status", "pending"),
+    client
+      .from("settlement_items")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "paid")
+      .gte("paid_at", monthStart.toISOString()),
+  ]);
+
+  if (pendingRes.error) throw pendingRes.error;
+  if (paidRes.error) throw paidRes.error;
+
+  const pendingRows = pendingRes.data || [];
+
+  return {
+    pendingCount: pendingRows.length,
+    pendingAmount: pendingRows.reduce((sum, row) => sum + row.settlement_amount, 0),
+    paidThisMonthCount: paidRes.count || 0,
+  };
+};
+
+export interface SellerSettlementListItem {
+  id: string;
+  period_start: string;
+  period_end: string;
+  total_sales_amount: number;
+  shipping_reimbursement: number;
+  commission_amount: number;
+  settlement_amount: number;
+  status: string;
+  paid_at: string | null;
+}
+
+// 판매자 본인용 정산 내역 목록
+export const getSellerSettlements = async (
+  client: SupabaseClient<Database>,
+  sellerId: string,
+  { periodStart, status }: { periodStart?: string; status?: string } = {}
+): Promise<SellerSettlementListItem[]> => {
+  let query = client
+    .from("settlement_items")
+    .select(
+      `
+      id, period_start, period_end, total_sales_amount, shipping_reimbursement,
+      commission_amount, settlement_amount, status, paid_at
+    `
+    )
+    .eq("seller_id", sellerId)
+    .order("period_start", { ascending: false });
+
+  if (periodStart) {
+    query = query.eq("period_start", periodStart);
+  }
+  if (status && status !== "ALL") {
+    query = query.eq("status", status as "pending" | "paid");
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+};
+
+// 기간 필터 드롭다운용 — 판매자 본인 정산월만
+export const getSellerSettlementPeriods = async (
+  client: SupabaseClient<Database>,
+  sellerId: string
+): Promise<string[]> => {
+  const { data, error } = await client
+    .from("settlement_items")
+    .select("period_start")
+    .eq("seller_id", sellerId)
+    .order("period_start", { ascending: false });
+
+  if (error) throw error;
+
+  return Array.from(new Set((data || []).map((item) => item.period_start)));
+};
+
+export interface SellerSettlementDetail {
+  id: string;
+  bank_name: string | null;
+  account_number: string | null;
+  account_holder_name: string | null;
+  period_start: string;
+  period_end: string;
+  total_sales_amount: number;
+  shipping_reimbursement: number;
+  commission_rate: number;
+  commission_amount: number;
+  settlement_amount: number;
+  status: string;
+  paid_at: string | null;
+  created_at: string;
+}
+
+// 판매자 본인용 정산 상세 — 소유 검증 포함(다른 판매자 정산 id로 접근 불가)
+export const getSellerSettlementDetail = async (
+  client: SupabaseClient<Database>,
+  { sellerId, settlementId }: { sellerId: string; settlementId: string }
+): Promise<SellerSettlementDetail | null> => {
+  const { data, error } = await client
+    .from("settlement_items")
+    .select(
+      `
+      id, period_start, period_end, total_sales_amount,
+      shipping_reimbursement, commission_rate, commission_amount,
+      settlement_amount, status, paid_at, created_at,
+      admin_sellers ( bank_name, account_number, account_holder_name )
+    `
+    )
+    .eq("id", settlementId)
+    .eq("seller_id", sellerId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return null;
+
+  const seller: any = data.admin_sellers;
+
+  return {
+    id: data.id,
+    bank_name: seller?.bank_name ?? null,
+    account_number: seller?.account_number ?? null,
+    account_holder_name: seller?.account_holder_name ?? null,
+    period_start: data.period_start,
+    period_end: data.period_end,
+    total_sales_amount: data.total_sales_amount,
+    shipping_reimbursement: data.shipping_reimbursement,
+    commission_rate: data.commission_rate,
+    commission_amount: data.commission_amount,
+    settlement_amount: data.settlement_amount,
+    status: data.status,
+    paid_at: data.paid_at,
+    created_at: data.created_at,
+  };
+};
+
 export interface SettlementLineItem {
   order_number: string;
   product_name: string;

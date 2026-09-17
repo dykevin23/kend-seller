@@ -13,13 +13,23 @@ import {
   TableRow,
 } from "~/common/components/ui/table";
 import { Button } from "~/common/components/ui/button";
-import { useRootData } from "~/hooks/useRootData";
+import { makeSSRClient } from "~/supa-client";
+import { getAllCommonCodes } from "../queries";
 
-export default function CommonCodeGroupPage({ params }: Route.ComponentProps) {
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const { client } = makeSSRClient(request);
+  const commonCodes = await getAllCommonCodes(client);
+  return { commonCodes };
+};
+
+export default function CommonCodeGroupPage({
+  params,
+  loaderData,
+}: Route.ComponentProps) {
   const navigate = useNavigate();
-  const { commonCodes } = useRootData();
+  const { commonCodes } = loaderData;
 
-  const group = commonCodes?.find((item) => item.code === params.groupCode);
+  const group = commonCodes.find((item) => item.code === params.groupCode);
 
   const handleRowClick = (code: string) => {
     navigate(`./code/${code}`);
@@ -40,24 +50,26 @@ export default function CommonCodeGroupPage({ params }: Route.ComponentProps) {
           <Button type="submit">수정</Button>
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted">
-              <TableHead>No</TableHead>
-              <TableHead>그룹코드</TableHead>
-              <TableHead>그룹코드명</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {group?.children.map((code, index) => (
-              <TableRow key={code.id} onClick={() => handleRowClick(code.code)}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{code.code}</TableCell>
-                <TableCell>{code.name}</TableCell>
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted">
+                <TableHead>No</TableHead>
+                <TableHead>그룹코드</TableHead>
+                <TableHead>그룹코드명</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {group?.children.map((code, index) => (
+                <TableRow key={code.id} onClick={() => handleRowClick(code.code)}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{code.code}</TableCell>
+                  <TableCell>{code.name}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
 
         <div className="flex justify-end gap-2">
           <Button

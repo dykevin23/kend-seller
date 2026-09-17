@@ -77,7 +77,7 @@ export default function PlatformSettingsPage({
             플랫폼이 배송비를 부담합니다. 0으로 설정하면 이 기능이 꺼집니다.
           </p>
           {actionData?.formErrors?.freeShippingThreshold && (
-            <p className="px-4 text-sm text-red-500">
+            <p className="px-4 text-sm text-destructive">
               {actionData.formErrors.freeShippingThreshold[0]}
             </p>
           )}
@@ -102,7 +102,7 @@ export default function PlatformSettingsPage({
             과거 정산 내역에는 영향을 주지 않습니다.
           </p>
           {actionData?.formErrors?.commissionRate && (
-            <p className="px-4 text-sm text-red-500">
+            <p className="px-4 text-sm text-destructive">
               {actionData.formErrors.commissionRate[0]}
             </p>
           )}

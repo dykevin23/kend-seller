@@ -220,8 +220,8 @@ function SellerPendingNotice({
   return (
     <Content className="space-y-4">
       <Title title="판매자 정보 관리" />
-      <Card className="border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950">
-        <h2 className="text-lg font-bold mb-2 text-amber-700 dark:text-amber-400">
+      <Card className="border-warning-border bg-warning-background">
+        <h2 className="text-lg font-bold mb-2 text-warning">
           승인 대기 중입니다
         </h2>
         <p className="text-sm text-muted-foreground">
@@ -274,8 +274,8 @@ function SellerRegistrationForm({
       <Title title={intent === "resubmit" ? "판매자 정보 관리" : "판매자 정보 입력"} />
 
       {intent === "resubmit" && seller?.rejection_reason && (
-        <Card className="border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950">
-          <h2 className="text-lg font-bold mb-2 text-red-700 dark:text-red-400">
+        <Card className="border-destructive/30 bg-destructive/10">
+          <h2 className="text-lg font-bold mb-2 text-destructive">
             승인 결과: 반려
           </h2>
           <p className="text-sm text-muted-foreground mb-3">

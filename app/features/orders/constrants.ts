@@ -7,6 +7,19 @@ export const ORDER_STATUS = [
   { label: "취소", value: "cancelled" },
 ] as const;
 
+// 상태 뱃지 색상 매핑 — 목록/상세 화면 공통
+export const ORDER_STATUS_BADGE_VARIANT: Record<
+  string,
+  "default" | "warning" | "success" | "danger" | "neutral"
+> = {
+  pending: "warning",
+  confirmed: "default",
+  preparing: "default",
+  shipped: "default",
+  delivered: "success",
+  cancelled: "danger",
+};
+
 // 판매자가 이 화면에서 일괄/개별로 전환할 수 있는 목표 상태
 // (shipped/delivered는 송장입력과 함께 배송 처리 화면에서 다룸)
 export const ORDER_STATUS_ACTIONS = [

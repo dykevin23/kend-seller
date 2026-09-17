@@ -1,6 +1,7 @@
 import { useNavigate, useSearchParams } from "react-router";
 import Content from "~/common/components/content";
 import Title from "~/common/components/title";
+import Card from "~/common/components/card";
 import {
   Table,
   TableBody,
@@ -10,6 +11,7 @@ import {
   TableRow,
 } from "~/common/components/ui/table";
 import { Button } from "~/common/components/ui/button";
+import { Badge } from "~/common/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -17,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/common/components/ui/select";
-import { cn } from "~/lib/utils";
 import {
   INQUIRY_CATEGORY_LABELS,
   INQUIRY_STATUS_LABELS,
@@ -109,61 +110,59 @@ export default function InquiryListPage({ loaderData }: Route.ComponentProps) {
         </Select>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-muted">
-            <TableHead>접수일</TableHead>
-            <TableHead>카테고리</TableHead>
-            <TableHead>제목</TableHead>
-            <TableHead>주문번호</TableHead>
-            <TableHead>상품</TableHead>
-            <TableHead className="text-center">상태</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {inquiries.length > 0 ? (
-            inquiries.map((item) => (
-              <TableRow
-                key={item.id}
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => navigate(`/orders/inquiries/${item.id}`)}
-              >
-                <TableCell className="py-3">
-                  {item.created_at.slice(0, 10)}
-                </TableCell>
-                <TableCell className="py-3">
-                  {INQUIRY_CATEGORY_LABELS[item.category] ?? item.category}
-                </TableCell>
-                <TableCell className="max-w-[280px] truncate py-3">
-                  {item.title}
-                </TableCell>
-                <TableCell className="py-3">{item.order_number}</TableCell>
-                <TableCell className="max-w-[200px] truncate py-3">
-                  {item.product_name}
-                </TableCell>
-                <TableCell className="py-3 text-center">
-                  <span
-                    className={cn(
-                      "inline-block rounded-full px-2 py-1 text-xs font-medium",
-                      item.status === "answered"
-                        ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-400"
-                        : "bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400"
-                    )}
-                  >
-                    {INQUIRY_STATUS_LABELS[item.status] ?? item.status}
-                  </span>
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted">
+              <TableHead>접수일</TableHead>
+              <TableHead>카테고리</TableHead>
+              <TableHead>제목</TableHead>
+              <TableHead>주문번호</TableHead>
+              <TableHead>상품</TableHead>
+              <TableHead className="text-center">상태</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {inquiries.length > 0 ? (
+              inquiries.map((item) => (
+                <TableRow
+                  key={item.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => navigate(`/orders/inquiries/${item.id}`)}
+                >
+                  <TableCell className="py-3">
+                    {item.created_at.slice(0, 10)}
+                  </TableCell>
+                  <TableCell className="py-3">
+                    {INQUIRY_CATEGORY_LABELS[item.category] ?? item.category}
+                  </TableCell>
+                  <TableCell className="max-w-[280px] truncate py-3">
+                    {item.title}
+                  </TableCell>
+                  <TableCell className="py-3">{item.order_number}</TableCell>
+                  <TableCell className="max-w-[200px] truncate py-3">
+                    {item.product_name}
+                  </TableCell>
+                  <TableCell className="py-3 text-center">
+                    <Badge
+                      variant={item.status === "answered" ? "success" : "warning"}
+                      className="mx-auto"
+                    >
+                      {INQUIRY_STATUS_LABELS[item.status] ?? item.status}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} className="h-24 text-center">
+                  조회된 문의가 없습니다.
                 </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={6} className="h-24 text-center">
-                조회된 문의가 없습니다.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            )}
+          </TableBody>
+        </Table>
+      </Card>
     </Content>
   );
 }

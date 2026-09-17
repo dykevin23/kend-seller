@@ -260,10 +260,10 @@ export default function OrderDetailPage({
             </Button>
           </div>
           {trackingError && (
-            <p className="text-sm text-red-500 mt-2">{trackingError}</p>
+            <p className="text-sm text-destructive mt-2">{trackingError}</p>
           )}
           {shipFetcher.data?.error && (
-            <p className="text-sm text-red-500 mt-2">
+            <p className="text-sm text-destructive mt-2">
               {shipFetcher.data.error}
             </p>
           )}
@@ -274,13 +274,13 @@ export default function OrderDetailPage({
         <Card>
           <h2 className="text-xl font-bold">배송 정보</h2>
           {showTrackingSyncAlert && (
-            <p className="mb-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+            <p className="mb-2 rounded-md bg-warning-background px-3 py-2 text-sm text-warning">
               발송 후 {TRACKING_SYNC_ALERT_HOURS}시간이 지나도 배송 조회가 확인되지
               않고 있습니다. 송장번호를 다시 확인해주세요.
             </p>
           )}
           {showStalledDeliveryAlert && (
-            <p className="mb-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+            <p className="mb-2 rounded-md bg-warning-background px-3 py-2 text-sm text-warning">
               발송 후 {STALLED_IN_TRANSIT_DAYS}일이 지나도 배송이 완료되지 않고
               있습니다. 장기미수령·수취거절 반송 가능성이 있으니 택배사에 직접
               확인해주세요.

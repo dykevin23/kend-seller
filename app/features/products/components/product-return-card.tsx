@@ -78,14 +78,14 @@ export default function ProductReturnCard({
           {/* 반품지 정보 */}
           <div>
             {returnAddresses.length === 0 ? (
-              <div className="flex items-center justify-between py-4 px-4 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-gray-600">등록된 반품지가 없습니다.</p>
+              <div className="flex items-center justify-between py-4 px-4 bg-muted rounded-lg border border-border">
+                <p className="text-muted-foreground">등록된 반품지가 없습니다.</p>
                 <Button type="button" onClick={handleOpenRegisterModal}>
                   등록
                 </Button>
               </div>
             ) : (
-              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="p-4 bg-muted rounded-lg border border-border">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-lg">
                     {currentAddress.address_name}
@@ -103,7 +103,7 @@ export default function ProductReturnCard({
                     변경
                   </Button>
                 </div>
-                <div className="space-y-1 text-sm text-gray-600">
+                <div className="space-y-1 text-sm text-muted-foreground">
                   <p>
                     {currentAddress.address} (우: {currentAddress.zone_code})
                   </p>

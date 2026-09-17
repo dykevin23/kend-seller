@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useFetcher, useRevalidator } from "react-router";
+import Card from "~/common/components/card";
 import {
   Table,
   TableBody,
@@ -9,6 +10,7 @@ import {
   TableRow,
 } from "~/common/components/ui/table";
 import { Button } from "~/common/components/ui/button";
+import { Badge } from "~/common/components/ui/badge";
 import { Textarea } from "~/common/components/ui/textarea";
 import {
   Dialog,
@@ -40,6 +42,12 @@ interface SellerApprovalTableProps {
 const STATUS_LABEL = Object.fromEntries(
   SELLER_STATUS.map((status) => [status.value, status.label])
 );
+
+const STATUS_BADGE_VARIANT: Record<Seller["status"], "warning" | "success" | "danger"> = {
+  PENDING: "warning",
+  APPROVED: "success",
+  REJECTED: "danger",
+};
 
 export default function SellerApprovalTable({
   sellers,
@@ -75,58 +83,66 @@ export default function SellerApprovalTable({
   };
 
   if (sellers.length === 0) {
-    return <p className="text-sm text-muted-foreground">등록된 판매자가 없습니다.</p>;
+    return (
+      <Card>
+        <p className="text-sm text-muted-foreground">등록된 판매자가 없습니다.</p>
+      </Card>
+    );
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow className="bg-muted">
-          <TableHead>번호</TableHead>
-          <TableHead>판매자 코드</TableHead>
-          <TableHead>상호명</TableHead>
-          <TableHead>대표자</TableHead>
-          <TableHead>사업자등록번호</TableHead>
-          <TableHead>상태</TableHead>
-          <TableHead>등록일</TableHead>
-          <TableHead>처리</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {sellers.map((seller, index) => (
-          <TableRow key={seller.id}>
-            <TableCell>{index + 1}</TableCell>
-            <TableCell>{seller.seller_code}</TableCell>
-            <TableCell>{seller.name}</TableCell>
-            <TableCell>{seller.representative_name}</TableCell>
-            <TableCell>{seller.bizr_no}</TableCell>
-            <TableCell>
-              {STATUS_LABEL[seller.status]}
-              {seller.status === "REJECTED" && seller.rejection_reason && (
-                <p className="text-xs text-muted-foreground">
-                  ({seller.rejection_reason})
-                </p>
-              )}
-            </TableCell>
-            <TableCell>{seller.created_at.slice(0, 10)}</TableCell>
-            <TableCell>
-              {seller.status === "PENDING" && (
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={() => handleApprove(seller.id)}
-                  >
-                    승인
-                  </Button>
-                  <RejectDialog sellerId={seller.id} onReject={handleReject} />
-                </div>
-              )}
-            </TableCell>
+    <Card>
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-muted">
+            <TableHead>번호</TableHead>
+            <TableHead>판매자 코드</TableHead>
+            <TableHead>상호명</TableHead>
+            <TableHead>대표자</TableHead>
+            <TableHead>사업자등록번호</TableHead>
+            <TableHead>상태</TableHead>
+            <TableHead>등록일</TableHead>
+            <TableHead>처리</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {sellers.map((seller, index) => (
+            <TableRow key={seller.id}>
+              <TableCell>{index + 1}</TableCell>
+              <TableCell>{seller.seller_code}</TableCell>
+              <TableCell>{seller.name}</TableCell>
+              <TableCell>{seller.representative_name}</TableCell>
+              <TableCell>{seller.bizr_no}</TableCell>
+              <TableCell>
+                <Badge variant={STATUS_BADGE_VARIANT[seller.status]}>
+                  {STATUS_LABEL[seller.status]}
+                </Badge>
+                {seller.status === "REJECTED" && seller.rejection_reason && (
+                  <p className="text-xs text-muted-foreground">
+                    ({seller.rejection_reason})
+                  </p>
+                )}
+              </TableCell>
+              <TableCell>{seller.created_at.slice(0, 10)}</TableCell>
+              <TableCell>
+                {seller.status === "PENDING" && (
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => handleApprove(seller.id)}
+                    >
+                      승인
+                    </Button>
+                    <RejectDialog sellerId={seller.id} onReject={handleReject} />
+                  </div>
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Card>
   );
 }
 

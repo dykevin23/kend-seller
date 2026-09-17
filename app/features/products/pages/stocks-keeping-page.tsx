@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "~/common/components/ui/table";
 import { Button } from "~/common/components/ui/button";
+import { Badge } from "~/common/components/ui/badge";
 import { Input } from "~/common/components/ui/input";
 import {
   Select,
@@ -174,45 +175,47 @@ export default function StocksKeepingPage({ loaderData }: Route.ComponentProps) 
         </Card>
 
         {/* SKU 목록 테이블 */}
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted">
-              <TableHead>상품명</TableHead>
-              <TableHead className="text-center">SKU</TableHead>
-              <TableHead>옵션</TableHead>
-              <TableHead className="text-right">판매가</TableHead>
-              <TableHead className="text-center w-[110px]">재고</TableHead>
-              <TableHead className="text-center w-[140px]">
-                판매상태
-              </TableHead>
-              <TableHead className="text-center w-[80px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {items.length > 0 ? (
-              items.map((sku) => (
-                <StockKeepingRow
-                  key={sku.id}
-                  sku={sku}
-                  getOptionLabel={getOptionLabel}
-                />
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
-                  조회된 SKU가 없습니다.
-                </TableCell>
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted">
+                <TableHead>상품명</TableHead>
+                <TableHead className="text-center">SKU</TableHead>
+                <TableHead>옵션</TableHead>
+                <TableHead className="text-right">판매가</TableHead>
+                <TableHead className="text-center w-[110px]">재고</TableHead>
+                <TableHead className="text-center w-[140px]">
+                  판매상태
+                </TableHead>
+                <TableHead className="text-center w-[80px]"></TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {items.length > 0 ? (
+                items.map((sku) => (
+                  <StockKeepingRow
+                    key={sku.id}
+                    sku={sku}
+                    getOptionLabel={getOptionLabel}
+                  />
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center">
+                    조회된 SKU가 없습니다.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
 
-        {/* 페이지네이션 */}
-        <Pagination
-          currentPage={page}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
+          {/* 페이지네이션 */}
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </Card>
       </div>
     </Content>
   );
@@ -284,15 +287,9 @@ function StockKeepingRow({
             onChange={handleStockChange}
             className="w-20 text-right"
           />
-          {stock === 0 && (
-            <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-400 whitespace-nowrap">
-              품절
-            </span>
-          )}
+          {stock === 0 && <Badge variant="danger">품절</Badge>}
           {stock > 0 && stock <= LOW_STOCK_THRESHOLD && (
-            <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400 whitespace-nowrap">
-              부족
-            </span>
+            <Badge variant="warning">부족</Badge>
           )}
         </div>
       </TableCell>

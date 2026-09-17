@@ -11,11 +11,21 @@ import {
   TableHeader,
   TableRow,
 } from "~/common/components/ui/table";
-import { useRootData } from "~/hooks/useRootData";
+import type { Route } from "./+types/common-code-groups-page";
+import { makeSSRClient } from "~/supa-client";
+import { getAllCommonCodes } from "../queries";
 
-export default function CommonCodeGroupPage() {
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const { client } = makeSSRClient(request);
+  const commonCodes = await getAllCommonCodes(client);
+  return { commonCodes };
+};
+
+export default function CommonCodeGroupPage({
+  loaderData,
+}: Route.ComponentProps) {
   const navigate = useNavigate();
-  const { commonCodes } = useRootData();
+  const { commonCodes } = loaderData;
 
   const handleRowClick = (code: string) => {
     navigate(`./group/${code}`);

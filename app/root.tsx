@@ -13,13 +13,15 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import Navigation from "./common/components/navigation";
+import Sidebar from "./common/components/sidebar";
 import { cn } from "./lib/utils";
 import { makeSSRClient } from "./supa-client";
 import { getUserById } from "./features/users/queries";
 import { useEffect } from "react";
 import { AlertProvider, useAlert } from "./hooks/useAlert";
-import { getSellerInfo } from "./features/seller/queries";
+import { getSellerInfo, getPendingSellerCount } from "./features/seller/queries";
+import { getPendingSettlementCount } from "./features/settlements/queries";
+import { getUnansweredGeneralInquiryCount } from "./features/inquiries/queries";
 import type { RootLoaderData } from "./hooks/useRootData";
 import { LoadingOverlay } from "./common/components/ui/spinner";
 
@@ -32,7 +34,7 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+KR:wght@400;500;600;700&display=swap",
   },
 ];
 
@@ -83,7 +85,21 @@ export const loader = async ({
         }
       }
 
-      return { user, profile, seller };
+      // 사이드바 배지용 — 관리자만 조회(매 페이지 로드마다 실행되므로 가벼운 count만)
+      const adminCounts =
+        profile.role === "administrator"
+          ? await Promise.all([
+              getPendingSellerCount(client),
+              getPendingSettlementCount(client),
+              getUnansweredGeneralInquiryCount(client),
+            ]).then(([pendingSellers, pendingSettlements, unansweredInquiries]) => ({
+              pendingSellers,
+              pendingSettlements,
+              unansweredInquiries,
+            }))
+          : null;
+
+      return { user, profile, seller, adminCounts };
     } else {
       await client.auth.signOut({ scope: "global" });
       return redirect("/auth/login", { headers });
@@ -95,7 +111,7 @@ export const loader = async ({
       return redirect("/auth/login", { headers });
     }
   }
-  return { user: null, profile: null, seller: null };
+  return { user: null, profile: null, seller: null, adminCounts: null };
 };
 
 export default function App({ loaderData }: Route.ComponentProps) {
@@ -118,7 +134,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
     ) {
       alert({
         title: "알림",
-        message: "판매자 정보를 입력해야합니다.",
+        message: "판매자 정보를 입력해야 합니다.",
         primaryButton: {
           label: "등록하러가기",
           onClick: () => {
@@ -132,15 +148,11 @@ export default function App({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <LoadingOverlay isLoading={isLoading} />
-      <div
-        className={cn({
-          // "py-28 px-5 md:px-20": !pathname.includes("/auth/"),
-          // "transition-opacity animate-pulse": isLoading,
-          "pt-20": isAuth,
-        })}
-      >
-        {isAuth && <Navigation />}
-        <Outlet />
+      <div className={cn(isAuth && "flex")}>
+        {isAuth && <Sidebar />}
+        <div className={cn(isAuth && "min-w-0 flex-1")}>
+          <Outlet />
+        </div>
       </div>
     </>
   );

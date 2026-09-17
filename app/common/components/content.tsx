@@ -7,5 +7,9 @@ export default function Content({
   children: React.ReactNode;
   className?: string | object;
 }) {
-  return <div className={cn("px-5 md:px-20 py-10", className)}>{children}</div>;
+  return (
+    <div className={cn("max-w-[1400px] px-6 py-8 md:px-10", className)}>
+      {children}
+    </div>
+  );
 }

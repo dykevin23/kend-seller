@@ -56,6 +56,30 @@ export const getSellerInquiries = async (
   });
 };
 
+export interface InquiryStats {
+  totalCount: number;
+  unansweredCount: number;
+}
+
+// 대시보드 "문의" 카드용
+export const getSellerInquiryStats = async (
+  client: SupabaseClient,
+  sellerId: string
+): Promise<InquiryStats> => {
+  const { data, error } = await client
+    .from("inquiries")
+    .select("status, order_items!inner ( orders!inner ( seller_id ) )")
+    .eq("order_items.orders.seller_id", sellerId);
+
+  if (error) throw error;
+
+  const rows = data || [];
+  return {
+    totalCount: rows.length,
+    unansweredCount: rows.filter((row) => row.status === "pending").length,
+  };
+};
+
 export interface InquiryDetail {
   id: string;
   category: string;
@@ -120,6 +144,19 @@ export interface AdminInquiryListItem {
   created_at: string;
   writer_nickname: string;
 }
+
+// 관리자 대시보드/사이드바 배지용
+export const getUnansweredGeneralInquiryCount = async (
+  client: SupabaseClient
+): Promise<number> => {
+  const { count, error } = await client
+    .from("inquiries")
+    .select("id", { count: "exact", head: true })
+    .is("order_item_id", null)
+    .eq("status", "pending");
+  if (error) throw error;
+  return count || 0;
+};
 
 export const getAdminGeneralInquiries = async (
   client: SupabaseClient,

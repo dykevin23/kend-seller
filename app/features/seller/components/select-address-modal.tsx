@@ -41,14 +41,14 @@ export default function SelectAddressModal({
                 onClose();
               }}
               className={cn(
-                "w-full rounded-lg border p-3 text-left transition-colors hover:bg-gray-50",
+                "w-full rounded-lg border p-3 text-left transition-colors hover:bg-muted",
                 item.id === selectedId
                   ? "border-primary bg-primary/5"
-                  : "border-gray-200"
+                  : "border-border"
               )}
             >
               <p className="font-semibold">{item.address_name}</p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 ({item.zone_code}) {item.address} {item.address_detail}
               </p>
             </button>

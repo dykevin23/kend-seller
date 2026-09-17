@@ -1,5 +1,6 @@
 import Content from "~/common/components/content";
 import Title from "~/common/components/title";
+import Card from "~/common/components/card";
 import type { Route } from "./+types/domains-page";
 import { makeSSRClient } from "~/supa-client";
 import { getDomains } from "../queries";
@@ -11,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/common/components/ui/table";
+import { Badge } from "~/common/components/ui/badge";
 import { Button } from "~/common/components/ui/button";
 import { Link } from "react-router";
 
@@ -26,28 +28,32 @@ export default function domainsPage({ loaderData }: Route.ComponentProps) {
     <Content>
       <Title title="도메인 관리" />
 
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-muted">
-            <TableHead>번호</TableHead>
-            <TableHead>서비스 분류코드</TableHead>
-            <TableHead>서비스 명</TableHead>
-            <TableHead>사용유무</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {loaderData.domains.map((domain, index) => (
-            <TableRow key={domain.id}>
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>{domain.code}</TableCell>
-              <TableCell>{domain.name}</TableCell>
-              <TableCell>
-                {domain.use_yn === "Y" ? "사용" : "사용안함"}
-              </TableCell>
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted">
+              <TableHead>번호</TableHead>
+              <TableHead>서비스 분류코드</TableHead>
+              <TableHead>서비스 명</TableHead>
+              <TableHead>사용유무</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {loaderData.domains.map((domain, index) => (
+              <TableRow key={domain.id}>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{domain.code}</TableCell>
+                <TableCell>{domain.name}</TableCell>
+                <TableCell>
+                  <Badge variant={domain.use_yn === "Y" ? "success" : "neutral"}>
+                    {domain.use_yn === "Y" ? "사용" : "사용안함"}
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
 
       <div className="flex pt-4 w-full justify-end">
         <Button asChild>

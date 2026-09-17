@@ -184,13 +184,13 @@ export default function ProductImageCard({
               <div className="flex gap-2">
                 {!mainImage ? (
                   <div
-                    className="flex justify-center items-center w-30 h-30 bg-gray-100 border border-dashed border-gray-300 rounded cursor-pointer hover:bg-gray-200 transition-colors"
+                    className="flex justify-center items-center w-30 h-30 bg-muted border border-dashed border-border rounded cursor-pointer hover:bg-accent transition-colors"
                     onClick={handleMainImg}
                   >
                     {isUploading ? (
-                      <Loader className="w-6 h-6 text-gray-400 animate-spin" />
+                      <Loader className="w-6 h-6 text-muted-foreground animate-spin" />
                     ) : (
-                      <Plus className="w-6 h-6 text-gray-400" />
+                      <Plus className="w-6 h-6 text-muted-foreground" />
                     )}
                   </div>
                 ) : (
@@ -198,15 +198,15 @@ export default function ProductImageCard({
                     <img
                       src={mainImage.url}
                       alt="대표 이미지"
-                      className="w-full h-full object-cover rounded border border-gray-200"
+                      className="w-full h-full object-cover rounded border border-border"
                     />
                     <Button
                       type="button"
                       size="icon"
-                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-white/90 hover:bg-white border border-gray-300 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-card/90 hover:bg-card border border-border opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                       onClick={handleRemoveMainImage}
                     >
-                      <X className="w-4 h-4 text-black" />
+                      <X className="w-4 h-4 text-foreground" />
                     </Button>
                   </div>
                 )}
@@ -225,19 +225,19 @@ export default function ProductImageCard({
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label>추가이미지</Label>
-                <Label className="text-xs text-gray-500">
+                <Label className="text-xs text-muted-foreground">
                   {additionalImages.length}/{MAX_ADDITIONAL_IMAGES}
                 </Label>
               </div>
               <div className="flex gap-2">
                 <div
-                  className="shrink-0 flex justify-center items-center w-30 h-30 bg-gray-100 border border-dashed border-gray-300 rounded cursor-pointer hover:bg-gray-200 transition-colors"
+                  className="shrink-0 flex justify-center items-center w-30 h-30 bg-muted border border-dashed border-border rounded cursor-pointer hover:bg-accent transition-colors"
                   onClick={handleAdditionalImg}
                 >
                   {isUploading ? (
-                    <Loader className="w-6 h-6 text-gray-400 animate-spin" />
+                    <Loader className="w-6 h-6 text-muted-foreground animate-spin" />
                   ) : (
-                    <Plus className="w-6 h-6 text-gray-400" />
+                    <Plus className="w-6 h-6 text-muted-foreground" />
                   )}
                 </div>
                 <div className="flex gap-2 overflow-x-auto pb-2">
@@ -246,15 +246,15 @@ export default function ProductImageCard({
                       <img
                         src={image.url}
                         alt={`추가 이미지 ${index + 1}`}
-                        className="w-full h-full object-cover rounded border border-gray-200"
+                        className="w-full h-full object-cover rounded border border-border"
                       />
                       <Button
                         type="button"
                         size="icon"
-                        className="absolute top-1 right-1 w-6 h-6 rounded-full bg-white/90 hover:bg-white border border-gray-300 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                        className="absolute top-1 right-1 w-6 h-6 rounded-full bg-card/90 hover:bg-card border border-border opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                         onClick={() => handleRemoveAdditionalImage(index)}
                       >
-                        <X className="w-4 h-4 text-black" />
+                        <X className="w-4 h-4 text-foreground" />
                       </Button>
                     </div>
                   ))}

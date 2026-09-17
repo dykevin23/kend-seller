@@ -29,7 +29,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 
   if (data.password !== data.password_check) {
     return {
-      formErrors: { password: ["패스워드가 일치하지 않습니다."] },
+      formErrors: { password: ["비밀번호가 일치하지 않습니다."] },
     };
   }
 
@@ -56,58 +56,73 @@ export const action = async ({ request }: Route.ActionArgs) => {
 };
 
 export default function JoinPage({ actionData }: Route.ComponentProps) {
-  console.log("### actionData => ", actionData);
   return (
-    <div className="flex justify-center items-center bg-gray-300 h-screen">
-      <Form
-        className="flex flex-col p-10 bg-white rounded-md gap-4"
-        method="post"
-      >
-        <div className="flex flex-col gap-2">
-          <TextField id="email" name="email" placeholder="이메일" />
-          {actionData && "formErrors" in actionData && (
-            <p className="text-sm text-red-500">
-              {actionData?.formErrors?.email}
-            </p>
-          )}
-          <TextField
-            id="password"
-            name="password"
-            type="password"
-            placeholder="패스워드"
-          />
-          <TextField
-            id="password_check"
-            name="password_check"
-            type="password"
-            placeholder="패스워드 확인"
-          />
-          {actionData && "formErrors" in actionData && (
-            <p className="text-sm text-red-500">
-              {actionData?.formErrors?.password}
-            </p>
-          )}
-          <TextField id="username" name="username" placeholder="이름" />
-          {actionData && "formErrors" in actionData && (
-            <p className="text-sm text-red-500">
-              {actionData?.formErrors?.username}
-            </p>
-          )}
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-sm">
+        <div className="mb-8 flex flex-col items-center gap-3">
+          <span className="flex size-11 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">
+            K
+          </span>
+          <div className="text-center">
+            <p className="text-lg font-bold tracking-tight">kend seller</p>
+            <p className="text-sm text-muted-foreground">판매자 계정을 만들어보세요</p>
+          </div>
         </div>
 
-        <Separator />
+        <Form
+          className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-8 shadow-sm"
+          method="post"
+        >
+          <div className="flex flex-col gap-2">
+            <TextField id="email" name="email" placeholder="이메일" />
+            {actionData && "formErrors" in actionData && (
+              <p className="text-sm text-destructive">
+                {actionData?.formErrors?.email}
+              </p>
+            )}
+            <TextField
+              id="password"
+              name="password"
+              type="password"
+              placeholder="비밀번호"
+            />
+            <TextField
+              id="password_check"
+              name="password_check"
+              type="password"
+              placeholder="비밀번호 확인"
+            />
+            {actionData && "formErrors" in actionData && (
+              <p className="text-sm text-destructive">
+                {actionData?.formErrors?.password}
+              </p>
+            )}
+            <TextField id="username" name="username" placeholder="이름" />
+            {actionData && "formErrors" in actionData && (
+              <p className="text-sm text-destructive">
+                {actionData?.formErrors?.username}
+              </p>
+            )}
+            {actionData && "signUpError" in actionData && (
+              <p className="text-sm text-destructive">
+                {actionData?.signUpError}
+              </p>
+            )}
+          </div>
 
-        <Button type="submit" size="lg" className="text-xs">
-          가입하기
-        </Button>
-        <div className="flex justify-center gap-1">
-          <span className="text-xs">이미 계정이 있으신가요?</span>
+          <Separator />
 
-          <Link to="/auth/login" className="text-xs text-blue-500">
-            로그인
-          </Link>
-        </div>
-      </Form>
+          <Button type="submit" size="lg">
+            가입하기
+          </Button>
+          <div className="flex justify-center gap-1.5">
+            <span className="text-xs text-muted-foreground">이미 계정이 있으신가요?</span>
+            <Link to="/auth/login" className="text-xs font-semibold text-primary">
+              로그인
+            </Link>
+          </div>
+        </Form>
+      </div>
     </div>
   );
 }

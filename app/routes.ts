@@ -53,6 +53,13 @@ export default [
       index("features/seller/pages/banner-list-page.tsx"),
       route("/post", "features/seller/pages/post-banner-page.tsx"),
     ]),
+    ...prefix("settlements", [
+      index("features/settlements/pages/seller-settlement-list-page.tsx"),
+      route(
+        "/:settlementId",
+        "features/settlements/pages/seller-settlement-detail-page.tsx"
+      ),
+    ]),
   ]),
 
   /* 시스템관리 (admin 전용) */

@@ -4,8 +4,10 @@ interface TitleProps {
 
 export default function Title({ title }: TitleProps) {
   return (
-    <div className="pb-4 pl-2">
-      <h1 className="text-3xl font-bold pl-2">{title}</h1>
+    <div className="pb-5">
+      <h1 className="text-2xl font-bold tracking-tight text-foreground">
+        {title}
+      </h1>
     </div>
   );
 }

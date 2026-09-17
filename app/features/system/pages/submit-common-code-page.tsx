@@ -8,8 +8,7 @@ import type { Route } from "./+types/submit-common-code-page";
 import { z } from "zod";
 import { makeSSRClient } from "~/supa-client";
 import { createCommonCode } from "../mutations";
-import { getCommonCodeGroupByCode } from "../queries";
-import { useRootData } from "~/hooks/useRootData";
+import { getCommonCodeGroupByCode, getAllCommonCodes } from "../queries";
 
 export const formSchema = z.object({
   code: z.string().min(3),
@@ -33,14 +32,23 @@ export const action = async ({ request, params }: Route.ActionArgs) => {
   const group = await getCommonCodeGroupByCode(client, params.groupCode);
 
   await createCommonCode(client, { group_id: group.id, code, name });
-  return redirect(`/system/commonCodes/${params.groupCode}`);
+  return redirect(`/system/commonCodes/group/${params.groupCode}`);
 };
 
-export default function SubmitCommonCodePage({ params }: Route.ComponentProps) {
-  const navigate = useNavigate();
-  const { commonCodes } = useRootData();
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const { client } = makeSSRClient(request);
+  const commonCodes = await getAllCommonCodes(client);
+  return { commonCodes };
+};
 
-  const group = commonCodes?.find((item) => item.code === params.groupCode);
+export default function SubmitCommonCodePage({
+  params,
+  loaderData,
+}: Route.ComponentProps) {
+  const navigate = useNavigate();
+  const { commonCodes } = loaderData;
+
+  const group = commonCodes.find((item) => item.code === params.groupCode);
 
   return (
     <Content>
@@ -52,7 +60,7 @@ export default function SubmitCommonCodePage({ params }: Route.ComponentProps) {
             value={group?.code}
             readOnly
             direction="row"
-            className="w-1/2 bg-gray-300"
+            className="w-1/2 bg-muted"
           />
           <TextField
             id="code"

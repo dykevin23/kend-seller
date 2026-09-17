@@ -37,9 +37,9 @@ export function LoadingOverlay({ isLoading }: LoadingOverlayProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="flex flex-col items-center gap-4 rounded-lg bg-white p-6 shadow-lg">
+      <div className="flex flex-col items-center gap-4 rounded-lg bg-card p-6 shadow-lg">
         <Spinner size="lg" className="text-primary" />
-        <p className="text-sm font-medium text-gray-700">처리 중입니다...</p>
+        <p className="text-sm font-medium text-foreground">처리 중입니다...</p>
       </div>
     </div>
   );

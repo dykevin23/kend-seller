@@ -389,7 +389,7 @@ function ReviewCard({ review }: { review: ReviewListItem }) {
       )}
 
       {fetcher.data?.error && (
-        <p className="mt-2 text-sm text-red-500">{fetcher.data.error}</p>
+        <p className="mt-2 text-sm text-destructive">{fetcher.data.error}</p>
       )}
     </Card>
   );

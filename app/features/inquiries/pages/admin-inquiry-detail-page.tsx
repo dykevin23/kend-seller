@@ -6,6 +6,7 @@ import Card from "~/common/components/card";
 import { Separator } from "~/common/components/ui/separator";
 import { Label } from "~/common/components/ui/label";
 import { Button } from "~/common/components/ui/button";
+import { Badge } from "~/common/components/ui/badge";
 import { Textarea } from "~/common/components/ui/textarea";
 import { useAlert } from "~/hooks/useAlert";
 import { INQUIRY_CATEGORY_LABELS, INQUIRY_STATUS_LABELS } from "../constrants";
@@ -104,15 +105,9 @@ export default function AdminInquiryDetailPage({
       <Card>
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">{inquiry.title}</h2>
-          <span
-            className={
-              isAnswered
-                ? "rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-400"
-                : "rounded-full bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-400"
-            }
-          >
+          <Badge variant={isAnswered ? "success" : "warning"}>
             {INQUIRY_STATUS_LABELS[inquiry.status] ?? inquiry.status}
-          </span>
+          </Badge>
         </div>
         <div className="mt-3">
           <InfoRow
@@ -152,7 +147,7 @@ export default function AdminInquiryDetailPage({
           </p>
         )}
         {fetcher.data?.error && (
-          <p className="mt-2 text-sm text-red-500">{fetcher.data.error}</p>
+          <p className="mt-2 text-sm text-destructive">{fetcher.data.error}</p>
         )}
       </Card>
 

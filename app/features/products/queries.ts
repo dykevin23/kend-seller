@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { LOW_STOCK_THRESHOLD } from "./constrants";
 
 export interface ProductListItem {
   id: string;
@@ -85,6 +86,47 @@ export const getProducts = async (
   return {
     data: products,
     total: count || 0,
+  };
+};
+
+export interface PlatformCatalogStats {
+  totalProducts: number;
+  onSale: number;
+  soldOut: number;
+  lowStockSkus: number;
+}
+
+// 관리자 대시보드 "카탈로그 현황" 카드용 — 전체 판매자 합산
+export const getPlatformCatalogStats = async (
+  client: SupabaseClient
+): Promise<PlatformCatalogStats> => {
+  const [totalRes, onSaleRes, soldOutRes, lowStockRes] = await Promise.all([
+    client.from("products").select("id", { count: "exact", head: true }),
+    client
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "SALE"),
+    client
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "SOLD_OUT"),
+    client
+      .from("product_stock_keepings")
+      .select("id", { count: "exact", head: true })
+      .gt("stock", 0)
+      .lte("stock", LOW_STOCK_THRESHOLD),
+  ]);
+
+  if (totalRes.error) throw totalRes.error;
+  if (onSaleRes.error) throw onSaleRes.error;
+  if (soldOutRes.error) throw soldOutRes.error;
+  if (lowStockRes.error) throw lowStockRes.error;
+
+  return {
+    totalProducts: totalRes.count || 0,
+    onSale: onSaleRes.count || 0,
+    soldOut: soldOutRes.count || 0,
+    lowStockSkus: lowStockRes.count || 0,
   };
 };
 

@@ -85,13 +85,13 @@ export default function SubmitAddressModal({
 
           <div className="flex px-4">
             <Label htmlFor="zoneCode" className="w-1/4">
-              우변번호
+              우편번호
             </Label>
             <div className="flex gap-2 items-center">
               <TextField
                 id="zoneCode"
                 name="zoneCode"
-                className="w-40 bg-gray-200"
+                className="w-40 bg-muted"
                 readOnly
                 value={address?.zoneCode}
               />

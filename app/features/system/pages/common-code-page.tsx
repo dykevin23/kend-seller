@@ -5,13 +5,23 @@ import TextField from "~/common/components/text-field";
 import Title from "~/common/components/title";
 import { Button } from "~/common/components/ui/button";
 import type { Route } from "./+types/common-code-page";
-import { useRootData } from "~/hooks/useRootData";
+import { makeSSRClient } from "~/supa-client";
+import { getAllCommonCodes } from "../queries";
 
-export default function CommonCodePage({ params }: Route.ComponentProps) {
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const { client } = makeSSRClient(request);
+  const commonCodes = await getAllCommonCodes(client);
+  return { commonCodes };
+};
+
+export default function CommonCodePage({
+  params,
+  loaderData,
+}: Route.ComponentProps) {
   const navigate = useNavigate();
-  const { commonCodes } = useRootData();
+  const { commonCodes } = loaderData;
 
-  const group = commonCodes?.find((item) => item.code === params.groupCode);
+  const group = commonCodes.find((item) => item.code === params.groupCode);
   const commonCode = group?.children.find(
     (item) => item.code === params.codeValue
   );

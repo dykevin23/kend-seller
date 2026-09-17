@@ -1,4 +1,4 @@
-import { Link, useFetcher, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import Content from "~/common/components/content";
 import Title from "~/common/components/title";
 import Card from "~/common/components/card";
@@ -14,28 +14,30 @@ import {
   TableHeader,
   TableRow,
 } from "~/common/components/ui/table";
-import { useAlert } from "~/hooks/useAlert";
 import { formatNumber } from "~/common/utils/format";
 import { SETTLEMENT_STATUS_LABELS } from "../constrants";
-import type { Route } from "./+types/settlement-detail-page";
+import type { Route } from "./+types/seller-settlement-detail-page";
 import { makeSSRClient } from "~/supa-client";
-import { getSettlementDetail, getSettlementLineItems } from "../queries";
-import { markSettlementPaid } from "../mutations";
-
-export const action = async ({ request, params }: Route.ActionArgs) => {
-  const { client } = makeSSRClient(request);
-  return await markSettlementPaid(client, params.settlementId);
-};
+import { getSellerSettlementDetail, getSettlementLineItems } from "../queries";
+import { getSellerInfo } from "~/features/seller/queries";
 
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const { client } = makeSSRClient(request);
-  const settlement = await getSettlementDetail(client, params.settlementId);
+  const seller = await getSellerInfo(client);
+  if (!seller) {
+    return { settlement: null, lineItems: [] };
+  }
+
+  const settlement = await getSellerSettlementDetail(client, {
+    sellerId: seller.id,
+    settlementId: params.settlementId,
+  });
   if (!settlement) {
     return { settlement: null, lineItems: [] };
   }
 
   const lineItems = await getSettlementLineItems(client, {
-    sellerId: settlement.seller_id,
+    sellerId: seller.id,
     periodStart: settlement.period_start,
     periodEnd: settlement.period_end,
   });
@@ -43,13 +45,11 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   return { settlement, lineItems };
 };
 
-export default function SettlementDetailPage({
+export default function SellerSettlementDetailPage({
   loaderData,
 }: Route.ComponentProps) {
   const { settlement, lineItems } = loaderData;
   const navigate = useNavigate();
-  const { confirm } = useAlert();
-  const fetcher = useFetcher();
 
   if (!settlement) {
     return (
@@ -60,7 +60,7 @@ export default function SettlementDetailPage({
             정산 내역을 찾을 수 없습니다.
           </p>
           <Button variant="outline" className="mt-4" asChild>
-            <Link to="/system/settlements">목록으로</Link>
+            <Link to="/seller/settlements">목록으로</Link>
           </Button>
         </Card>
       </Content>
@@ -68,22 +68,6 @@ export default function SettlementDetailPage({
   }
 
   const isPaid = settlement.status === "paid";
-  const hasAccount = !!(settlement.bank_name && settlement.account_number);
-
-  const handleMarkPaid = () => {
-    confirm({
-      title: "지급 완료 처리",
-      message:
-        "계좌이체를 완료하셨나요? 확인을 누르면 이 정산 내역이 지급완료로 표시됩니다.",
-      primaryButton: {
-        label: "지급 완료",
-        onClick: () => {
-          fetcher.submit({}, { method: "post" });
-        },
-      },
-      secondaryButton: { label: "취소", onClick: () => {} },
-    });
-  };
 
   return (
     <Content className="space-y-4">
@@ -92,7 +76,7 @@ export default function SettlementDetailPage({
       <Card>
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">
-            {settlement.seller_name} ({settlement.seller_code})
+            {settlement.period_start.slice(0, 7)} 정산
           </h2>
           <Badge variant={isPaid ? "success" : "warning"}>
             {SETTLEMENT_STATUS_LABELS[settlement.status] ?? settlement.status}
@@ -114,10 +98,7 @@ export default function SettlementDetailPage({
             value={`${formatNumber(settlement.shipping_reimbursement)}원`}
           />
           <Separator />
-          <InfoRow
-            label="수수료율"
-            value={`${settlement.commission_rate}%`}
-          />
+          <InfoRow label="수수료율" value={`${settlement.commission_rate}%`} />
           <Separator />
           <InfoRow
             label="수수료"
@@ -131,10 +112,7 @@ export default function SettlementDetailPage({
           {settlement.paid_at && (
             <>
               <Separator />
-              <InfoRow
-                label="지급일"
-                value={settlement.paid_at.slice(0, 10)}
-              />
+              <InfoRow label="지급일" value={settlement.paid_at.slice(0, 10)} />
             </>
           )}
         </div>
@@ -155,7 +133,7 @@ export default function SettlementDetailPage({
           </div>
         ) : (
           <p className="mt-2 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-            등록된 계좌가 없습니다. 판매자에게 정산 계좌 등록을 요청해주세요.
+            등록된 정산 계좌가 없습니다. 판매자 프로필에서 계좌를 등록해주세요.
           </p>
         )}
       </Card>
@@ -192,9 +170,7 @@ export default function SettlementDetailPage({
                     {formatNumber(item.subtotal)}원
                   </TableCell>
                   <TableCell className="py-3 text-center">
-                    {item.shipping_fee_bearer === "PLATFORM"
-                      ? "플랫폼"
-                      : "판매자"}
+                    {item.shipping_fee_bearer === "PLATFORM" ? "플랫폼" : "판매자"}
                   </TableCell>
                   <TableCell className="py-3">
                     {item.purchase_confirmed_at?.slice(0, 10) ?? "-"}
@@ -212,22 +188,10 @@ export default function SettlementDetailPage({
         </Table>
       </Card>
 
-      {fetcher.data?.error && (
-        <p className="text-sm text-destructive">{fetcher.data.error}</p>
-      )}
-
-      <div className="flex justify-end gap-2">
-        <Button
-          variant="outline"
-          onClick={() => navigate("/system/settlements")}
-        >
+      <div className="flex justify-end">
+        <Button variant="outline" onClick={() => navigate("/seller/settlements")}>
           목록으로
         </Button>
-        {!isPaid && (
-          <Button onClick={handleMarkPaid} disabled={!hasAccount}>
-            지급 완료 처리
-          </Button>
-        )}
       </div>
     </Content>
   );

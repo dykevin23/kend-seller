@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "~/common/components/ui/table";
 import { Button } from "~/common/components/ui/button";
+import { Badge } from "~/common/components/ui/badge";
 import { Textarea } from "~/common/components/ui/textarea";
 import {
   Dialog,
@@ -23,7 +24,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/common/components/ui/dialog";
-import { cn } from "~/lib/utils";
 import { RETURN_REASON_LABELS } from "../constrants";
 import type { Route } from "./+types/return-list-page";
 import { makeSSRClient } from "~/supa-client";
@@ -83,32 +83,20 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
 type Stage = {
   label: string;
-  className: string;
+  variant: "danger" | "default" | "warning" | "neutral";
 };
 
 const getStage = (item: ReturnRequestItem): Stage => {
   if (item.reject_reason) {
-    return {
-      label: "거절됨",
-      className: "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-400",
-    };
+    return { label: "거절됨", variant: "danger" };
   }
   if (item.return_received_at) {
-    return {
-      label: "회수확인 완료 (검수 대기)",
-      className: "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-400",
-    };
+    return { label: "회수확인 완료 (검수 대기)", variant: "default" };
   }
   if (item.return_approved_at) {
-    return {
-      label: "1차 승인됨 (회수 대기)",
-      className: "bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
-    };
+    return { label: "1차 승인됨 (회수 대기)", variant: "warning" };
   }
-  return {
-    label: "승인 대기",
-    className: "bg-muted text-muted-foreground",
-  };
+  return { label: "승인 대기", variant: "neutral" };
 };
 
 export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
@@ -204,9 +192,7 @@ export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
-                        <span className="inline-block rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-950 dark:text-green-400">
-                          반품 완료
-                        </span>
+                        <Badge variant="success">반품 완료</Badge>
                       </TableCell>
                       <TableCell className="text-center">
                         {item.refunded_at ? (
@@ -214,7 +200,7 @@ export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
                             환불 완료 ({item.refunded_at.slice(0, 10)})
                           </span>
                         ) : (
-                          <span className="text-xs text-amber-600">환불 처리 중</span>
+                          <span className="text-xs text-warning">환불 처리 중</span>
                         )}
                       </TableCell>
                     </TableRow>
@@ -238,14 +224,7 @@ export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <span
-                        className={cn(
-                          "inline-block rounded-full px-2 py-1 text-xs font-medium",
-                          stage.className
-                        )}
-                      >
-                        {stage.label}
-                      </span>
+                      <Badge variant={stage.variant}>{stage.label}</Badge>
                       {item.reject_reason && (
                         <p className="mt-1 text-xs text-muted-foreground">
                           ({item.reject_reason})
@@ -366,7 +345,7 @@ export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
       </Card>
 
       {fetcher.data?.error && (
-        <p className="mt-2 text-sm text-red-500">{fetcher.data.error}</p>
+        <p className="mt-2 text-sm text-destructive">{fetcher.data.error}</p>
       )}
     </Content>
   );

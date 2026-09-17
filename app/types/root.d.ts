@@ -26,6 +26,12 @@ export type Seller = {
   zone_code: string;
 };
 
+export type AdminCounts = {
+  pendingSellers: number;
+  pendingSettlements: number;
+  unansweredInquiries: number;
+};
+
 export type CommonCode = {
   id: number;
   group_code: number | null;

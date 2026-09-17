@@ -51,24 +51,26 @@ export default function MainCategoryPage({ params }: Route.ComponentProps) {
         <Button type="submit">수정</Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-muted">
-            <TableHead>No</TableHead>
-            <TableHead>그룹코드</TableHead>
-            <TableHead>그룹코드명</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {category?.children.map((code, index) => (
-            <TableRow key={code.id} onClick={() => handleRowClick(code.code)}>
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>{code.code}</TableCell>
-              <TableCell>{code.name}</TableCell>
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted">
+              <TableHead>No</TableHead>
+              <TableHead>그룹코드</TableHead>
+              <TableHead>그룹코드명</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {category?.children.map((code, index) => (
+              <TableRow key={code.id} onClick={() => handleRowClick(code.code)}>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{code.code}</TableCell>
+                <TableCell>{code.name}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
 
       <div className="flex justify-end gap-2">
         <Button

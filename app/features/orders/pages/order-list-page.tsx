@@ -23,15 +23,26 @@ import {
   SelectValue,
 } from "~/common/components/ui/select";
 import Pagination from "~/common/components/pagination";
-import { ORDER_STATUS, ORDER_STATUS_ACTIONS } from "../constrants";
+import { Badge } from "~/common/components/ui/badge";
+import { KpiTile, SalesTrendCard } from "~/common/components/stat-widgets";
+import {
+  ORDER_STATUS,
+  ORDER_STATUS_ACTIONS,
+  ORDER_STATUS_BADGE_VARIANT,
+} from "../constrants";
 import { formatNumber } from "~/common/utils/format";
 import type { Route } from "./+types/order-list-page";
 import { makeSSRClient } from "~/supa-client";
-import { getSellerOrders, getNewOrderCount } from "../queries";
+import {
+  getSellerOrders,
+  getNewOrderCount,
+  getSellerSalesOverview,
+} from "../queries";
 import { updateOrderStatus } from "../mutations";
 import { getSellerInfo } from "~/features/seller/queries";
 
 const ITEMS_PER_PAGE = 10;
+const TREND_DAYS = 30;
 
 export const action = async ({ request }: Route.ActionArgs) => {
   const { client } = makeSSRClient(request);
@@ -72,10 +83,18 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
 
   const seller = await getSellerInfo(client);
   if (!seller) {
-    return { orders: [], total: 0, page, status, keyword, newOrderCount: 0 };
+    return {
+      orders: [],
+      total: 0,
+      page,
+      status,
+      keyword,
+      newOrderCount: 0,
+      salesOverview: null,
+    };
   }
 
-  const [{ data: orders, total }, newOrderCount] = await Promise.all([
+  const [{ data: orders, total }, newOrderCount, salesOverview] = await Promise.all([
     getSellerOrders(client, {
       sellerId: seller.id,
       status,
@@ -84,9 +103,10 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       limit: ITEMS_PER_PAGE,
     }),
     getNewOrderCount(client, seller.id),
+    getSellerSalesOverview(client, seller.id, { trendDays: TREND_DAYS }),
   ]);
 
-  return { orders, total, page, status, keyword, newOrderCount };
+  return { orders, total, page, status, keyword, newOrderCount, salesOverview };
 };
 
 export default function OrderListPage({ loaderData }: Route.ComponentProps) {
@@ -97,6 +117,7 @@ export default function OrderListPage({ loaderData }: Route.ComponentProps) {
     status: initialStatus,
     keyword: initialKeyword,
     newOrderCount,
+    salesOverview,
   } = loaderData;
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -184,11 +205,35 @@ export default function OrderListPage({ loaderData }: Route.ComponentProps) {
 
       <div className="space-y-4">
         {newOrderCount > 0 && (
-          <Card className="border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950">
-            <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+          <Card className="flex flex-row items-center space-y-0 border-warning-border bg-warning-background">
+            <p className="text-sm font-medium text-warning">
               신규 주문 {newOrderCount}건이 접수를 기다리고 있습니다.
             </p>
           </Card>
+        )}
+
+        {/* 매출 요약 */}
+        {salesOverview && (
+          <>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <KpiTile
+                label="오늘 매출"
+                value={`${formatNumber(salesOverview.todaySales)}원`}
+                note={`주문 ${formatNumber(salesOverview.todayOrders)}건`}
+              />
+              <KpiTile
+                label="이번달 매출"
+                value={`${formatNumber(salesOverview.monthSales)}원`}
+                note={`주문 ${formatNumber(salesOverview.monthOrders)}건`}
+              />
+              <KpiTile
+                label="이번달 주문"
+                value={`${formatNumber(salesOverview.monthOrders)}건`}
+                note="이달 1일부터 오늘까지"
+              />
+            </div>
+            <SalesTrendCard trend={salesOverview.dailyTrend} />
+          </>
         )}
 
         {/* 검색 필터 영역 */}
@@ -235,7 +280,7 @@ export default function OrderListPage({ loaderData }: Route.ComponentProps) {
           <div className="text-sm text-muted-foreground">
             {selectedIds.size > 0 && `${selectedIds.size}건 선택됨`}
             {selectedIds.size > 0 && hasMixedStatus && (
-              <span className="text-amber-600"> — 서로 다른 상태가 섞여 있어 일괄변경이 제한될 수 있습니다.</span>
+              <span className="text-warning"> — 서로 다른 상태가 섞여 있어 일괄변경이 제한될 수 있습니다.</span>
             )}
           </div>
           <div className="flex items-center gap-2">
@@ -259,79 +304,81 @@ export default function OrderListPage({ loaderData }: Route.ComponentProps) {
         </div>
 
         {/* 주문 목록 테이블 */}
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted">
-              <TableHead className="w-[50px]">
-                <Checkbox
-                  checked={isAllSelected || (isSomeSelected && "indeterminate")}
-                  onCheckedChange={handleSelectAll}
-                  aria-label="전체 선택"
-                />
-              </TableHead>
-              <TableHead>주문번호</TableHead>
-              <TableHead>수령인</TableHead>
-              <TableHead>상품</TableHead>
-              <TableHead className="text-center">주문금액</TableHead>
-              <TableHead className="text-center">상태</TableHead>
-              <TableHead className="text-center">주문일</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {orders.length > 0 ? (
-              orders.map((order) => (
-                <TableRow
-                  key={order.id}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => navigate(`/orders/${order.order_number}`)}
-                >
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <Checkbox
-                      checked={selectedIds.has(order.id)}
-                      onCheckedChange={(checked) =>
-                        handleSelectRow(order.id, !!checked)
-                      }
-                      aria-label={`${order.order_number} 선택`}
-                    />
-                  </TableCell>
-                  <TableCell>{order.order_number}</TableCell>
-                  <TableCell>{order.recipient_name}</TableCell>
-                  <TableCell className="max-w-[240px] truncate">
-                    {order.item_summary}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {formatNumber(order.total_amount)}원
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-1.5">
-                      {getStatusLabel(order.status)}
-                      {order.stalled_delivery && (
-                        <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400">
-                          정체
-                        </span>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {order.created_at.slice(0, 10)}
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted">
+                <TableHead className="w-[50px]">
+                  <Checkbox
+                    checked={isAllSelected || (isSomeSelected && "indeterminate")}
+                    onCheckedChange={handleSelectAll}
+                    aria-label="전체 선택"
+                  />
+                </TableHead>
+                <TableHead>주문번호</TableHead>
+                <TableHead>수령인</TableHead>
+                <TableHead>상품</TableHead>
+                <TableHead className="text-center">주문금액</TableHead>
+                <TableHead className="text-center">상태</TableHead>
+                <TableHead className="text-center">주문일</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {orders.length > 0 ? (
+                orders.map((order) => (
+                  <TableRow
+                    key={order.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => navigate(`/orders/${order.order_number}`)}
+                  >
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={selectedIds.has(order.id)}
+                        onCheckedChange={(checked) =>
+                          handleSelectRow(order.id, !!checked)
+                        }
+                        aria-label={`${order.order_number} 선택`}
+                      />
+                    </TableCell>
+                    <TableCell>{order.order_number}</TableCell>
+                    <TableCell>{order.recipient_name}</TableCell>
+                    <TableCell className="max-w-[240px] truncate">
+                      {order.item_summary}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {formatNumber(order.total_amount)}원
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Badge variant={ORDER_STATUS_BADGE_VARIANT[order.status] ?? "neutral"}>
+                          {getStatusLabel(order.status)}
+                        </Badge>
+                        {order.stalled_delivery && (
+                          <Badge variant="warning">정체</Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {order.created_at.slice(0, 10)}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center">
+                    조회된 주문이 없습니다.
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
-                  조회된 주문이 없습니다.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
 
-        <Pagination
-          currentPage={page}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </Card>
       </div>
     </Content>
   );

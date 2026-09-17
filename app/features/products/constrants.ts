@@ -24,6 +24,19 @@ export const SALES_STATUS = [
   { label: "판매종료", value: "END" },
 ] as const;
 
+// 상태 뱃지 색상 매핑 — 목록 화면 공통
+export const SALES_STATUS_BADGE_VARIANT: Record<
+  string,
+  "default" | "warning" | "success" | "danger" | "neutral"
+> = {
+  REGISTERED: "neutral",
+  PREPARE: "neutral",
+  SALE: "success",
+  SOLD_OUT: "danger",
+  STOP: "warning",
+  END: "neutral",
+};
+
 // 상품(product) 상태 변경 시 판매자가 고를 수 있는 값 — REGISTERED는 등록
 // 완료 전(임시저장) 상태로만 쓰기로 해서, 이미 존재하는 상품을 다시 이
 // 상태로 되돌리는 선택지는 제공하지 않는다

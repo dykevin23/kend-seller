@@ -14,6 +14,7 @@ import {
 } from "~/common/components/ui/table";
 import { Checkbox } from "~/common/components/ui/checkbox";
 import { Button } from "~/common/components/ui/button";
+import { Badge } from "~/common/components/ui/badge";
 import { Input } from "~/common/components/ui/input";
 import {
   Select,
@@ -25,6 +26,7 @@ import {
 import Pagination from "~/common/components/pagination";
 import {
   SALES_STATUS,
+  SALES_STATUS_BADGE_VARIANT,
   PRODUCT_STATUS_OPTIONS,
   LOW_STOCK_THRESHOLD,
 } from "../constrants";
@@ -271,96 +273,99 @@ export default function ProductListPage({ loaderData }: Route.ComponentProps) {
         </div>
 
         {/* 상품 목록 테이블 */}
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted">
-              <TableHead className="w-[50px]">
-                <Checkbox
-                  checked={isAllSelected || (isSomeSelected && "indeterminate")}
-                  onCheckedChange={handleSelectAll}
-                  aria-label="전체 선택"
-                />
-              </TableHead>
-              <TableHead className="text-center">상품코드</TableHead>
-              <TableHead>상품명</TableHead>
-              <TableHead className="text-center">지난30일 판매량</TableHead>
-              <TableHead className="text-center">판매가</TableHead>
-              <TableHead className="text-center">상품상태</TableHead>
-              <TableHead className="text-center">재고수량</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {products.length > 0 ? (
-              products.map((product) => (
-                <TableRow
-                  key={product.id}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => navigate(`/products/${product.product_code}`)}
-                >
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <Checkbox
-                      checked={selectedIds.has(product.id)}
-                      onCheckedChange={(checked) =>
-                        handleSelectRow(product.id, !!checked)
-                      }
-                      aria-label={`${product.name} 선택`}
-                    />
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {product.product_code}
-                  </TableCell>
-                  <TableCell className="max-w-[300px] truncate">
-                    {product.name}
-                  </TableCell>
-                  <TableCell className="text-center">-</TableCell>
-                  <TableCell className="text-center">
-                    {product.min_sale_price != null
-                      ? product.min_sale_price === product.max_sale_price
-                        ? `${formatNumber(product.min_sale_price)}원`
-                        : `${formatNumber(product.min_sale_price)}원 ~ ${formatNumber(product.max_sale_price!)}원`
-                      : "-"}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {getStatusLabel(product.status)}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {product.total_stock != null ? (
-                      <span className="inline-flex items-center gap-1.5">
-                        {formatNumber(product.total_stock)}
-                        {product.total_stock === 0 && (
-                          <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-400">
-                            품절
-                          </span>
-                        )}
-                        {product.total_stock > 0 &&
-                          product.total_stock <= LOW_STOCK_THRESHOLD && (
-                            <span className="rounded px-1.5 py-0.5 text-xs font-medium bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400">
-                              재고부족
-                            </span>
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted">
+                <TableHead className="w-[50px]">
+                  <Checkbox
+                    checked={isAllSelected || (isSomeSelected && "indeterminate")}
+                    onCheckedChange={handleSelectAll}
+                    aria-label="전체 선택"
+                  />
+                </TableHead>
+                <TableHead className="text-center">상품코드</TableHead>
+                <TableHead>상품명</TableHead>
+                <TableHead className="text-center">지난 30일 판매량</TableHead>
+                <TableHead className="text-center">판매가</TableHead>
+                <TableHead className="text-center">상품상태</TableHead>
+                <TableHead className="text-center">재고수량</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products.length > 0 ? (
+                products.map((product) => (
+                  <TableRow
+                    key={product.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => navigate(`/products/${product.product_code}`)}
+                  >
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={selectedIds.has(product.id)}
+                        onCheckedChange={(checked) =>
+                          handleSelectRow(product.id, !!checked)
+                        }
+                        aria-label={`${product.name} 선택`}
+                      />
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {product.product_code}
+                    </TableCell>
+                    <TableCell className="max-w-[300px] truncate">
+                      {product.name}
+                    </TableCell>
+                    <TableCell className="text-center">-</TableCell>
+                    <TableCell className="text-center">
+                      {product.min_sale_price != null
+                        ? product.min_sale_price === product.max_sale_price
+                          ? `${formatNumber(product.min_sale_price)}원`
+                          : `${formatNumber(product.min_sale_price)}원 ~ ${formatNumber(product.max_sale_price!)}원`
+                        : "-"}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge
+                        variant={SALES_STATUS_BADGE_VARIANT[product.status] ?? "neutral"}
+                        className="mx-auto"
+                      >
+                        {getStatusLabel(product.status)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {product.total_stock != null ? (
+                        <span className="inline-flex items-center gap-1.5">
+                          {formatNumber(product.total_stock)}
+                          {product.total_stock === 0 && (
+                            <Badge variant="danger">품절</Badge>
                           )}
-                      </span>
-                    ) : (
-                      "-"
-                    )}
+                          {product.total_stock > 0 &&
+                            product.total_stock <= LOW_STOCK_THRESHOLD && (
+                              <Badge variant="warning">재고부족</Badge>
+                            )}
+                        </span>
+                      ) : (
+                        "-"
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center">
+                    조회된 상품이 없습니다.
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
-                  조회된 상품이 없습니다.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
 
-        {/* 페이지네이션 */}
-        <Pagination
-          currentPage={page}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
+          {/* 페이지네이션 */}
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </Card>
       </div>
     </Content>
   );

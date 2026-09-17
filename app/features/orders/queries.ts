@@ -330,3 +330,290 @@ export const getNewOrderCount = async (
   if (error) throw error;
   return count || 0;
 };
+
+export interface OrderStatusCounts {
+  pending: number;
+  confirmed: number;
+  preparing: number;
+  shipped: number;
+  delivered: number;
+  stalledInTransit: number;
+}
+
+// 대시보드 "주문·배송" 카드용 — 최근 N일 접수된 주문의 상태별 카운트
+export const getSellerOrderStatusCounts = async (
+  client: SupabaseClient,
+  sellerId: string,
+  { days = 14 }: { days?: number } = {}
+): Promise<OrderStatusCounts> => {
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+
+  const { data, error } = await client
+    .from("orders")
+    .select(
+      "status, order_groups!inner ( status ), deliveries ( status, shipped_at )"
+    )
+    .eq("seller_id", sellerId)
+    .gte("created_at", since.toISOString())
+    .not(
+      "order_groups.status",
+      "in",
+      `(${UNPAID_ORDER_GROUP_STATUSES.join(",")})`
+    );
+
+  if (error) throw error;
+
+  const counts: OrderStatusCounts = {
+    pending: 0,
+    confirmed: 0,
+    preparing: 0,
+    shipped: 0,
+    delivered: 0,
+    stalledInTransit: 0,
+  };
+
+  for (const row of (data || []) as any[]) {
+    if (row.status in counts) {
+      counts[row.status as keyof Omit<OrderStatusCounts, "stalledInTransit">] += 1;
+    }
+    const deliveryRaw = row.deliveries;
+    const delivery = Array.isArray(deliveryRaw)
+      ? (deliveryRaw[0] ?? null)
+      : (deliveryRaw ?? null);
+    if (isStalledInTransit(delivery?.status, delivery?.shipped_at)) {
+      counts.stalledInTransit += 1;
+    }
+  }
+
+  return counts;
+};
+
+export interface ReturnCancelCounts {
+  cancelled: number;
+  returnRequested: number;
+  returned: number;
+}
+
+// 대시보드 "반품·취소" 카드용
+export const getSellerReturnCancelCounts = async (
+  client: SupabaseClient,
+  sellerId: string,
+  { days = 30 }: { days?: number } = {}
+): Promise<ReturnCancelCounts> => {
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+
+  const [cancelledRes, requestedRes, returnedRes] = await Promise.all([
+    client
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("seller_id", sellerId)
+      .eq("status", "cancelled")
+      .gte("created_at", since.toISOString()),
+    client
+      .from("delivery_items")
+      .select("id, order_items!inner ( orders!inner ( seller_id ) )", {
+        count: "exact",
+        head: true,
+      })
+      .eq("status", "return_requested")
+      .eq("order_items.orders.seller_id", sellerId),
+    client
+      .from("delivery_items")
+      .select("id, order_items!inner ( orders!inner ( seller_id ) )", {
+        count: "exact",
+        head: true,
+      })
+      .eq("status", "returned")
+      .eq("order_items.orders.seller_id", sellerId)
+      .gte("updated_at", since.toISOString()),
+  ]);
+
+  if (cancelledRes.error) throw cancelledRes.error;
+  if (requestedRes.error) throw requestedRes.error;
+  if (returnedRes.error) throw returnedRes.error;
+
+  return {
+    cancelled: cancelledRes.count || 0,
+    returnRequested: requestedRes.count || 0,
+    returned: returnedRes.count || 0,
+  };
+};
+
+export interface DailySales {
+  date: string; // YYYY-MM-DD
+  sales: number;
+  orders: number;
+}
+
+export interface SalesOverview {
+  todaySales: number;
+  todayOrders: number;
+  monthSales: number;
+  monthOrders: number;
+  dailyTrend: DailySales[]; // 최근 trendDays일, 날짜 오름차순
+}
+
+// 대시보드 KPI(오늘/이번달 매출·주문) + 매출 추이 차트용 — 취소 건은 매출 집계에서 제외
+export const getSellerSalesOverview = async (
+  client: SupabaseClient,
+  sellerId: string,
+  { trendDays = 14 }: { trendDays?: number } = {}
+): Promise<SalesOverview> => {
+  const now = new Date();
+  const monthStartDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  const trendStartDate = new Date(now);
+  trendStartDate.setDate(trendStartDate.getDate() - (trendDays - 1));
+  trendStartDate.setHours(0, 0, 0, 0);
+  const rangeStart = monthStartDate < trendStartDate ? monthStartDate : trendStartDate;
+  const monthStartIso = monthStartDate.toISOString();
+  const todayKey = now.toISOString().slice(0, 10);
+
+  const { data, error } = await client
+    .from("orders")
+    .select("total_amount, created_at, order_groups!inner ( status )")
+    .eq("seller_id", sellerId)
+    .neq("status", "cancelled")
+    .gte("created_at", rangeStart.toISOString())
+    .not(
+      "order_groups.status",
+      "in",
+      `(${UNPAID_ORDER_GROUP_STATUSES.join(",")})`
+    );
+
+  if (error) throw error;
+
+  const trendMap = new Map<string, DailySales>();
+  for (let i = 0; i < trendDays; i++) {
+    const d = new Date(trendStartDate);
+    d.setDate(d.getDate() + i);
+    const key = d.toISOString().slice(0, 10);
+    trendMap.set(key, { date: key, sales: 0, orders: 0 });
+  }
+
+  let todaySales = 0;
+  let todayOrders = 0;
+  let monthSales = 0;
+  let monthOrders = 0;
+
+  for (const row of data || []) {
+    const dateKey = row.created_at.slice(0, 10);
+    const amount = row.total_amount;
+
+    if (row.created_at >= monthStartIso) {
+      monthSales += amount;
+      monthOrders += 1;
+    }
+    if (dateKey === todayKey) {
+      todaySales += amount;
+      todayOrders += 1;
+    }
+    const trendEntry = trendMap.get(dateKey);
+    if (trendEntry) {
+      trendEntry.sales += amount;
+      trendEntry.orders += 1;
+    }
+  }
+
+  return {
+    todaySales,
+    todayOrders,
+    monthSales,
+    monthOrders,
+    dailyTrend: Array.from(trendMap.values()),
+  };
+};
+
+// 관리자 대시보드 "플랫폼 거래액 추이" 차트용 — seller_id 필터 없이 전체 합산
+export const getPlatformSalesTrend = async (
+  client: SupabaseClient,
+  { trendDays = 14 }: { trendDays?: number } = {}
+): Promise<DailySales[]> => {
+  const trendStartDate = new Date();
+  trendStartDate.setDate(trendStartDate.getDate() - (trendDays - 1));
+  trendStartDate.setHours(0, 0, 0, 0);
+
+  const { data, error } = await client
+    .from("orders")
+    .select("total_amount, created_at, order_groups!inner ( status )")
+    .neq("status", "cancelled")
+    .gte("created_at", trendStartDate.toISOString())
+    .not(
+      "order_groups.status",
+      "in",
+      `(${UNPAID_ORDER_GROUP_STATUSES.join(",")})`
+    );
+
+  if (error) throw error;
+
+  const trendMap = new Map<string, DailySales>();
+  for (let i = 0; i < trendDays; i++) {
+    const d = new Date(trendStartDate);
+    d.setDate(d.getDate() + i);
+    const key = d.toISOString().slice(0, 10);
+    trendMap.set(key, { date: key, sales: 0, orders: 0 });
+  }
+
+  for (const row of data || []) {
+    const dateKey = row.created_at.slice(0, 10);
+    const trendEntry = trendMap.get(dateKey);
+    if (trendEntry) {
+      trendEntry.sales += row.total_amount;
+      trendEntry.orders += 1;
+    }
+  }
+
+  return Array.from(trendMap.values());
+};
+
+export interface TopProduct {
+  productName: string;
+  quantity: number;
+  amount: number;
+}
+
+// 대시보드 "인기 상품" 카드용 — 최근 N일 판매수량 기준 TOP N
+export const getSellerTopProducts = async (
+  client: SupabaseClient,
+  sellerId: string,
+  { days = 30, limit = 5 }: { days?: number; limit?: number } = {}
+): Promise<TopProduct[]> => {
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+
+  const { data, error } = await client
+    .from("order_items")
+    .select(
+      `
+      product_name, quantity, subtotal,
+      orders!inner ( seller_id, status, created_at, order_groups!inner ( status ) )
+    `
+    )
+    .eq("orders.seller_id", sellerId)
+    .neq("orders.status", "cancelled")
+    .gte("orders.created_at", since.toISOString())
+    .not(
+      "orders.order_groups.status",
+      "in",
+      `(${UNPAID_ORDER_GROUP_STATUSES.join(",")})`
+    );
+
+  if (error) throw error;
+
+  const map = new Map<string, TopProduct>();
+  for (const row of data || []) {
+    const entry = map.get(row.product_name) ?? {
+      productName: row.product_name,
+      quantity: 0,
+      amount: 0,
+    };
+    entry.quantity += row.quantity;
+    entry.amount += row.subtotal;
+    map.set(row.product_name, entry);
+  }
+
+  return Array.from(map.values())
+    .sort((a, b) => b.quantity - a.quantity)
+    .slice(0, limit);
+};

@@ -32,7 +32,7 @@ export default function ProductDetailCard({
               readOnly={nobrand}
               defaultValue={defaultValues?.brand}
               className={cn({
-                "bg-gray-200": nobrand,
+                "bg-muted": nobrand,
               })}
             />
             <div className="flex gap-1 w-full items-center">

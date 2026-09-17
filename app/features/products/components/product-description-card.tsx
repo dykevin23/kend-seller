@@ -92,15 +92,15 @@ export default function ProductDescriptionCard({
         <Label>상세설명 이미지</Label>
         <div className="flex flex-col gap-2">
           <div
-            className="flex justify-center items-center w-full h-32 bg-gray-100 border border-dashed border-gray-300 rounded cursor-pointer hover:bg-gray-200 transition-colors"
+            className="flex justify-center items-center w-full h-32 bg-muted border border-dashed border-border rounded cursor-pointer hover:bg-accent transition-colors"
             onClick={handleAddImage}
           >
             {isUploading ? (
-              <Loader className="w-6 h-6 text-gray-400 animate-spin" />
+              <Loader className="w-6 h-6 text-muted-foreground animate-spin" />
             ) : (
               <div className="flex flex-col items-center gap-2">
-                <Plus className="w-6 h-6 text-gray-400" />
-                <span className="text-sm text-gray-500">
+                <Plus className="w-6 h-6 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
                   이미지를 추가하세요
                 </span>
               </div>
@@ -122,20 +122,20 @@ export default function ProductDescriptionCard({
             {images.map((image, index) => (
               <div
                 key={index}
-                className="relative w-full h-64 group border border-gray-200 rounded overflow-hidden"
+                className="relative w-full h-64 group border border-border rounded overflow-hidden"
               >
                 <img
                   src={image.url}
                   alt={`상세설명 이미지 ${index + 1}`}
-                  className="w-full h-full object-contain bg-gray-50"
+                  className="w-full h-full object-contain bg-muted"
                 />
                 <Button
                   type="button"
                   size="icon"
-                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 hover:bg-white border border-gray-300 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-card/90 hover:bg-card border border-border opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                   onClick={() => handleRemoveImage(index)}
                 >
-                  <X className="w-5 h-5 text-black" />
+                  <X className="w-5 h-5 text-foreground" />
                 </Button>
                 <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
                   {index + 1}

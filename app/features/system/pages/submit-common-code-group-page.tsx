@@ -33,7 +33,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 export default function SubmitCommonCodeGroupPage() {
   return (
     <Content>
-      <Title title="공통코드 그룹등록" />
+      <Title title="공통코드 그룹 등록" />
       <Form className="space-y-5" method="post">
         <Card>
           <TextField
