@@ -690,6 +690,36 @@ export type Database = {
           },
         ]
       }
+      notices: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_visible: boolean
+          target: Database["public"]["Enums"]["notice_target"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          target?: Database["public"]["Enums"]["notice_target"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          target?: Database["public"]["Enums"]["notice_target"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_groups: {
         Row: {
           address: string
@@ -2002,6 +2032,7 @@ export type Database = {
       inquiry_category: "DELIVERY" | "PRODUCT" | "PAYMENT" | "ETC"
       inquiry_status: "pending" | "answered"
       island_delivery_type: "AVAILABLE" | "UNAVAILABLE"
+      notice_target: "ALL" | "SELLER" | "BUYER"
       order_group_status:
         | "payment_in_progress"
         | "payment_pending"
@@ -2213,6 +2244,7 @@ export const Constants = {
       inquiry_category: ["DELIVERY", "PRODUCT", "PAYMENT", "ETC"],
       inquiry_status: ["pending", "answered"],
       island_delivery_type: ["AVAILABLE", "UNAVAILABLE"],
+      notice_target: ["ALL", "SELLER", "BUYER"],
       order_group_status: [
         "payment_in_progress",
         "payment_pending",

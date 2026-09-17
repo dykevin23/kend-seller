@@ -60,6 +60,8 @@ export default [
         "features/settlements/pages/seller-settlement-detail-page.tsx"
       ),
     ]),
+    // 공지사항 (판매자 대상 조회 전용)
+    route("/notices", "features/system/pages/seller-notice-list-page.tsx"),
   ]),
 
   /* 시스템관리 (admin 전용) */
@@ -116,6 +118,11 @@ export default [
       ]),
       // 플랫폼 설정
       route("/settings", "features/system/pages/platform-settings-page.tsx"),
+      // 공지사항 관리
+      ...prefix("notices", [
+        index("features/system/pages/notices-page.tsx"),
+        route("/submit", "features/system/pages/submit-notice-page.tsx"),
+      ]),
       // 일반 문의 (판매자/상품과 무관한 문의)
       ...prefix("inquiries", [
         index("features/inquiries/pages/admin-inquiry-list-page.tsx"),

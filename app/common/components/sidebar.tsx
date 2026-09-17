@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   Layers,
   MessagesSquare,
+  Megaphone,
   LogOut,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
@@ -103,6 +104,7 @@ const menus: Menu[] = [
     roles: ["administrator"],
     items: [
       { name: "일반 문의 관리", to: "/system/inquiries", badgeKey: "unansweredInquiries" },
+      { name: "공지사항 관리", to: "/system/notices" },
       { name: "플랫폼 설정", to: "/system/settings" },
     ],
   },
@@ -123,6 +125,7 @@ export default function Sidebar() {
   // prefix이기도 함) 가장 구체적으로(가장 길게) 일치하는 항목 하나만 active로 표시한다.
   const allPaths = [
     "/",
+    ...(userRole === "seller" ? ["/seller/notices"] : []),
     ...filteredMenus.flatMap((menu) => menu.items.map((item) => item.to)),
   ];
   const matches = (to: string) =>
@@ -161,6 +164,21 @@ export default function Sidebar() {
           <LayoutDashboard className="size-4" />
           대시보드
         </Link>
+
+        {userRole === "seller" && (
+          <Link
+            to="/seller/notices"
+            className={cn(
+              "flex items-center gap-2 rounded-lg px-3 py-2 text-[13.5px] font-semibold transition-colors",
+              isActive("/seller/notices")
+                ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                : "text-sidebar-foreground hover:bg-sidebar-accent/60"
+            )}
+          >
+            <Megaphone className="size-4" />
+            공지사항
+          </Link>
+        )}
 
         {filteredMenus.map((menu) => {
           const Icon = menu.icon;

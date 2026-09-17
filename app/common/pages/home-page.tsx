@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   Landmark,
   Layers,
+  Megaphone,
 } from "lucide-react";
 import Content from "../components/content";
 import Title from "../components/title";
@@ -47,6 +48,7 @@ import {
   getAdminSettlementSummary,
 } from "~/features/settlements/queries";
 import { getPlatformCatalogStats } from "~/features/products/queries";
+import { getVisibleNoticesForSeller } from "~/features/system/queries";
 
 const TREND_DAYS = 14;
 
@@ -64,6 +66,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       inquiryStats,
       reviewStats,
       settlementSummary,
+      notices,
     ] = await Promise.all([
       getNewOrderCount(client, seller.id),
       getSellerOrderStatusCounts(client, seller.id, { days: TREND_DAYS }),
@@ -73,6 +76,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       getSellerInquiryStats(client, seller.id),
       getSellerReviewStats(client, seller.id),
       getSellerSettlementSummary(client, seller.id),
+      getVisibleNoticesForSeller(client, { limit: 3 }),
     ]);
 
     return {
@@ -86,6 +90,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
       inquiryStats,
       reviewStats,
       settlementSummary,
+      notices,
     };
   }
 
@@ -153,6 +158,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
     inquiryStats,
     reviewStats,
     settlementSummary,
+    notices,
   } = loaderData;
 
   return (
@@ -315,7 +321,51 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
         <SalesTrendCard trend={salesOverview.dailyTrend} />
         <TopProductsCard products={topProducts} />
       </div>
+
+      {notices.length > 0 && (
+        <>
+          <SectionLabel>공지사항</SectionLabel>
+          <NoticesCard notices={notices} />
+        </>
+      )}
     </Content>
+  );
+}
+
+function NoticesCard({
+  notices,
+}: {
+  notices: { id: string; title: string; created_at: string }[];
+}) {
+  return (
+    <Card>
+      <div className="mb-1 flex items-center justify-between">
+        <span className="flex items-center gap-1.5 text-[14.5px] font-bold">
+          <Megaphone className="size-4 text-muted-foreground" />
+          최신 공지
+        </span>
+        <Link
+          to="/seller/notices"
+          className="text-[12.5px] font-medium text-primary hover:underline"
+        >
+          전체보기
+        </Link>
+      </div>
+      <div className="divide-y divide-border">
+        {notices.map((notice) => (
+          <Link
+            key={notice.id}
+            to="/seller/notices"
+            className="flex items-center justify-between gap-3 py-2.5 text-sm hover:text-primary"
+          >
+            <span className="truncate">{notice.title}</span>
+            <span className="shrink-0 text-xs text-muted-foreground">
+              {notice.created_at.slice(0, 10)}
+            </span>
+          </Link>
+        ))}
+      </div>
+    </Card>
   );
 }
 

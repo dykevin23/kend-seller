@@ -80,6 +80,39 @@ export const createDomain = async (
   if (error) throw error;
 };
 
+export const createNotice = async (
+  client: SupabaseClient<Database>,
+  {
+    title,
+    content,
+    target,
+  }: { title: string; content: string; target: "ALL" | "SELLER" | "BUYER" }
+) => {
+  const { error } = await client
+    .from("notices")
+    .insert({ title, content, target });
+  if (error) throw error;
+};
+
+export const updateNoticeVisibility = async (
+  client: SupabaseClient<Database>,
+  { noticeId, isVisible }: { noticeId: string; isVisible: boolean }
+) => {
+  const { error } = await client
+    .from("notices")
+    .update({ is_visible: isVisible, updated_at: new Date().toISOString() })
+    .eq("id", noticeId);
+  if (error) throw error;
+};
+
+export const deleteNotice = async (
+  client: SupabaseClient<Database>,
+  noticeId: string
+) => {
+  const { error } = await client.from("notices").delete().eq("id", noticeId);
+  if (error) throw error;
+};
+
 export const createCommonCodeGroup = async (
   client: SupabaseClient<Database>,
   {

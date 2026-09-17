@@ -85,6 +85,20 @@
       "when": 1788312812385,
       "tag": "0011_flowery_callisto",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1789625179476,
+      "tag": "0012_known_black_crow",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1789625650360,
+      "tag": "0013_friendly_whiplash",
+      "breakpoints": true
     }
   ]
 }

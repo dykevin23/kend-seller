@@ -1,4 +1,13 @@
-import { integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
+import { NOTICE_TARGETS } from "./constrants";
 
 /**
  * 도메인 테이블(domains)
@@ -80,6 +89,30 @@ export const platform_settings = pgTable("platform_settings", {
   id: uuid().primaryKey().defaultRandom(),
   free_shipping_threshold: integer().notNull().default(0),
   commission_rate: integer().notNull().default(10),
+  updated_at: timestamp().notNull().defaultNow(),
+});
+
+export const NoticeTarget = pgEnum(
+  "notice_target",
+  NOTICE_TARGETS.map((target) => target.value) as [string, ...string[]]
+);
+
+/**
+ * 공지사항 테이블(notices)
+ * id: 공지 id(pk)
+ * title: 제목
+ * content: 본문
+ * target: 노출 대상 — SELLER(kend-seller 판매자) / BUYER(kend 구매자 앱) / ALL(양쪽)
+ * is_visible: 노출여부 — kend `/myPage/notices`는 target IN (BUYER,ALL) AND is_visible=true인 것만 최신순으로 노출
+ * 수정(edit) 기능은 v1 스코프 제외 — 잘못 올리면 삭제 후 재등록
+ */
+export const notices = pgTable("notices", {
+  id: uuid().primaryKey().defaultRandom(),
+  title: text().notNull(),
+  content: text().notNull(),
+  target: NoticeTarget().notNull().default("ALL"),
+  is_visible: boolean().notNull().default(true),
+  created_at: timestamp().notNull().defaultNow(),
   updated_at: timestamp().notNull().defaultNow(),
 });
 

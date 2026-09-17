@@ -43,6 +43,38 @@ export const getDomains = async (client: SupabaseClient<Database>) => {
   return data;
 };
 
+// 관리자 화면용 — 노출여부 무관 전체 조회, 최신순
+export const getNotices = async (client: SupabaseClient<Database>) => {
+  const { data, error } = await client
+    .from("notices")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return data;
+};
+
+// 판매자 화면(대시보드·공지사항 목록)용 — 노출중 + 판매자 대상(SELLER/ALL)인 것만
+export const getVisibleNoticesForSeller = async (
+  client: SupabaseClient<Database>,
+  { limit }: { limit?: number } = {}
+) => {
+  let query = client
+    .from("notices")
+    .select("id, title, content, created_at")
+    .eq("is_visible", true)
+    .in("target", ["SELLER", "ALL"])
+    .order("created_at", { ascending: false });
+
+  if (limit) {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data;
+};
+
 export const getAllCommonCodes = async (client: SupabaseClient<Database>) => {
   const { data: groupData, error: groupError } = await client
     .from("common_code_group")
