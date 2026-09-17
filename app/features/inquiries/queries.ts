@@ -16,7 +16,19 @@ export interface InquiryListItem {
 export const getSellerInquiries = async (
   client: SupabaseClient,
   sellerId: string,
-  { status, category }: { status?: string; category?: string } = {}
+  {
+    status,
+    category,
+    periodStart,
+    periodEnd,
+    sort = "latest",
+  }: {
+    status?: string;
+    category?: string;
+    periodStart?: string;
+    periodEnd?: string;
+    sort?: "latest" | "pending_first";
+  } = {}
 ): Promise<InquiryListItem[]> => {
   let query = client
     .from("inquiries")
@@ -29,8 +41,7 @@ export const getSellerInquiries = async (
       )
     `
     )
-    .eq("order_items.orders.seller_id", sellerId)
-    .order("created_at", { ascending: false });
+    .eq("order_items.orders.seller_id", sellerId);
 
   if (status && status !== "ALL") {
     query = query.eq("status", status);
@@ -38,6 +49,22 @@ export const getSellerInquiries = async (
   if (category && category !== "ALL") {
     query = query.eq("category", category);
   }
+  if (periodStart) {
+    query = query.gte("created_at", periodStart);
+  }
+  if (periodEnd) {
+    const exclusiveEnd = new Date(periodEnd);
+    exclusiveEnd.setDate(exclusiveEnd.getDate() + 1);
+    query = query.lt("created_at", exclusiveEnd.toISOString());
+  }
+
+  // "답변대기 우선"은 status 내림차순으로 정렬한다 — 'pending'이 'answered'보다
+  // 사전순으로 뒤에 오는 우연에 기대는 게 아니라, 의도를 명확히 하려고 값을
+  // 그대로 비교한다('pending' > 'answered'라 내림차순 시 대기 건이 먼저 옴)
+  if (sort === "pending_first") {
+    query = query.order("status", { ascending: false });
+  }
+  query = query.order("created_at", { ascending: false });
 
   const { data, error } = await query;
   if (error) throw error;
