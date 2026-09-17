@@ -10,7 +10,7 @@ KEND-SELLER 판매자 관리자 웹의 주요 변경사항을 날짜별로 기�
 
 ## 2026-09-17
 
-### [KEND-SELLER] 공지사항(notices) 스키마 + 관리자 CRUD + 판매자 조회화면 신설 (Phase 3, B-5, 구현됨·테스트 대기)
+### [KEND-SELLER] 공지사항(notices) 스키마 + 관리자 CRUD + 판매자 조회화면 신설 (Phase 3, B-5)
 
 - **배경**: kend `/myPage/notices`가 정적 스텁("등록된 공지사항이 없습니다"만 표시)이라, 소유권 원칙(실제 read/write하는 앱이 스키마 소유)에 따라 kend-seller가 스키마+admin 등록 화면을 먼저 만들어야 kend이 조회 화면을 붙일 수 있는 상황 — kend 세션이 구체 스펙을 전달해줌
 - **`notices` 테이블 신설**: title/content/is_visible(boolean)/created_at/updated_at. `db:generate` → `db:migrate` → `db:typegen` 순서로 실제 DB 적용
@@ -18,7 +18,7 @@ KEND-SELLER 판매자 관리자 웹의 주요 변경사항을 날짜별로 기�
 - **관리자 화면**(`/system/notices`, `/submit`): 목록에 대상 배지·노출토글(체크박스, 클릭 즉시 반영)·삭제, 등록 화면에 대상 선택 드롭다운 추가. 수정 기능은 스펙대로 v1 제외(삭제 후 재등록)
 - **판매자 화면 신설**(`/seller/notices`): 노출중 + 대상이 SELLER/ALL인 공지만 아코디언으로 조회(제목 클릭 시 본문 펼침). 사이드바에 "공지사항" 단독 메뉴 추가, 대시보드 하단에 최신 공지 3건 카드도 추가
 - **kend과의 계약**: 테이블/컬럼명(`notices`, `is_visible`, `target`, `title`, `content`, `created_at`) 그대로 유지 — kend은 `is_visible=true AND target IN (BUYER,ALL)`로 최신순 조회하면 됨. RLS는 기존 마이그레이션 전체에 선례가 없어 이번에도 추가 안 함
-- typecheck 클린 + dev 서버 정상 기동 확인. 아직 실사용 화면 클릭 테스트 전 — 확인되면 Phase 3 잔여는 B-6(교환처리, 정책 미정) 한 건만 남음
+- 실사용 테스트 완료(사용자 확인) — 관리자 등록/노출토글/삭제, 판매자 조회화면·대시보드 카드까지 전부 확인. 이걸로 B-5 종료, Phase 3 잔여는 B-6(교환처리, 정책 미정) 한 건만 남음
 
 ### [KEND-SELLER] 문의 관리 화면 CS 운영기능 추가 (Phase 3, B-4, 구현됨·테스트 대기)
 
