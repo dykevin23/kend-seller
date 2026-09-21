@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import Content from "~/common/components/content";
 import Title from "~/common/components/title";
@@ -78,6 +79,15 @@ export default function InquiryListPage({ loaderData }: Route.ComponentProps) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // 날짜는 달력 내비게이션(이전달 등)만 눌러도 브라우저가 change를 쏘기 때문에
+  // 즉시 조회하지 않고 검색 버튼을 눌러야 반영되도록 대기시킨다
+  const [pendingPeriodStart, setPendingPeriodStart] = useState(periodStart);
+  const [pendingPeriodEnd, setPendingPeriodEnd] = useState(periodEnd);
+  useEffect(() => {
+    setPendingPeriodStart(periodStart);
+    setPendingPeriodEnd(periodEnd);
+  }, [periodStart, periodEnd]);
+
   const updateParam = (key: string, value: string) => {
     const next = new URLSearchParams(searchParams);
     if (!value || value === "ALL") {
@@ -91,6 +101,21 @@ export default function InquiryListPage({ loaderData }: Route.ComponentProps) {
   const handleStatusChange = (nextStatus: string) => updateParam("status", nextStatus);
   const handleCategoryChange = (nextCategory: string) =>
     updateParam("category", nextCategory);
+
+  const handlePeriodSearch = () => {
+    const next = new URLSearchParams(searchParams);
+    if (pendingPeriodStart) {
+      next.set("periodStart", pendingPeriodStart);
+    } else {
+      next.delete("periodStart");
+    }
+    if (pendingPeriodEnd) {
+      next.set("periodEnd", pendingPeriodEnd);
+    } else {
+      next.delete("periodEnd");
+    }
+    setSearchParams(next);
+  };
 
   const answeredCount = stats.totalCount - stats.unansweredCount;
   const responseRate =
@@ -141,16 +166,19 @@ export default function InquiryListPage({ loaderData }: Route.ComponentProps) {
           <Input
             type="date"
             className="w-36"
-            value={periodStart}
-            onChange={(e) => updateParam("periodStart", e.target.value)}
+            value={pendingPeriodStart}
+            onChange={(e) => setPendingPeriodStart(e.target.value)}
           />
           <span className="text-sm text-muted-foreground">~</span>
           <Input
             type="date"
             className="w-36"
-            value={periodEnd}
-            onChange={(e) => updateParam("periodEnd", e.target.value)}
+            value={pendingPeriodEnd}
+            onChange={(e) => setPendingPeriodEnd(e.target.value)}
           />
+          <Button type="button" size="sm" variant="outline" onClick={handlePeriodSearch}>
+            검색
+          </Button>
           <Select value={category} onValueChange={handleCategoryChange}>
             <SelectTrigger className="w-32">
               <SelectValue />
