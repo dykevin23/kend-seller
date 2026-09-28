@@ -56,13 +56,18 @@ Deno.serve(async (req) => {
       continue;
     }
 
-    const url = new URL("https://info.sweettracker.co.kr/api/v1/trackingInfo");
-    url.searchParams.set("t_key", sweettrackerKey);
-    url.searchParams.set("t_code", tCode);
-    url.searchParams.set("t_invoice", delivery.tracking_number!);
+    // 2026-10-30 14시부로 GET 방식 지원 종료 예정 → POST + form-urlencoded body로 전환
+    const params = new URLSearchParams();
+    params.set("t_key", sweettrackerKey);
+    params.set("t_code", tCode);
+    params.set("t_invoice", delivery.tracking_number!);
 
     try {
-      const res = await fetch(url.toString());
+      const res = await fetch("https://info.sweettracker.co.kr/api/v1/trackingInfo", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString(),
+      });
       const body: TrackingInfoResponse = await res.json();
 
       // 101/102/103/105: 키 자체 문제거나 요청 한도 초과 — 이번 실행 전체를 중단
