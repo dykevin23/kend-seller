@@ -25,14 +25,14 @@ export type Database = MergeDeep<
 
 export const browserClient = createBrowserClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY!
 );
 
 export const makeSSRClient = (request: Request) => {
   const headers = new Headers();
   const serverSideClient = createServerClient<Database>(
     process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {

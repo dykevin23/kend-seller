@@ -28,11 +28,28 @@ interface TrackingInfoResponse {
 // 배송중 상태가 이 기간을 넘겨도 안 끝나면 판매자 수동확인이 필요하다고 본다
 const STALLED_IN_TRANSIT_DAYS = 7;
 
+// SUPABASE_SECRET_KEYS: 런타임이 주입하는 { 키이름: 키값 } JSON (새 API 키 방식)
+const getSecretKeys = (): string[] => {
+  try {
+    return Object.values(
+      JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}")
+    ) as string[];
+  } catch {
+    return [];
+  }
+};
+
 Deno.serve(async (req) => {
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-  );
+  // pg_cron(Vault의 secret_key)만 호출한다 — apikey 헤더가 이 프로젝트의 secret 키여야 함
+  // (verify_jwt=false — supabase/config.toml. 새 키는 JWT가 아니라 코드에서 직접 검사)
+  const apiKey = req.headers.get("apikey");
+  if (!apiKey || !getSecretKeys().includes(apiKey)) {
+    return new Response(JSON.stringify({ error: "unauthorized" }), {
+      status: 401,
+    });
+  }
+
+  const supabase = createClient(Deno.env.get("SUPABASE_URL")!, apiKey);
   const sweettrackerKey = Deno.env.get("SWEETTRACKER_API_KEY")!;
 
   const { data: deliveries, error } = await supabase

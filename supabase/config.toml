@@ -306,3 +306,7 @@ s3_region = "env(S3_REGION)"
 s3_access_key = "env(S3_ACCESS_KEY)"
 # Configures AWS_SECRET_ACCESS_KEY for S3 bucket
 s3_secret_key = "env(S3_SECRET_KEY)"
+
+# 새 API 키(sb_secret_…)는 JWT가 아니므로 게이트웨이 JWT 검사를 끄고, 함수 코드에서 apikey를 직접 검사한다
+[functions.sync-tracking]
+verify_jwt = false
