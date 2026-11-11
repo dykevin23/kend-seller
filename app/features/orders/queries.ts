@@ -1,5 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { isStalledInTransit } from "./constrants";
+import {
+  addKstDays,
+  kstDayStartIso,
+  toKstDateKey,
+} from "~/common/utils/kst-date";
 
 // 판매자에게 숨겨야 하는 order_group 상태 — 결제 자체가 안 된 "유령 주문"만 제외.
 // paid 이후 상태(취소/환불 포함)는 판매자가 계속 볼 수 있어야 하므로 화이트리스트가 아닌
@@ -461,21 +466,18 @@ export const getSellerSalesOverview = async (
   sellerId: string,
   { trendDays = 14 }: { trendDays?: number } = {}
 ): Promise<SalesOverview> => {
-  const now = new Date();
-  const monthStartDate = new Date(now.getFullYear(), now.getMonth(), 1);
-  const trendStartDate = new Date(now);
-  trendStartDate.setDate(trendStartDate.getDate() - (trendDays - 1));
-  trendStartDate.setHours(0, 0, 0, 0);
-  const rangeStart = monthStartDate < trendStartDate ? monthStartDate : trendStartDate;
-  const monthStartIso = monthStartDate.toISOString();
-  const todayKey = now.toISOString().slice(0, 10);
+  // 날짜 경계는 모두 한국 시간 기준 (서버는 UTC) — "오늘"=KST 0~24시, "이번 달"=KST 1일 0시~
+  const todayKey = toKstDateKey(new Date());
+  const monthStartKey = `${todayKey.slice(0, 7)}-01`;
+  const trendStartKey = addKstDays(todayKey, -(trendDays - 1));
+  const rangeStartKey = monthStartKey < trendStartKey ? monthStartKey : trendStartKey;
 
   const { data, error } = await client
     .from("orders")
     .select("total_amount, created_at, order_groups!inner ( status )")
     .eq("seller_id", sellerId)
     .neq("status", "cancelled")
-    .gte("created_at", rangeStart.toISOString())
+    .gte("created_at", kstDayStartIso(rangeStartKey))
     .not(
       "order_groups.status",
       "in",
@@ -486,9 +488,7 @@ export const getSellerSalesOverview = async (
 
   const trendMap = new Map<string, DailySales>();
   for (let i = 0; i < trendDays; i++) {
-    const d = new Date(trendStartDate);
-    d.setDate(d.getDate() + i);
-    const key = d.toISOString().slice(0, 10);
+    const key = addKstDays(trendStartKey, i);
     trendMap.set(key, { date: key, sales: 0, orders: 0 });
   }
 
@@ -498,10 +498,10 @@ export const getSellerSalesOverview = async (
   let monthOrders = 0;
 
   for (const row of data || []) {
-    const dateKey = row.created_at.slice(0, 10);
+    const dateKey = toKstDateKey(row.created_at);
     const amount = row.total_amount;
 
-    if (row.created_at >= monthStartIso) {
+    if (dateKey >= monthStartKey) {
       monthSales += amount;
       monthOrders += 1;
     }
@@ -530,15 +530,13 @@ export const getPlatformSalesTrend = async (
   client: SupabaseClient,
   { trendDays = 14 }: { trendDays?: number } = {}
 ): Promise<DailySales[]> => {
-  const trendStartDate = new Date();
-  trendStartDate.setDate(trendStartDate.getDate() - (trendDays - 1));
-  trendStartDate.setHours(0, 0, 0, 0);
+  const trendStartKey = addKstDays(toKstDateKey(new Date()), -(trendDays - 1));
 
   const { data, error } = await client
     .from("orders")
     .select("total_amount, created_at, order_groups!inner ( status )")
     .neq("status", "cancelled")
-    .gte("created_at", trendStartDate.toISOString())
+    .gte("created_at", kstDayStartIso(trendStartKey))
     .not(
       "order_groups.status",
       "in",
@@ -549,14 +547,12 @@ export const getPlatformSalesTrend = async (
 
   const trendMap = new Map<string, DailySales>();
   for (let i = 0; i < trendDays; i++) {
-    const d = new Date(trendStartDate);
-    d.setDate(d.getDate() + i);
-    const key = d.toISOString().slice(0, 10);
+    const key = addKstDays(trendStartKey, i);
     trendMap.set(key, { date: key, sales: 0, orders: 0 });
   }
 
   for (const row of data || []) {
-    const dateKey = row.created_at.slice(0, 10);
+    const dateKey = toKstDateKey(row.created_at);
     const trendEntry = trendMap.get(dateKey);
     if (trendEntry) {
       trendEntry.sales += row.total_amount;
