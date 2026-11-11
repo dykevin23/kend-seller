@@ -21,7 +21,7 @@ import {
   StatItem,
   SalesTrendCard,
 } from "../components/stat-widgets";
-import { formatNumber } from "~/common/utils/format";
+import { formatNumber, formatKstDate } from "~/common/utils/format";
 import type { Route } from "./+types/home-page";
 import { makeSSRClient } from "~/supa-client";
 import { getUserById } from "~/features/users/queries";
@@ -360,7 +360,7 @@ function NoticesCard({
           >
             <span className="truncate">{notice.title}</span>
             <span className="shrink-0 text-xs text-muted-foreground">
-              {notice.created_at.slice(0, 10)}
+              {formatKstDate(notice.created_at)}
             </span>
           </Link>
         ))}

@@ -16,7 +16,7 @@ import {
 } from "~/common/components/ui/select";
 import { useAlert } from "~/hooks/useAlert";
 import { cn } from "~/lib/utils";
-import { formatNumber } from "~/common/utils/format";
+import { formatNumber, formatKstDate } from "~/common/utils/format";
 import type { Route } from "./+types/review-list-page";
 import { makeSSRClient } from "~/supa-client";
 import {
@@ -318,7 +318,7 @@ function ReviewCard({ review }: { review: ReviewListItem }) {
           <div className="flex items-center gap-2">
             <span className="font-medium">{review.reviewer_nickname}</span>
             <span className="text-xs text-muted-foreground">
-              {review.created_at.slice(0, 10)}
+              {formatKstDate(review.created_at)}
             </span>
           </div>
           <StarRow rating={review.rating} />
@@ -347,7 +347,7 @@ function ReviewCard({ review }: { review: ReviewListItem }) {
         <div className="mt-3 rounded-md bg-muted/30 p-3">
           <div className="flex items-center justify-between">
             <p className="text-xs font-medium text-muted-foreground">
-              판매자 답변 · {review.seller_replied_at?.slice(0, 10)}
+              판매자 답변 · {review.seller_replied_at ? formatKstDate(review.seller_replied_at) : ""}
             </p>
             <div className="flex gap-1">
               <Button

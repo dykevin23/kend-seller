@@ -23,6 +23,7 @@ import { INQUIRY_CATEGORY_LABELS, INQUIRY_STATUS_LABELS } from "../constrants";
 import type { Route } from "./+types/admin-inquiry-list-page";
 import { makeSSRClient } from "~/supa-client";
 import { getAdminGeneralInquiries } from "../queries";
+import { formatKstDate } from "~/common/utils/format";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client } = makeSSRClient(request);
@@ -123,7 +124,7 @@ export default function AdminInquiryListPage({
                   onClick={() => navigate(`/system/inquiries/${item.id}`)}
                 >
                   <TableCell className="py-3">
-                    {item.created_at.slice(0, 10)}
+                    {formatKstDate(item.created_at)}
                   </TableCell>
                   <TableCell className="py-3">
                     {INQUIRY_CATEGORY_LABELS[item.category] ?? item.category}

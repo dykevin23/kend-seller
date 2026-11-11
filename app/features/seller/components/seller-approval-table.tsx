@@ -23,6 +23,7 @@ import {
 } from "~/common/components/ui/dialog";
 import { useAlert } from "~/hooks/useAlert";
 import { SELLER_STATUS } from "../constrants";
+import { formatKstDate } from "~/common/utils/format";
 
 interface Seller {
   id: string;
@@ -123,7 +124,7 @@ export default function SellerApprovalTable({
                   </p>
                 )}
               </TableCell>
-              <TableCell>{seller.created_at.slice(0, 10)}</TableCell>
+              <TableCell>{formatKstDate(seller.created_at)}</TableCell>
               <TableCell>
                 {seller.status === "PENDING" && (
                   <div className="flex gap-2">

@@ -25,7 +25,7 @@ import {
   INQUIRY_CATEGORY_LABELS,
   INQUIRY_STATUS_LABELS,
 } from "../constrants";
-import { formatNumber } from "~/common/utils/format";
+import { formatNumber, formatKstDate } from "~/common/utils/format";
 import type { Route } from "./+types/inquiry-list-page";
 import { makeSSRClient } from "~/supa-client";
 import { getSellerInquiries, getSellerInquiryStats } from "../queries";
@@ -225,7 +225,7 @@ export default function InquiryListPage({ loaderData }: Route.ComponentProps) {
                   onClick={() => navigate(`/orders/inquiries/${item.id}`)}
                 >
                   <TableCell className="py-3">
-                    {item.created_at.slice(0, 10)}
+                    {formatKstDate(item.created_at)}
                   </TableCell>
                   <TableCell className="py-3">
                     {INQUIRY_CATEGORY_LABELS[item.category] ?? item.category}

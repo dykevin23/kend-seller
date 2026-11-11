@@ -313,9 +313,9 @@ export default function OrderDetailPage({
               <Separator />
               <InfoRow
                 label="마지막 확인"
-                value={new Date(order.delivery.tracking_synced_at).toLocaleString(
-                  "ko-KR"
-                )}
+                value={new Date(order.delivery.tracking_synced_at).toLocaleString("ko-KR", {
+                  timeZone: "Asia/Seoul",
+                })}
               />
             </>
           )}

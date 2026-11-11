@@ -35,6 +35,7 @@ import {
   finalizeReturnApproval,
 } from "../mutations";
 import { getSellerInfo } from "~/features/seller/queries";
+import { formatKstDate } from "~/common/utils/format";
 
 export const action = async ({ request }: Route.ActionArgs) => {
   const { client } = makeSSRClient(request);
@@ -177,7 +178,7 @@ export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
                 if (tab === "completed") {
                   return (
                     <TableRow key={item.id}>
-                      <TableCell>{item.updated_at.slice(0, 10)}</TableCell>
+                      <TableCell>{formatKstDate(item.updated_at)}</TableCell>
                       <TableCell>{item.order_number}</TableCell>
                       <TableCell>
                         {item.product_name} ({item.sku_code}) x {item.quantity}
@@ -197,7 +198,7 @@ export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
                       <TableCell className="text-center">
                         {item.refunded_at ? (
                           <span className="text-xs text-muted-foreground">
-                            환불 완료 ({item.refunded_at.slice(0, 10)})
+                            환불 완료 ({formatKstDate(item.refunded_at)})
                           </span>
                         ) : (
                           <span className="text-xs text-warning">환불 처리 중</span>
@@ -209,7 +210,7 @@ export default function ReturnListPage({ loaderData }: Route.ComponentProps) {
 
                 return (
                   <TableRow key={item.id}>
-                    <TableCell>{item.updated_at.slice(0, 10)}</TableCell>
+                    <TableCell>{formatKstDate(item.updated_at)}</TableCell>
                     <TableCell>{item.order_number}</TableCell>
                     <TableCell>
                       {item.product_name} ({item.sku_code}) x {item.quantity}

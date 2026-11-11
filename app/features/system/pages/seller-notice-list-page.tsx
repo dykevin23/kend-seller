@@ -6,6 +6,7 @@ import Card from "~/common/components/card";
 import type { Route } from "./+types/seller-notice-list-page";
 import { makeSSRClient } from "~/supa-client";
 import { getVisibleNoticesForSeller } from "../queries";
+import { formatKstDate } from "~/common/utils/format";
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const { client } = makeSSRClient(request);
@@ -65,7 +66,7 @@ function NoticeRow({
         <div className="min-w-0">
           <p className="truncate font-medium">{title}</p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {createdAt.slice(0, 10)}
+            {formatKstDate(createdAt)}
           </p>
         </div>
         <ChevronDown

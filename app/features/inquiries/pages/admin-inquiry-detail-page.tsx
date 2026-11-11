@@ -14,6 +14,7 @@ import type { Route } from "./+types/admin-inquiry-detail-page";
 import { makeSSRClient } from "~/supa-client";
 import { getAdminInquiryDetail } from "../queries";
 import { answerAdminInquiry } from "../mutations";
+import { formatKstDate } from "~/common/utils/format";
 
 export const action = async ({ request, params }: Route.ActionArgs) => {
   const { client } = makeSSRClient(request);
@@ -119,7 +120,7 @@ export default function AdminInquiryDetailPage({
           <Separator />
           <InfoRow label="작성자" value={inquiry.writer_nickname} />
           <Separator />
-          <InfoRow label="접수일" value={inquiry.created_at.slice(0, 10)} />
+          <InfoRow label="접수일" value={formatKstDate(inquiry.created_at)} />
         </div>
       </Card>
 
@@ -143,7 +144,7 @@ export default function AdminInquiryDetailPage({
         />
         {inquiry.answered_at && (
           <p className="mt-1 text-xs text-muted-foreground">
-            답변일: {inquiry.answered_at.slice(0, 10)}
+            답변일: {formatKstDate(inquiry.answered_at)}
           </p>
         )}
         {fetcher.data?.error && (

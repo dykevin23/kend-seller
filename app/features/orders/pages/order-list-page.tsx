@@ -30,7 +30,7 @@ import {
   ORDER_STATUS_ACTIONS,
   ORDER_STATUS_BADGE_VARIANT,
 } from "../constrants";
-import { formatNumber } from "~/common/utils/format";
+import { formatNumber, formatKstDate } from "~/common/utils/format";
 import type { Route } from "./+types/order-list-page";
 import { makeSSRClient } from "~/supa-client";
 import {
@@ -359,7 +359,7 @@ export default function OrderListPage({ loaderData }: Route.ComponentProps) {
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      {order.created_at.slice(0, 10)}
+                      {formatKstDate(order.created_at)}
                     </TableCell>
                   </TableRow>
                 ))

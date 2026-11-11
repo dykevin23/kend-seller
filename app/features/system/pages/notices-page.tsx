@@ -19,6 +19,7 @@ import type { Route } from "./+types/notices-page";
 import { makeSSRClient } from "~/supa-client";
 import { getNotices } from "../queries";
 import { updateNoticeVisibility, deleteNotice } from "../mutations";
+import { formatKstDate } from "~/common/utils/format";
 
 export const action = async ({ request }: Route.ActionArgs) => {
   const { client } = makeSSRClient(request);
@@ -111,7 +112,7 @@ export default function NoticesPage({ loaderData }: Route.ComponentProps) {
                     </Badge>
                   </TableCell>
                   <TableCell className="py-3">
-                    {notice.created_at.slice(0, 10)}
+                    {formatKstDate(notice.created_at)}
                   </TableCell>
                   <TableCell className="py-3 text-center">
                     <div className="flex items-center justify-center gap-2">

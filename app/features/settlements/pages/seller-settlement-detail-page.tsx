@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/common/components/ui/table";
-import { formatNumber } from "~/common/utils/format";
+import { formatNumber, formatKstDate } from "~/common/utils/format";
 import { SETTLEMENT_STATUS_LABELS } from "../constrants";
 import type { Route } from "./+types/seller-settlement-detail-page";
 import { makeSSRClient } from "~/supa-client";
@@ -85,7 +85,7 @@ export default function SellerSettlementDetailPage({
         <div className="mt-3">
           <InfoRow
             label="정산기간"
-            value={`${settlement.period_start.slice(0, 10)} ~ ${settlement.period_end.slice(0, 10)}`}
+            value={`${formatKstDate(settlement.period_start)} ~ ${formatKstDate(settlement.period_end)}`}
           />
           <Separator />
           <InfoRow
@@ -112,7 +112,7 @@ export default function SellerSettlementDetailPage({
           {settlement.paid_at && (
             <>
               <Separator />
-              <InfoRow label="지급일" value={settlement.paid_at.slice(0, 10)} />
+              <InfoRow label="지급일" value={formatKstDate(settlement.paid_at)} />
             </>
           )}
         </div>
@@ -173,7 +173,7 @@ export default function SellerSettlementDetailPage({
                     {item.shipping_fee_bearer === "PLATFORM" ? "플랫폼" : "판매자"}
                   </TableCell>
                   <TableCell className="py-3">
-                    {item.purchase_confirmed_at?.slice(0, 10) ?? "-"}
+                    {(item.purchase_confirmed_at ? formatKstDate(item.purchase_confirmed_at) : "-")}
                   </TableCell>
                 </TableRow>
               ))
