@@ -29,16 +29,16 @@ export const settlement_items = pgTable(
     seller_id: uuid()
       .references(() => sellers.id)
       .notNull(),
-    period_start: timestamp().notNull(),
-    period_end: timestamp().notNull(),
+    period_start: timestamp({ withTimezone: true }).notNull(),
+    period_end: timestamp({ withTimezone: true }).notNull(),
     total_sales_amount: integer().notNull(),
     shipping_reimbursement: integer().notNull().default(0),
     commission_rate: integer().notNull(),
     commission_amount: integer().notNull(),
     settlement_amount: integer().notNull(),
     status: SettlementStatus().notNull().default("pending"),
-    paid_at: timestamp(),
-    created_at: timestamp().notNull().defaultNow(),
+    paid_at: timestamp({ withTimezone: true }),
+    created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [unique().on(table.seller_id, table.period_start)]
 );

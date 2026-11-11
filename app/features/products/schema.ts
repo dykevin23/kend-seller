@@ -60,8 +60,8 @@ export const products = pgTable("products", {
     onDelete: "cascade",
   }),
   status: SalesStatus().notNull().default("REGISTERED"),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 export const product_detail = pgTable("product_details", {
@@ -71,8 +71,8 @@ export const product_detail = pgTable("product_details", {
   }),
   brand: text(),
   maker: text().notNull(),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 export const stockKeepings = pgTable("product_stock_keepings", {
@@ -86,8 +86,8 @@ export const stockKeepings = pgTable("product_stock_keepings", {
   regular_price: integer().default(0),
   sale_price: integer().default(0),
   status: SalesStatus().notNull().default("PREPARE"),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 export const product_options = pgTable("product_options", {
@@ -99,8 +99,8 @@ export const product_options = pgTable("product_options", {
     .references(() => system_options.id)
     .notNull(),
   option: text().notNull(),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 export const ImageType = pgEnum(
@@ -118,8 +118,8 @@ export const product_images = pgTable("product_images", {
   }),
   type: ImageType().notNull().default("MAIN"),
   url: text().notNull(),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 export const DescriptionType = pgEnum(
@@ -134,8 +134,8 @@ export const product_descriptions = pgTable("product_descriptions", {
   }),
   type: DescriptionType().notNull().default("IMAGE"),
   content: text(),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 // 제주/도서산간 배송여부
@@ -187,8 +187,8 @@ export const product_deliveries = pgTable("product_deliveries", {
   free_shipping_condition: integer().default(0),
   shipping_days: integer().notNull().default(1),
   courier_company: CourierCompany().notNull().default("CJ"),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 // 상품 반품/교환 정보
@@ -204,6 +204,6 @@ export const product_returns = pgTable("product_returns", {
     .notNull(),
   initial_shipping_fee: integer().notNull().default(0),
   return_shipping_fee: integer().notNull().default(0),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });

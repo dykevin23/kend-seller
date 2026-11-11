@@ -21,8 +21,8 @@ export const domains = pgTable("domains", {
   code: text().notNull().unique(),
   name: text().notNull(),
   use_yn: text().notNull(),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 export const main_categories = pgTable("main_categories", {
@@ -32,8 +32,8 @@ export const main_categories = pgTable("main_categories", {
     .notNull(),
   code: text().notNull().unique(),
   name: text().notNull(),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 export const sub_categories = pgTable("sub_categories", {
@@ -43,8 +43,8 @@ export const sub_categories = pgTable("sub_categories", {
     .notNull(),
   code: text().notNull(),
   name: text().notNull(),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 export const system_options = pgTable("system_options", {
@@ -54,16 +54,16 @@ export const system_options = pgTable("system_options", {
     .notNull(),
   code: text().notNull().unique(),
   name: text().notNull(),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 export const common_code_group = pgTable("common_code_group", {
   id: uuid().primaryKey().defaultRandom(),
   code: text().notNull().unique(),
   name: text().notNull(),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 export const common_codes = pgTable("common_codes", {
@@ -74,8 +74,8 @@ export const common_codes = pgTable("common_codes", {
   code: text().notNull().unique(),
   name: text().notNull(),
   use_yn: text().notNull().default("Y"),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 /**
@@ -89,7 +89,7 @@ export const platform_settings = pgTable("platform_settings", {
   id: uuid().primaryKey().defaultRandom(),
   free_shipping_threshold: integer().notNull().default(0),
   commission_rate: integer().notNull().default(10),
-  updated_at: timestamp().notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 export const NoticeTarget = pgEnum(
@@ -112,8 +112,8 @@ export const notices = pgTable("notices", {
   content: text().notNull(),
   target: NoticeTarget().notNull().default("ALL"),
   is_visible: boolean().notNull().default(true),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 /**
@@ -124,6 +124,6 @@ export const notices = pgTable("notices", {
 export const hashtags = pgTable("hashtags", {
   id: uuid().primaryKey().defaultRandom(),
   name: text().notNull().unique(),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });

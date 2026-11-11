@@ -51,8 +51,8 @@ export const sellers = pgTable("admin_sellers", {
   account_holder_name: text(),
   status: SellerStatus().notNull().default("PENDING"),
   rejection_reason: text(),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 export const seller_members = pgTable("admin_seller_members", {
@@ -63,8 +63,8 @@ export const seller_members = pgTable("admin_seller_members", {
   user_id: uuid().references(() => profiles.profile_id, {
     onDelete: "cascade",
   }),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 export const AdminAddressType = pgEnum(
@@ -92,8 +92,8 @@ export const sellers_address = pgTable("admin_seller_address", {
   address: text().notNull(),
   address_detail: text().notNull(),
   address_type: AdminAddressType().notNull(),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
 
 /**
@@ -111,8 +111,8 @@ export const seller_hashtags = pgTable(
     hashtag_id: uuid()
       .references(() => hashtags.id, { onDelete: "cascade" })
       .notNull(),
-    created_at: timestamp().notNull().defaultNow(),
-    updated_at: timestamp().notNull().defaultNow(),
+    created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [unique().on(table.seller_id, table.hashtag_id)]
 );
@@ -135,6 +135,6 @@ export const seller_banners = pgTable("seller_banners", {
   image_url: text().notNull(),
   display_order: integer().notNull().default(0),
   is_active: boolean().notNull().default(true),
-  created_at: timestamp().notNull().defaultNow(),
-  updated_at: timestamp().notNull().defaultNow(),
+  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 });
